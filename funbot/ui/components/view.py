@@ -55,18 +55,18 @@ class View(discord.ui.View):
     async def on_timeout(self) -> None:
         """Handle view timeout by disabling all non-URL buttons."""
         # Check if all buttons are URL buttons (which don't need disabling)
-        all_url_buttons = all(
-            isinstance(item, discord.ui.Button) and item.url is not None
-            for item in self.children
-            if isinstance(item, discord.ui.Button)
-        )
+        has_non_url_buttons = False
+        for item in self.children:
+            if isinstance(item, discord.ui.Button) and item.url is None:
+                has_non_url_buttons = True
+                break
 
-        if self.message is not None and not all_url_buttons:
+        if self.message is not None and has_non_url_buttons:
             self.disable_items()
             with contextlib.suppress(discord.HTTPException):
                 await self.message.edit(view=self)
 
-        if self.message is None and not all_url_buttons:
+        if self.message is None and has_non_url_buttons:
             logger.warning(f"View {self!r} timed out without a set message")
 
     async def on_error(
@@ -79,8 +79,9 @@ class View(discord.ui.View):
 
         # Try to unset loading state if applicable
         with contextlib.suppress(Exception):
-            if hasattr(item, "unset_loading_state"):
-                await item.unset_loading_state(interaction)  # type: ignore
+            unset_fn = getattr(item, "unset_loading_state", None)
+            if unset_fn is not None:
+                await unset_fn(interaction)
             await self.absolute_edit(interaction, view=self)
 
         await self.absolute_send(interaction, embed=embed, ephemeral=True)
@@ -105,8 +106,9 @@ class View(discord.ui.View):
         for child in self.children:
             if isinstance(child, discord.ui.Button | discord.ui.Select):
                 # Store original state
-                if child.custom_id is not None:
-                    self.item_states[child.custom_id] = child.disabled
+                custom_id = getattr(child, "custom_id", None)
+                if custom_id is not None:
+                    self.item_states[custom_id] = child.disabled
 
                 # Skip URL buttons
                 if isinstance(child, discord.ui.Button) and child.url:
@@ -123,15 +125,17 @@ class View(discord.ui.View):
                     continue
 
                 # Restore original state
-                if child.custom_id is not None:
-                    child.disabled = self.item_states.get(child.custom_id, False)
+                custom_id = getattr(child, "custom_id", None)
+                if custom_id is not None:
+                    child.disabled = self.item_states.get(custom_id, False)
                 else:
                     child.disabled = False
 
     def get_item(self, custom_id: str) -> discord.ui.Item[Any] | None:
         """Get an item by its custom_id."""
         for item in self.children:
-            if hasattr(item, "custom_id") and item.custom_id == custom_id:
+            item_custom_id = getattr(item, "custom_id", None)
+            if item_custom_id == custom_id:
                 return item
         return None
 

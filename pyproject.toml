@@ -49,7 +49,9 @@ addopts = "-v --tb=short"
 [tool.pyright]
 pythonVersion = "3.12"
 typeCheckingMode = "standard"
-include = ["funbot", "tests"]
+venvPath = "."
+venv = ".venv"
+include = ["funbot"]
 exclude = [
     "**/node_modules",
     "**/__pycache__",

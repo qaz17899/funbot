@@ -25,7 +25,7 @@ async def main() -> None:
     redis = None
     if CONFIG.redis_url:
         try:
-            from redis.asyncio import Redis
+            from redis.asyncio import Redis  # noqa: PLC0415
 
             redis = Redis.from_url(CONFIG.redis_url)
             logger.info("Redis connection initialized")

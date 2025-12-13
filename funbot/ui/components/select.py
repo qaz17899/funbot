@@ -15,15 +15,17 @@ if TYPE_CHECKING:
 __all__ = ("Select", "SelectOption")
 
 
-class SelectOption(discord.SelectOption):
-    """Enhanced SelectOption - same as discord.py version but can be extended."""
+# Re-export discord's SelectOption - don't subclass to avoid type issues
+SelectOption = discord.SelectOption
 
 
-class Select[V_co: View](discord.ui.Select):
+class Select[V_co: View](discord.ui.Select[V_co]):
     """Enhanced Select with loading state support.
 
     Type parameter V_co allows type-safe access to self.view.
     """
+
+    view: V_co  # Type hint to help pyright understand view is set
 
     def __init__(
         self,
@@ -32,13 +34,13 @@ class Select[V_co: View](discord.ui.Select):
         placeholder: str | None = None,
         min_values: int = 1,
         max_values: int = 1,
-        options: list[SelectOption],
+        options: list[discord.SelectOption],
         disabled: bool = False,
         row: int | None = None,
     ) -> None:
         # Handle empty options
         if not options:
-            options = [SelectOption(label="No options", value="0")]
+            options = [discord.SelectOption(label="No options", value="0")]
             disabled = True
 
         super().__init__(
@@ -46,23 +48,23 @@ class Select[V_co: View](discord.ui.Select):
             placeholder=placeholder,
             min_values=min_values,
             max_values=max_values,
-            options=options,  # type: ignore
+            options=options,
             disabled=disabled,
             row=row,
         )
 
         # Store original state for loading state management
         self.original_placeholder: str | None = None
-        self.original_options: list[SelectOption] | None = None
+        self.original_options: list[discord.SelectOption] | None = None
         self.original_disabled: bool | None = None
         self.original_max_values: int | None = None
         self.original_min_values: int | None = None
 
-        self.view: V_co
-
     async def set_loading_state(self, interaction: Interaction) -> None:
         """Set the select to a loading state."""
-        self.original_options = list(self.options)  # type: ignore
+        assert self.view is not None  # View is always set when callback runs
+
+        self.original_options = list(self.options)
         self.original_disabled = self.disabled
         self.original_placeholder = self.placeholder[:] if self.placeholder else None
         self.original_max_values = self.max_values
@@ -70,7 +72,9 @@ class Select[V_co: View](discord.ui.Select):
 
         self.view.disable_items()
 
-        self.options = [SelectOption(label="Loading...", value="loading", default=True, emoji="⏳")]  # type: ignore
+        self.options = [
+            discord.SelectOption(label="Loading...", value="loading", default=True, emoji="⏳")
+        ]
         self.disabled = True
         self.max_values = 1
         self.min_values = 1
@@ -79,6 +83,8 @@ class Select[V_co: View](discord.ui.Select):
 
     async def unset_loading_state(self, interaction: Interaction, **kwargs) -> None:
         """Restore the select from loading state."""
+        assert self.view is not None  # View is always set when callback runs
+
         if (
             self.original_options is None
             or self.original_disabled is None
@@ -90,7 +96,7 @@ class Select[V_co: View](discord.ui.Select):
 
         self.view.enable_items()
 
-        self.options = self.original_options  # type: ignore
+        self.options = self.original_options
         self.disabled = self.original_disabled
         self.placeholder = self.original_placeholder
         self.max_values = self.original_max_values
