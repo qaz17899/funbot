@@ -87,13 +87,13 @@ class CachedModel(BaseModel):
                     retry_on_timeout=True,
                     socket_keepalive=True,
                 )
-            except Exception as e:
+            except redis.RedisError as e:
                 logger.error(f"Failed to create Redis connection pool: {e}")
                 return None
 
         try:
             return redis.Redis(connection_pool=cls._redis_pool)
-        except Exception as e:
+        except redis.RedisError as e:
             logger.error(f"Failed to get Redis connection: {e}")
             return None
 
@@ -131,8 +131,8 @@ class CachedModel(BaseModel):
             serialized_data = self.serialize()
             json_data = orjson.dumps(serialized_data).decode("utf-8")
             await redis_conn.setex(cache_key, self._cache_ttl, json_data)
-        except Exception:
-            logger.exception(f"Failed to cache {self.__class__.__name__} instance")
+        except (redis.RedisError, TypeError) as e:
+            logger.error(f"Failed to cache {self.__class__.__name__} instance: {e}")
         finally:
             await redis_conn.aclose()
 
@@ -146,8 +146,8 @@ class CachedModel(BaseModel):
             kwargs = {pk: getattr(self, pk) for pk in self._pks}
             cache_key = self._get_cache_key(**kwargs)
             await redis_conn.delete(cache_key)
-        except Exception:
-            logger.exception(f"Failed to delete cache for {self.__class__.__name__}")
+        except redis.RedisError as e:
+            logger.error(f"Failed to delete cache for {self.__class__.__name__}: {e}")
         finally:
             await redis_conn.aclose()
 
@@ -166,8 +166,8 @@ class CachedModel(BaseModel):
                 return None
 
             return orjson.loads(cached_data)  # type: ignore[arg-type]
-        except Exception:
-            logger.exception(f"Failed to get cache for {cls.__name__}")
+        except (redis.RedisError, orjson.JSONDecodeError) as e:
+            logger.error(f"Failed to get cache for {cls.__name__}: {e}")
             return None
         finally:
             await redis_conn.aclose()

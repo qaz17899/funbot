@@ -9,14 +9,16 @@ from __future__ import annotations
 
 import io
 import os
-from concurrent.futures import ThreadPoolExecutor
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import orjson
-import redis
+import redis.asyncio as redis
 from loguru import logger
 
 from funbot.config import CONFIG
+
+if TYPE_CHECKING:
+    from PIL import Image  # pyright: ignore[reportMissingImports]
 
 __all__ = ("OrjsonSerializer", "RedisImageCache", "image_cache")
 
@@ -44,26 +46,25 @@ class OrjsonSerializer:
 
 
 class RedisImageCache:
-    """Redis cache for PIL images.
+    """Async Redis cache for PIL images.
 
     Caches generated images in Redis to avoid regenerating them.
-    Uses a background executor for non-blocking cache writes.
 
     Usage:
         from funbot.cache import image_cache
 
-        # Get cached image
+        # Get cached image (async)
         if image_cache:
-            cached = image_cache.get("my_key")
+            cached = await image_cache.get("my_key")
             if cached:
                 return cached
 
         # Generate image...
         image = generate_image()
 
-        # Cache in background
+        # Cache (async)
         if image_cache:
-            image_cache.set_background("my_key", image)
+            await image_cache.set("my_key", image)
     """
 
     def __init__(self, redis_url: str) -> None:
@@ -74,7 +75,6 @@ class RedisImageCache:
         """
         self._redis_url = redis_url
         self._redis: redis.ConnectionPool | None = None
-        self._bg_executor: ThreadPoolExecutor | None = None
 
     @property
     def redis(self) -> redis.ConnectionPool:
@@ -84,39 +84,23 @@ class RedisImageCache:
             raise RuntimeError(msg)
         return self._redis
 
-    @property
-    def bg_executor(self) -> ThreadPoolExecutor:
-        """Get the background thread executor."""
-        if self._bg_executor is None:
-            msg = "Background executor is not initialized. Call connect() first."
-            raise RuntimeError(msg)
-        return self._bg_executor
-
-    def set(self, key: str, image: Any) -> None:
-        """Cache an image synchronously.
+    async def set(self, key: str, image: Image.Image) -> None:
+        """Cache an image asynchronously.
 
         Args:
             key: Cache key.
             image: PIL Image to cache.
         """
         try:
-            with redis.Redis(connection_pool=self.redis) as r, io.BytesIO() as output:
-                image.save(output, format="PNG")
-                r.setex(key, IMAGE_CACHE_TTL, output.getvalue())
+            async with redis.Redis(connection_pool=self.redis) as r:
+                with io.BytesIO() as output:
+                    image.save(output, format="PNG")
+                    await r.setex(key, IMAGE_CACHE_TTL, output.getvalue())
         except redis.RedisError as e:
             logger.error(f"Redis error while setting image {key}: {e}")
 
-    def set_background(self, key: str, image: Any) -> None:
-        """Cache an image asynchronously in background.
-
-        Args:
-            key: Cache key.
-            image: PIL Image to cache (will be copied).
-        """
-        self.bg_executor.submit(self.set, key, image.copy())
-
-    def get(self, key: str) -> Any:
-        """Get a cached image.
+    async def get(self, key: str) -> Image.Image | None:
+        """Get a cached image asynchronously.
 
         Args:
             key: Cache key.
@@ -125,8 +109,8 @@ class RedisImageCache:
             The cached PIL Image, or None if not found.
         """
         try:
-            with redis.Redis(connection_pool=self.redis) as r:
-                image_data = r.get(key)
+            async with redis.Redis(connection_pool=self.redis) as r:
+                image_data = await r.get(key)
                 if image_data is None:
                     return None
         except redis.RedisError as e:
@@ -136,19 +120,18 @@ class RedisImageCache:
             # Import PIL here to avoid requiring it if not using image cache
             from PIL import Image as PILImage  # pyright: ignore[reportMissingImports]
 
-            return PILImage.open(io.BytesIO(image_data))  # pyright: ignore[reportArgumentType]
+            return PILImage.open(io.BytesIO(image_data))
 
     def connect(self) -> None:
-        """Initialize the Redis connection pool and background executor."""
+        """Initialize the Redis connection pool."""
         logger.info(f"Image cache in PID {os.getpid()} connecting to Redis")
         self._redis = redis.ConnectionPool.from_url(self._redis_url)
-        self._bg_executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="RedisCacheWorker")
 
-    def disconnect(self) -> None:
-        """Close the connection pool and shutdown executor."""
-        self.bg_executor.shutdown(wait=True, cancel_futures=True)
-        self.redis.disconnect()
-        logger.info(f"Image cache in PID {os.getpid()} disconnected from Redis")
+    async def disconnect(self) -> None:
+        """Close the connection pool."""
+        if self._redis is not None:
+            await self._redis.aclose()
+            logger.info(f"Image cache in PID {os.getpid()} disconnected from Redis")
 
 
 # Global image cache instance (None if Redis not configured)
