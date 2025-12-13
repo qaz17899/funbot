@@ -21,7 +21,7 @@ from funbot.db.models.pokemon import (
 )
 from funbot.db.models.user import User
 from funbot.pokemon.constants.enums import PokemonType
-from funbot.pokemon.services.battle_service import BattleService
+from funbot.pokemon.services.battle_service import BattleService, ExploreResult
 from funbot.pokemon.services.catch_service import CatchService
 from funbot.pokemon.services.exp_service import ExpService
 from funbot.ui.components_v2 import Container, LayoutView, TextDisplay
@@ -135,9 +135,14 @@ class ExploreCog(commands.Cog):
         route: int,
         wild_pokemon: list[PokemonData],
         count: int,
-    ) -> dict:
-        """Simulate multiple encounters."""
-        results = {"defeated": 0, "caught": [], "shiny_count": 0, "total_money": 0, "total_exp": 0}
+    ) -> ExploreResult:
+        """Simulate multiple encounters and return structured result."""
+        # Track results
+        pokemon_defeated = 0
+        caught_pokemon: list[tuple[str, int, bool]] = []  # (name, id, is_shiny)
+        shiny_count = 0
+        total_money = 0
+        total_exp = 0
 
         owned_ids = {p.pokemon_data_id for p in party}
 
@@ -162,13 +167,13 @@ class ExploreCog(commands.Cog):
             can_defeat = BattleService.can_defeat_enemy(enemy_hp, party_attack)
 
             if can_defeat:
-                results["defeated"] += 1
+                pokemon_defeated += 1
 
                 # Money and exp
                 money = BattleService.calculate_route_money(route, 0)
                 exp = ExpService.calculate_battle_exp(wild.base_exp, route * 2, len(party))
-                results["total_money"] += money
-                results["total_exp"] += exp
+                total_money += money
+                total_exp += exp
 
                 # Attempt catch
                 is_new = wild.id not in owned_ids
@@ -179,9 +184,9 @@ class ExploreCog(commands.Cog):
                 catch_result = CatchService.attempt_catch(wild.catch_rate, pokeball)
 
                 if catch_result.success:
-                    results["caught"].append((wild.name, wild.id, is_shiny))
+                    caught_pokemon.append((wild.name, wild.id, is_shiny))
                     if is_shiny:
-                        results["shiny_count"] += 1
+                        shiny_count += 1
 
                     # Collect new Pokemon for bulk create later (avoid DB call in loop)
                     if is_new:
@@ -197,12 +202,12 @@ class ExploreCog(commands.Cog):
             )
 
         # Update wallet
-        if results["total_money"] > 0:
-            await wallet.add_pokedollar(results["total_money"])
+        if total_money > 0:
+            await wallet.add_pokedollar(total_money)
 
         # Distribute exp to all party Pokemon
-        if results["total_exp"] > 0:
-            exp_per_pokemon = results["total_exp"] // len(party)
+        if total_exp > 0:
+            exp_per_pokemon = total_exp // len(party)
             for poke in party:
                 level_result = ExpService.add_exp_and_level_up(
                     poke.level, poke.exp, exp_per_pokemon
@@ -213,35 +218,45 @@ class ExploreCog(commands.Cog):
             # Bulk update party Pokemon levels
             await PlayerPokemon.bulk_update(party, fields=["level", "exp"])
 
-        return results
+        return ExploreResult(
+            route=route,
+            region=0,  # Kanto
+            encounter_count=count,
+            pokemon_defeated=pokemon_defeated,
+            pokemon_caught=len(caught_pokemon),
+            shiny_count=shiny_count,
+            total_money=total_money,
+            total_exp=total_exp,
+            caught_pokemon=caught_pokemon,
+        )
 
-    def _create_result_view(self, username: str, route: int, results: dict) -> LayoutView:
+    def _create_result_view(self, username: str, route: int, results: ExploreResult) -> LayoutView:
         """Create V2 LayoutView for explore results."""
         # Determine color based on catch success
-        color = discord.Color.green() if results["caught"] else discord.Color.blue()
+        color = discord.Color.green() if results.caught_pokemon else discord.Color.blue()
 
         # Build content lines
         lines = [
             f"## 🗺️ Route {route} 探索結果",
             "",
-            f"⚔️ 擊敗: **{results['defeated']}** 隻寶可夢",
-            f"💰 獲得: **{results['total_money']:,}** PokeDollar",
-            f"⭐ 經驗: **+{results['total_exp']:,}** EXP (全隊)",
+            f"⚔️ 擊敗: **{results.pokemon_defeated}** 隻寶可夢",
+            f"💰 獲得: **{results.total_money:,}** PokeDollar",
+            f"⭐ 經驗: **+{results.total_exp:,}** EXP (全隊)",
         ]
 
         # Catch results
-        if results["caught"]:
-            caught_names = [f"{'✨' if s else ''}{name}" for name, _, s in results["caught"]]
+        if results.caught_pokemon:
+            caught_names = [f"{'✨' if s else ''}{name}" for name, _, s in results.caught_pokemon]
             lines.extend(
-                [f"🎯 捕獲: **{len(results['caught'])}** 隻", f"   {', '.join(caught_names[:5])}"]
+                [f"🎯 捕獲: **{results.pokemon_caught}** 隻", f"   {', '.join(caught_names[:5])}"]
             )
             if len(caught_names) > 5:
                 lines.append(f"   ...還有 {len(caught_names) - 5} 隻")
         else:
             lines.append("🎯 捕獲: 0 隻")
 
-        if results["shiny_count"] > 0:
-            lines.append(f"✨ 異色: **{results['shiny_count']}** 隻！")
+        if results.shiny_count > 0:
+            lines.append(f"✨ 異色: **{results.shiny_count}** 隻！")
 
         lines.append(f"\n-# 探索者: {username}")
 

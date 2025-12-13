@@ -13,6 +13,9 @@ class PlayerPokemon(Model):
     """A Pokemon owned by a player.
 
     Created when catching a new Pokemon.
+
+    Note: Use ExpService.calculate_attack_from_level() for attack calculations
+    to maintain a single source of truth for battle formulas.
     """
 
     class Meta:
@@ -49,21 +52,3 @@ class PlayerPokemon(Model):
         name = self.nickname or f"Pokemon #{self.pokemon_data_id}"
         shiny_mark = "✨" if self.shiny else ""
         return f"{shiny_mark}{name} Lv.{self.level}"
-
-    async def calculate_attack(self) -> int:
-        """Calculate total attack power.
-
-        Returns:
-            Attack stat based on base_attack, level, and bonus
-        """
-        # Need to load related pokemon_data if not already loaded
-        if not hasattr(self, "_pokemon_data") or self._pokemon_data is None:
-            await self.fetch_related("pokemon_data")
-
-        pokemon = self.pokemon_data  # type: ignore
-        base_attack = pokemon.base_attack
-
-        # Level scaling: attack grows ~3x from level 1 to 100
-        level_multiplier = 1 + (self.level - 1) * 0.02
-
-        return int(base_attack * level_multiplier) + self.attack_bonus
