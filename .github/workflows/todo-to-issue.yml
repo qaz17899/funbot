@@ -28,16 +28,11 @@ jobs:
       - name: "TODO to Issue"
         uses: alstr/todo-to-issue-action@v5
         with:
-          # 自動將新 issue 指派給觸發 action 的使用者
           AUTO_ASSIGN: "true"
-          # 當 TODO 被移除時關閉對應的 issue
           CLOSE_ISSUES: "true"
-          # 將 issue URL 插入回 TODO 註解（建議開啟以提高準確性）
           INSERT_ISSUE_URLS: "true"
-          # 自定義識別符（可加入 FIXME, HACK 等）
           IDENTIFIERS: '[{"name": "TODO", "labels": []}, {"name": "FIXME", "labels": ["bug"]}, {"name": "HACK", "labels": ["technical-debt"]}]'
 
-      # 如果啟用 INSERT_ISSUE_URLS，需要以下步驟來提交更改
       - name: Set Git user
         run: |
           git config --global user.name "github-actions[bot]"
