@@ -91,6 +91,14 @@ class FunBot(commands.AutoShardedBot):
             else:
                 logger.warning("DEV_GUILD_ID not set, syncing commands globally in dev mode")
 
+        # Debug: show registered commands before sync
+        all_commands = self.tree.get_commands()
+        logger.debug(f"Registered commands before sync: {[c.name for c in all_commands]}")
+
+        # If syncing to a specific guild, copy global commands to that guild first
+        if guild_to_sync is not None:
+            self.tree.copy_global_to(guild=guild_to_sync)
+
         # The custom CommandTree.sync method will log the outcome
         await self.tree.sync(guild=guild_to_sync)
 
@@ -100,6 +108,7 @@ class FunBot(commands.AutoShardedBot):
         """Dynamically load all cogs from the cogs directory."""
         cogs_path = anyio.Path("funbot/cogs")
 
+        # Load individual cog files (*.py)
         async for filepath in cogs_path.glob("*.py"):
             cog_name = filepath.stem
 
@@ -112,6 +121,26 @@ class FunBot(commands.AutoShardedBot):
                 logger.info(f"Loaded cog: {cog_name!r}")
             except Exception as e:
                 logger.exception(f"Failed to load cog {cog_name!r}: {e}")
+
+        # Load cog packages (subdirectories with __init__.py)
+        async for dirpath in cogs_path.iterdir():
+            if not await dirpath.is_dir():
+                continue
+
+            dir_name = dirpath.name
+            if dir_name.startswith("_"):
+                continue
+
+            # Check if it has __init__.py (is a package)
+            init_file = dirpath / "__init__.py"
+            if not await init_file.exists():
+                continue
+
+            try:
+                await self.load_extension(f"funbot.cogs.{dir_name}")
+                logger.info(f"Loaded cog package: {dir_name!r}")
+            except Exception as e:
+                logger.exception(f"Failed to load cog package {dir_name!r}: {e}")
 
     async def on_ready(self) -> None:
         """Called when the bot is ready and connected to Discord."""

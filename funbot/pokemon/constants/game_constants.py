@@ -1,0 +1,83 @@
+"""Game constants and formulas for the Pokemon system.
+
+Based on Pokeclicker mechanics with simplifications for Discord bot usage.
+"""
+
+from __future__ import annotations
+
+# =============================================================================
+# Battle Constants
+# =============================================================================
+
+# How often auto-battle ticks (seconds) - used for calculation only
+BATTLE_TICK_SECONDS: float = 1.0
+
+# Base health formula constants
+# Health = ROUTE_HEALTH_BASE * (route^2.2 / 12)^1.15 * (1 + region/20)
+ROUTE_HEALTH_BASE: int = 100
+ROUTE_HEALTH_MIN: int = 20
+
+# Base money per route
+# Money = ROUTE_MONEY_BASE * route + 5 * route^1.15
+ROUTE_MONEY_BASE: int = 3
+
+# =============================================================================
+# Catch Constants
+# =============================================================================
+
+# Base catch rate modifier
+# Final catch rate = (pokemon_catch_rate^0.75) + pokeball_bonus
+BASE_CATCH_RATE: float = 0.75
+
+# Shiny chance (1 in N)
+SHINY_CHANCE: int = 8192
+
+# =============================================================================
+# Experience Constants
+# =============================================================================
+
+# Base EXP modifier for party-wide distribution
+# Each pokemon gets: base_exp * level * modifier / party_size
+BASE_EXP_MODIFIER: float = 1.0
+
+# Level scaling factor (Pokeclicker uses medium-slow curve)
+# EXP to next level = EXP_SCALE_FACTOR * level^3
+EXP_SCALE_FACTOR: float = 1.2
+MAX_LEVEL: int = 100
+
+# =============================================================================
+# Starter Pokemon
+# =============================================================================
+
+# National dex IDs for starters (御三家) from each region
+STARTERS: dict[int, list[int]] = {
+    0: [1, 4, 7],  # Kanto: Bulbasaur, Charmander, Squirtle
+    1: [152, 155, 158],  # Johto: Chikorita, Cyndaquil, Totodile
+    2: [252, 255, 258],  # Hoenn: Treecko, Torchic, Mudkip
+    3: [387, 390, 393],  # Sinnoh: Turtwig, Chimchar, Piplup
+    4: [495, 498, 501],  # Unova: Snivy, Tepig, Oshawott
+    5: [650, 653, 656],  # Kalos: Chespin, Fennekin, Froakie
+    6: [722, 725, 728],  # Alola: Rowlet, Litten, Popplio
+    7: [810, 813, 816],  # Galar: Grookey, Scorbunny, Sobble
+    8: [906, 909, 912],  # Paldea: Sprigatito, Fuecoco, Quaxly
+}
+
+# Default starting region
+DEFAULT_STARTER_REGION: int = 0  # Kanto
+
+# =============================================================================
+# Route Configuration
+# =============================================================================
+
+# Route ranges per region (min_route, max_route)
+REGION_ROUTES: dict[int, tuple[int, int]] = {
+    0: (1, 25),  # Kanto
+    1: (26, 48),  # Johto
+    2: (101, 134),  # Hoenn
+    3: (201, 230),  # Sinnoh
+    4: (301, 323),  # Unova
+    5: (401, 422),  # Kalos
+    6: (501, 517),  # Alola
+    7: (601, 610),  # Galar
+    8: (701, 715),  # Paldea
+}
