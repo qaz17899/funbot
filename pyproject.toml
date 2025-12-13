@@ -50,4 +50,20 @@ addopts = "-v --tb=short"
 pythonVersion = "3.12"
 typeCheckingMode = "standard"
 include = ["funbot", "tests"]
-exclude = ["**/__pycache__", ".venv"]
+exclude = [
+    "**/node_modules",
+    "**/__pycache__",
+    ".venv",
+    "venv",
+    "build",
+    "dist",
+    "**/.pytest_cache",
+    "**/.ruff_cache",
+]
+enableTypeIgnoreComments = false
+reportIncompatibleMethodOverride = false
+reportIncompatibleVariableOverride = false
+reportUnnecessaryComparison = true
+reportUnnecessaryContains = true
+reportUnnecessaryIsInstance = true
+reportUnnecessaryTypeIgnoreComment = true
