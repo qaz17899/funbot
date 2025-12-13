@@ -66,6 +66,7 @@ class BattleService:
             Enemy max health
         """
         normalized_route = route  # TODO: normalize route based on region
+                                  # Issue URL: https://github.com/qaz17899/funbot/issues/17
         health = int(
             ROUTE_HEALTH_BASE * pow(pow(normalized_route, 2.2) / 12, 1.15) * (1 + region / 20)
         )
