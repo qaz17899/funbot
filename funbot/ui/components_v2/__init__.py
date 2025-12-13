@@ -16,6 +16,10 @@ Usage:
 
 from __future__ import annotations
 
+# Re-exports (unchanged in V2)
+from funbot.ui.components.modal import Modal
+from funbot.ui.components.text_input import TextInput
+
 # Components
 from funbot.ui.components_v2.action_row import ActionRow
 
@@ -35,10 +39,6 @@ from funbot.ui.components_v2.select import Select, SelectOption
 from funbot.ui.components_v2.separator import Separator
 from funbot.ui.components_v2.text_display import TextDisplay
 from funbot.ui.components_v2.thumbnail import Thumbnail
-
-# Re-exports (unchanged in V2)
-from funbot.ui.modal import Modal
-from funbot.ui.text_input import TextInput
 
 __all__ = (
     "ActionRow",

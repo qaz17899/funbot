@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from funbot.ui.button import Button
+from .button import Button
 
 if TYPE_CHECKING:
     from funbot.types import Interaction

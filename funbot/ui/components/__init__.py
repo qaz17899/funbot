@@ -1,4 +1,4 @@
-"""Legacy UI components - re-export from components subfolder."""
+"""UI components - Enhanced Discord UI components (legacy View-based)."""
 
 from __future__ import annotations
 

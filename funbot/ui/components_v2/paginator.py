@@ -9,7 +9,7 @@ import discord
 from discord import ui
 
 from funbot.embeds import ErrorEmbed
-from funbot.ui.modal import Modal
+from funbot.ui.components.modal import Modal
 
 from .action_row import ActionRow
 from .container import Container
