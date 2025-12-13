@@ -1,0 +1,54 @@
+name: "TODO to Issue"
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      MANUAL_COMMIT_REF:
+        description: "The SHA of the commit to get the diff for"
+        required: true
+      MANUAL_BASE_REF:
+        description: "By default, the commit entered above is compared to the one directly before it; to go back further, enter an earlier SHA here"
+        required: false
+
+jobs:
+  todo-to-issue:
+    name: "Convert TODOs to Issues"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: "TODO to Issue"
+        uses: alstr/todo-to-issue-action@v5
+        with:
+          # 自動將新 issue 指派給觸發 action 的使用者
+          AUTO_ASSIGN: "true"
+          # 當 TODO 被移除時關閉對應的 issue
+          CLOSE_ISSUES: "true"
+          # 將 issue URL 插入回 TODO 註解（建議開啟以提高準確性）
+          INSERT_ISSUE_URLS: "true"
+          # 自定義識別符（可加入 FIXME, HACK 等）
+          IDENTIFIERS: '[{"name": "TODO", "labels": []}, {"name": "FIXME", "labels": ["bug"]}, {"name": "HACK", "labels": ["technical-debt"]}]'
+
+      # 如果啟用 INSERT_ISSUE_URLS，需要以下步驟來提交更改
+      - name: Set Git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and Push Changes
+        run: |
+          git add -A
+          if [[ `git status --porcelain` ]]; then
+            git commit -m "🔗 Auto-link GitHub issue URLs to TODOs"
+            git push origin ${{ github.ref_name }}
+          else
+            echo "No changes to commit"
+          fi
