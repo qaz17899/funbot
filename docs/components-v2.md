@@ -1,6 +1,6 @@
 # Discord Components V2 Guide (funbot/ui/components_v2)
 
-> **For AI Agents**: This document explains Discord.py 2.6+ Components V2 system in detail. Use this as a reference when working with `funbot/ui/v2/` module.
+> **For AI Agents**: This document explains Discord.py 2.6+ Components V2 system in detail. Use this as a reference when working with the `funbot/ui/components_v2/` module.
 
 ## Overview
 

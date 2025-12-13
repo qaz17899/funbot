@@ -69,6 +69,8 @@ class Button[V_co: LayoutView](ui.Button[V_co]):
 
         Stores original state and shows loading indicator.
         """
+        assert self.view is not None, "Button must be attached to a view"
+
         self.original_label = self.label[:] if self.label else None
         self.original_emoji = self.emoji
         self.original_disabled = self.disabled
@@ -84,6 +86,8 @@ class Button[V_co: LayoutView](ui.Button[V_co]):
 
         Restores original state.
         """
+        assert self.view is not None, "Button must be attached to a view"
+
         if self.original_disabled is None:
             msg = "unset_loading_state called before set_loading_state"
             raise RuntimeError(msg)

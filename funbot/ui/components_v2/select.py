@@ -78,6 +78,8 @@ class Select[V_co: LayoutView](ui.Select[V_co]):
 
     async def set_loading_state(self, interaction: Interaction) -> None:
         """Set the select to a loading state."""
+        assert self.view is not None, "Select must be attached to a view"
+
         self.original_options = list(self.options)
         self.original_disabled = self.disabled
         self.original_placeholder = self.placeholder[:] if self.placeholder else None
@@ -93,6 +95,8 @@ class Select[V_co: LayoutView](ui.Select[V_co]):
 
     async def unset_loading_state(self, interaction: Interaction, **kwargs) -> None:
         """Restore the select from loading state."""
+        assert self.view is not None, "Select must be attached to a view"
+
         if (
             self.original_options is None
             or self.original_disabled is None
