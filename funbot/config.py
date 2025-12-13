@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-type EnvType = Literal["dev", "test", "prod"]
+type EnvType = Literal["dev", "prod"]
 
 
 class Config(BaseSettings):
@@ -26,6 +26,9 @@ class Config(BaseSettings):
 
     # Environment
     env: EnvType = "dev"
+
+    # Dev Guild ID (only sync commands to this guild in dev environment)
+    dev_guild_id: int | None = None
 
     # Logging
     log_level: str = "DEBUG"
