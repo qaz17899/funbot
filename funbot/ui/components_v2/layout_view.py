@@ -41,6 +41,7 @@ class LayoutView(ui.LayoutView):
         super().__init__(timeout=timeout)
         self.author = author
         self.message: discord.Message | None = None
+        self.item_states: dict[str, bool] = {}
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}>"
@@ -50,6 +51,31 @@ class LayoutView(ui.LayoutView):
         for item in items:
             self.add_item(item)
         return self
+
+    def disable_items(self) -> None:
+        """Disable all interactive items and store their original states."""
+        for item in self.walk_children():
+            if isinstance(item, ui.Button | ui.Select):
+                # Skip URL buttons
+                if isinstance(item, ui.Button) and item.url:
+                    continue
+                # Store original state
+                if item.custom_id is not None:
+                    self.item_states[item.custom_id] = item.disabled
+                item.disabled = True
+
+    def enable_items(self) -> None:
+        """Restore all interactive items to their original states."""
+        for item in self.walk_children():
+            if isinstance(item, ui.Button | ui.Select):
+                # Skip URL buttons
+                if isinstance(item, ui.Button) and item.url:
+                    continue
+                # Restore original state
+                if item.custom_id is not None:
+                    item.disabled = self.item_states.get(item.custom_id, False)
+                else:
+                    item.disabled = False
 
     async def on_timeout(self) -> None:
         """Handle view timeout by disabling interactive components."""

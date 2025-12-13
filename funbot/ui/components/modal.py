@@ -1,4 +1,4 @@
-"""Enhanced Modal with error handling."""
+"""Enhanced Modal with error handling and validation."""
 
 from __future__ import annotations
 
@@ -18,11 +18,12 @@ __all__ = ("Modal",)
 
 
 class Modal(discord.ui.Modal):
-    """Enhanced Modal with built-in error handling.
+    """Enhanced Modal with built-in error handling and validation.
 
     Features:
     - Automatic error handling with ErrorEmbed
     - Customizable timeout
+    - Auto-validation of TextInput children with is_digit=True
     """
 
     def __init__(self, *, title: str, custom_id: str = MISSING, timeout: float = 600.0) -> None:
@@ -43,11 +44,27 @@ class Modal(discord.ui.Modal):
         else:
             await interaction.followup.send(embed=embed, ephemeral=True)
 
+    def validate_inputs(self) -> None:
+        """Validate all TextInput children.
+
+        Raises:
+            ValueError: If any TextInput with is_digit=True has invalid input.
+        """
+        from funbot.ui.components.text_input import TextInput  # noqa: PLC0415
+
+        for item in self.children:
+            if isinstance(item, TextInput):
+                is_valid, error_msg = item.validate()
+                if not is_valid:
+                    raise ValueError(error_msg)
+
     async def on_submit(self, interaction: Interaction) -> None:
-        """Default submit handler - defer and stop.
+        """Default submit handler - validate, defer and stop.
 
         Override this in subclasses to add custom logic.
+        Call validate_inputs() manually if you override.
         """
+        self.validate_inputs()
         with contextlib.suppress(discord.NotFound):
             await interaction.response.defer()
         self.stop()

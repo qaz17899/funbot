@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 from tortoise import fields
-from tortoise.models import Model
+
+from funbot.db.models.base import BaseModel
 
 __all__ = ("User",)
 
 
-class User(Model):
+class User(BaseModel):
     """Represents a Discord user in the database.
 
     Attributes:
@@ -27,6 +28,3 @@ class User(Model):
 
     class Meta:
         table = "users"
-
-    def __repr__(self) -> str:
-        return f"<User id={self.id}>"

@@ -14,7 +14,8 @@ dependencies = [
     "aerich>=0.7.2",
     
     # Cache
-    "redis>=5.0.0",
+    "redis[hiredis]>=5.0.0",
+    "orjson>=3.9.0",
     
     # Configuration
     "pydantic-settings>=2.5.0",

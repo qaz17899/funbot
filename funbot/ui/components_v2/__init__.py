@@ -30,6 +30,9 @@ from funbot.ui.components_v2.button import Button
 from funbot.ui.components_v2.confirm import ConfirmView
 from funbot.ui.components_v2.container import Container
 
+# Utility buttons
+from funbot.ui.components_v2.go_back import GoBackButton
+
 # Base view
 from funbot.ui.components_v2.layout_view import LayoutView
 from funbot.ui.components_v2.media_gallery import MediaGallery, MediaGalleryItem
@@ -40,11 +43,15 @@ from funbot.ui.components_v2.separator import Separator
 from funbot.ui.components_v2.text_display import TextDisplay
 from funbot.ui.components_v2.thumbnail import Thumbnail
 
+# Toggle components
+from funbot.ui.components_v2.toggle import ToggleButton, ToggleUIButton
+
 __all__ = (
     "ActionRow",
     "Button",
     "ConfirmView",
     "Container",
+    "GoBackButton",
     "LayoutView",
     "MediaGallery",
     "MediaGalleryItem",
@@ -58,4 +65,6 @@ __all__ = (
     "TextDisplay",
     "TextInput",
     "Thumbnail",
+    "ToggleButton",
+    "ToggleUIButton",
 )
