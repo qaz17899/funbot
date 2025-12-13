@@ -37,7 +37,7 @@ dev = [
 ]
 
 [tool.aerich]
-tortoise_orm = "funbot.db.config.TORTOISE_CONFIG"
+tortoise_orm = "funbot.db.aerich_config.TORTOISE_CONFIG"
 location = "./migrations"
 src_folder = "./."
 

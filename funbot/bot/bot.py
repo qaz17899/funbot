@@ -111,6 +111,17 @@ class FunBot(commands.AutoShardedBot):
         logger.info(f"Connected to {len(self.guilds)} guilds")
         logger.info(f"Shard count: {self.shard_count or 1}")
 
+        # Sync commands based on environment
+        if self.config.is_dev and self.config.dev_guild_id:
+            # Dev environment: only sync to the dev guild
+            guild = discord.Object(id=self.config.dev_guild_id)
+            await self.tree.sync(guild=guild)
+            logger.info(f"Synced commands to dev guild: {self.config.dev_guild_id}")
+        else:
+            # Production: sync globally
+            await self.tree.sync()
+            logger.info("Synced commands globally")
+
     async def close(self) -> None:
         """Clean up resources when shutting down."""
         logger.info("Bot shutting down...")
