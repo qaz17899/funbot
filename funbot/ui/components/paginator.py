@@ -8,9 +8,10 @@ from typing import TYPE_CHECKING, Any
 import discord
 
 from funbot.embeds import ErrorEmbed
-from funbot.ui.button import Button
-from funbot.ui.modal import Modal
-from funbot.ui.view import View
+
+from .button import Button
+from .modal import Modal
+from .view import View
 
 if TYPE_CHECKING:
     from funbot.types import Interaction, User

@@ -1,29 +1,18 @@
-"""UI module - Enhanced Discord UI components."""
+"""UI module - Discord UI components.
+
+This module contains two submodules:
+
+- `funbot.ui.components` - Legacy View-based components (discord.ui.View)
+- `funbot.ui.components_v2` - Components V2 LayoutView-based (discord.ui.LayoutView)
+
+Usage:
+    # Legacy components
+    from funbot.ui.components import View, Button, PaginatorView
+
+    # Components V2
+    from funbot.ui.components_v2 import LayoutView, Container, TextDisplay
+"""
 
 from __future__ import annotations
 
-from funbot.ui.button import Button, GoBackButton
-from funbot.ui.confirm import ConfirmView
-from funbot.ui.modal import Modal
-from funbot.ui.paginator import Page, PaginatorView
-from funbot.ui.select import Select, SelectOption
-from funbot.ui.text_input import TextInput
-from funbot.ui.toggle import ToggleButton
-from funbot.ui.url_button import URLButtonView
-from funbot.ui.view import View
-
-__all__ = (
-    # Core
-    "Button",
-    "ConfirmView",
-    "GoBackButton",
-    "Modal",
-    "Page",
-    "PaginatorView",
-    "Select",
-    "SelectOption",
-    "TextInput",
-    "ToggleButton",
-    "URLButtonView",
-    "View",
-)
+__all__: list[str] = []

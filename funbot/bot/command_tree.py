@@ -2,8 +2,15 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from discord import app_commands
 from loguru import logger
+
+if TYPE_CHECKING:
+    from discord.abc import Snowflake
+
+    from funbot.bot import FunBot  # noqa: F401
 
 __all__ = ("CommandTree",)
 
@@ -16,7 +23,7 @@ class CommandTree(app_commands.CommandTree["FunBot"]):
     - Custom error handling integration
     """
 
-    async def sync(self, *, guild: object = None) -> list[app_commands.AppCommand]:
+    async def sync(self, *, guild: Snowflake | None = None) -> list[app_commands.AppCommand]:
         """Sync commands with Discord and log the result."""
         commands = await super().sync(guild=guild)
 
