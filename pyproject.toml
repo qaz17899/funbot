@@ -1,9 +1,53 @@
 [project]
 name = "funbot"
 version = "0.1.0"
-description = "Add your description here"
+description = "A Discord entertainment bot with perfect architecture"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "discord-py>=2.6.4",
+    # Discord
+    "discord-py[speed]>=2.5.0",
+    
+    # Database
+    "tortoise-orm>=0.21.7",
+    "asyncpg>=0.29.0",
+    "aerich>=0.7.2",
+    
+    # Cache
+    "redis>=5.0.0",
+    
+    # Configuration
+    "pydantic-settings>=2.5.0",
+    "python-dotenv>=1.0.0",
+    
+    # Logging
+    "loguru>=0.7.2",
+    
+    # Async utilities
+    "anyio>=4.4.0",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.8.0",
+    "pyright>=1.1.380",
+]
+
+[tool.aerich]
+tortoise_orm = "funbot.db.config.TORTOISE_CONFIG"
+location = "./migrations"
+src_folder = "./."
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
+include = ["funbot", "tests"]
+exclude = ["**/__pycache__", ".venv"]
