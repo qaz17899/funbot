@@ -84,15 +84,15 @@ class FunBot(commands.AutoShardedBot):
         await self._load_cogs()
 
         # Sync commands based on environment (only runs once at startup)
-        if self.config.is_dev and self.config.dev_guild_id:
-            # Dev environment: only sync to the dev guild
-            guild = discord.Object(id=self.config.dev_guild_id)
-            await self.tree.sync(guild=guild)
-            logger.info(f"Synced commands to dev guild: {self.config.dev_guild_id}")
-        else:
-            # Production: sync globally
-            await self.tree.sync()
-            logger.info("Synced commands globally")
+        guild_to_sync = None
+        if self.config.is_dev:
+            if self.config.dev_guild_id:
+                guild_to_sync = discord.Object(id=self.config.dev_guild_id)
+            else:
+                logger.warning("DEV_GUILD_ID not set, syncing commands globally in dev mode")
+
+        # The custom CommandTree.sync method will log the outcome
+        await self.tree.sync(guild=guild_to_sync)
 
         logger.info("Bot setup complete")
 
