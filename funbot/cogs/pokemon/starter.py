@@ -6,8 +6,6 @@ Uses Discord Components V2 with subclassing pattern.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import discord
 from discord import app_commands, ui
 from discord.ext import commands
@@ -15,31 +13,7 @@ from discord.ext import commands
 from funbot.db.models.pokemon import PlayerPokemon, PlayerWallet, PokemonData
 from funbot.db.models.user import User
 from funbot.pokemon.constants.game_constants import DEFAULT_STARTER_REGION, STARTERS
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
-
-
-# Type emoji helper (module-level for reuse)
-TYPE_EMOJIS: dict[int, str] = {
-    1: "⚪",  # Normal
-    2: "🔥",  # Fire
-    3: "💧",  # Water
-    4: "⚡",  # Electric
-    5: "🌿",  # Grass
-    6: "❄️",  # Ice
-    7: "👊",  # Fighting
-    8: "☠️",  # Poison
-    9: "🏔️",  # Ground
-    10: "🪽",  # Flying
-    11: "🔮",  # Psychic
-    12: "🐛",  # Bug
-}
-
-
-def get_type_emoji(type_id: int) -> str:
-    """Get emoji for Pokemon type."""
-    return TYPE_EMOJIS.get(type_id, "⚪")
+from funbot.pokemon.ui_utils import get_type_emoji
 
 
 class StarterCog(commands.Cog):

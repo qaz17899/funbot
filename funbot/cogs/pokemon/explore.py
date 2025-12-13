@@ -24,7 +24,7 @@ from funbot.pokemon.constants.enums import PokemonType
 from funbot.pokemon.services.battle_service import BattleService
 from funbot.pokemon.services.catch_service import CatchService
 from funbot.pokemon.services.exp_service import ExpService
-from funbot.ui.components_v2 import Container, LayoutView, Separator, TextDisplay
+from funbot.ui.components_v2 import Container, LayoutView, TextDisplay
 
 
 class ExploreCog(commands.Cog):
@@ -141,6 +141,9 @@ class ExploreCog(commands.Cog):
 
         owned_ids = {p.pokemon_data_id for p in party}
 
+        # Collect new Pokemon to create in bulk after the loop
+        new_pokemon_to_create: list[dict] = []
+
         for _ in range(count):
             # Pick random wild Pokemon
             wild = random.choice(wild_pokemon)
@@ -180,12 +183,18 @@ class ExploreCog(commands.Cog):
                     if is_shiny:
                         results["shiny_count"] += 1
 
-                    # Add to owned if new
+                    # Collect new Pokemon for bulk create later (avoid DB call in loop)
                     if is_new:
-                        await PlayerPokemon.get_or_create(
-                            user=user, pokemon_data=wild, defaults={"shiny": is_shiny}
+                        new_pokemon_to_create.append(
+                            {"user": user, "pokemon_data": wild, "shiny": is_shiny}
                         )
-                        owned_ids.add(wild.id)
+                        owned_ids.add(wild.id)  # Track to avoid duplicates in same batch
+
+        # Bulk create new Pokemon outside the loop
+        if new_pokemon_to_create:
+            await PlayerPokemon.bulk_create(
+                [PlayerPokemon(**data) for data in new_pokemon_to_create], ignore_conflicts=True
+            )
 
         # Update wallet
         if results["total_money"] > 0:
@@ -200,7 +209,9 @@ class ExploreCog(commands.Cog):
                 )
                 poke.level = level_result.new_level
                 poke.exp = level_result.exp_remaining
-                await poke.save(update_fields=["level", "exp"])
+
+            # Bulk update party Pokemon levels
+            await PlayerPokemon.bulk_update(party, fields=["level", "exp"])
 
         return results
 

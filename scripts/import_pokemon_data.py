@@ -166,7 +166,8 @@ async def import_pokemon(start_id: int = 1, end_id: int = 1025) -> None:
     from funbot.db.aerich_config import TORTOISE_CONFIG
 
     await Tortoise.init(config=TORTOISE_CONFIG)
-    await Tortoise.generate_schemas(safe=True)  # safe=True won't drop existing tables
+    # Note: Schema must be migrated via Aerich before running this script
+    # Do NOT use generate_schemas here to avoid mutating schema outside migration flow
 
     async with httpx.AsyncClient(timeout=30.0) as client:
         # Process in batches to avoid rate limiting

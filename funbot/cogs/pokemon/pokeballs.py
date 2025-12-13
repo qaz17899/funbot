@@ -13,21 +13,7 @@ from discord.ext import commands
 from funbot.db.models.pokemon import PlayerPokeballSettings
 from funbot.db.models.user import User
 from funbot.pokemon.constants.enums import Pokeball
-
-
-# Pokeball emoji mapping
-BALL_EMOJIS: dict[int, str] = {
-    Pokeball.NONE: "❌",
-    Pokeball.POKEBALL: "🔴",
-    Pokeball.GREATBALL: "🔵",
-    Pokeball.ULTRABALL: "🟡",
-    Pokeball.MASTERBALL: "🟣",
-}
-
-
-def get_ball_emoji(ball: int) -> str:
-    """Get emoji for pokeball type."""
-    return BALL_EMOJIS.get(ball, "⚪")
+from funbot.pokemon.ui_utils import get_ball_emoji
 
 
 class PokeballsCog(commands.Cog):

@@ -5,7 +5,9 @@ from __future__ import annotations
 from funbot.config import CONFIG
 
 # Tortoise ORM requires 'postgres://' scheme, not 'postgresql://'
-_db_url = CONFIG.db_url.replace("postgresql://", "postgres://")
+_db_url = CONFIG.db_url
+if _db_url.startswith("postgresql://"):
+    _db_url = "postgres://" + _db_url[len("postgresql://") :]
 
 # Tortoise ORM configuration
 TORTOISE_CONFIG = {

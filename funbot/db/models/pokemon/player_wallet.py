@@ -6,6 +6,7 @@ Stores Pokemon-specific currencies separate from main bot currencies.
 from __future__ import annotations
 
 from tortoise import fields
+from tortoise.expressions import F
 from tortoise.models import Model
 
 
@@ -39,7 +40,9 @@ class PlayerWallet(Model):
         return f"Wallet(user={self.user_id}, ¥{self.pokedollar:,})"
 
     async def add_pokedollar(self, amount: int) -> int:
-        """Add pokedollar to wallet.
+        """Add pokedollar to wallet atomically.
+
+        Uses F expression for atomic update to prevent race conditions.
 
         Args:
             amount: Amount to add (can be negative)
@@ -47,12 +50,21 @@ class PlayerWallet(Model):
         Returns:
             New balance
         """
-        self.pokedollar = max(0, self.pokedollar + amount)
-        await self.save(update_fields=["pokedollar", "updated_at"])
+        # Atomic update using F expression
+        await PlayerWallet.filter(id=self.id).update(pokedollar=F("pokedollar") + amount)
+        # Refresh to get new value
+        await self.refresh_from_db(fields=["pokedollar"])
+        # Ensure non-negative
+        if self.pokedollar < 0:
+            await PlayerWallet.filter(id=self.id).update(pokedollar=0)
+            self.pokedollar = 0
         return self.pokedollar
 
     async def add_dungeon_token(self, amount: int) -> int:
-        """Add dungeon tokens to wallet."""
-        self.dungeon_token = max(0, self.dungeon_token + amount)
-        await self.save(update_fields=["dungeon_token", "updated_at"])
+        """Add dungeon tokens to wallet atomically."""
+        await PlayerWallet.filter(id=self.id).update(dungeon_token=F("dungeon_token") + amount)
+        await self.refresh_from_db(fields=["dungeon_token"])
+        if self.dungeon_token < 0:
+            await PlayerWallet.filter(id=self.id).update(dungeon_token=0)
+            self.dungeon_token = 0
         return self.dungeon_token
