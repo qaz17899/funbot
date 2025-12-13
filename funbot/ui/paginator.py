@@ -73,16 +73,12 @@ class PaginatorView(View):
     """
 
     def __init__(
-        self,
-        pages: list[Page] | dict[int, Page],
-        *,
-        author: User | None = None,
-        timeout: float = 600.0,
+        self, pages: list[Page], *, author: User | None = None, timeout: float = 600.0
     ) -> None:
         """Initialize the paginator.
 
         Args:
-            pages: List or dict of Page objects to paginate.
+            pages: List of Page objects to paginate.
             author: The user who can interact with this view.
             timeout: Timeout in seconds.
         """
@@ -96,12 +92,12 @@ class PaginatorView(View):
         self._update_button_states()
 
     @property
-    def pages(self) -> list[Page] | dict[int, Page]:
+    def pages(self) -> list[Page]:
         """Get the pages."""
         return self._pages
 
     @pages.setter
-    def pages(self, pages: list[Page] | dict[int, Page]) -> None:
+    def pages(self, pages: list[Page]) -> None:
         """Set new pages and update max page."""
         self._pages = pages
         self._max_page = len(pages)
