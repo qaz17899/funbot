@@ -1,28 +1,18 @@
-"""Legacy UI components - re-export from components subfolder."""
+"""UI module - Discord UI components.
+
+This module contains two submodules:
+
+- `funbot.ui.components` - Legacy View-based components (discord.ui.View)
+- `funbot.ui.components_v2` - Components V2 LayoutView-based (discord.ui.LayoutView)
+
+Usage:
+    # Legacy components
+    from funbot.ui.components import View, Button, PaginatorView
+
+    # Components V2
+    from funbot.ui.components_v2 import LayoutView, Container, TextDisplay
+"""
 
 from __future__ import annotations
 
-from funbot.ui.components.button import Button, GoBackButton
-from funbot.ui.components.confirm import ConfirmView
-from funbot.ui.components.modal import Modal
-from funbot.ui.components.paginator import Page, PaginatorView
-from funbot.ui.components.select import Select, SelectOption
-from funbot.ui.components.text_input import TextInput
-from funbot.ui.components.toggle import ToggleButton
-from funbot.ui.components.url_button import URLButtonView
-from funbot.ui.components.view import View
-
-__all__ = (
-    "Button",
-    "ConfirmView",
-    "GoBackButton",
-    "Modal",
-    "Page",
-    "PaginatorView",
-    "Select",
-    "SelectOption",
-    "TextInput",
-    "ToggleButton",
-    "URLButtonView",
-    "View",
-)
+__all__: list[str] = []
