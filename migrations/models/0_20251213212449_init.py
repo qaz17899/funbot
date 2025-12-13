@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS "aerich" (
 
 async def downgrade(db: BaseDBAsyncClient) -> str:
     return """
-        """
+        DROP TABLE IF EXISTS "users";"""
 
 
 MODELS_STATE = (
