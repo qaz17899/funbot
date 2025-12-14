@@ -98,6 +98,7 @@ class RouteStatusService:
 
         # 3. Quest at location (skip for now - quest system not fully integrated)
         # TODO: Check if there's an active quest at this route
+        # Issue URL: https://github.com/qaz17899/funbot/issues/22
 
         # 4 & 5. Check for uncaught Pokemon
         uncaught_status = await self._check_uncaught_pokemon(player_id, route)

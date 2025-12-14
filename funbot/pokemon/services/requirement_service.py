@@ -297,6 +297,7 @@ class RequirementService:
         Note: Weather system not implemented. Returns True for now.
         """
         # TODO: Implement weather system
+        # Issue URL: https://github.com/qaz17899/funbot/issues/21
         return True
 
     def _check_day_of_week(self, params: dict) -> bool:
@@ -320,6 +321,7 @@ class RequirementService:
         Note: Event system not implemented. Returns False (events disabled).
         """
         # TODO: Implement event system
+        # Issue URL: https://github.com/qaz17899/funbot/issues/20
         # Events are seasonal, return False for now
         return False
 

@@ -155,7 +155,9 @@ class ExploreCog(commands.Cog):
         all_pokemon_names: list[str] = []
         all_pokemon_names.extend(route_data.land_pokemon or [])
         # TODO: Add water_pokemon when fishing is implemented
+        # Issue URL: https://github.com/qaz17899/funbot/issues/19
         # TODO: Add headbutt_pokemon when headbutt is implemented
+        # Issue URL: https://github.com/qaz17899/funbot/issues/18
 
         if not all_pokemon_names:
             return []
