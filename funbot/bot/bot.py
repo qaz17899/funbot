@@ -105,14 +105,21 @@ class FunBot(commands.AutoShardedBot):
         logger.info("Bot setup complete")
 
     async def _load_cogs(self) -> None:
-        """Dynamically load all cogs from the cogs directory."""
+        """Dynamically load all cogs from the cogs directory.
+
+        Auto-discovers all .py files:
+        - funbot/cogs/*.py -> loads as funbot.cogs.{name}
+        - funbot/cogs/{subdir}/*.py -> loads as funbot.cogs.{subdir}.{name}
+
+        No manual __init__.py registration required!
+        """
         cogs_path = anyio.Path("funbot/cogs")
 
-        # Load individual cog files (*.py)
+        # Load individual cog files (*.py) in the root cogs directory
         async for filepath in cogs_path.glob("*.py"):
             cog_name = filepath.stem
 
-            # Skip __init__.py
+            # Skip __init__.py and private modules
             if cog_name.startswith("_"):
                 continue
 
@@ -122,7 +129,7 @@ class FunBot(commands.AutoShardedBot):
             except Exception as e:
                 logger.exception(f"Failed to load cog {cog_name!r}: {e}")
 
-        # Load cog packages (subdirectories with __init__.py)
+        # Auto-discover and load all .py files in subdirectories
         async for dirpath in cogs_path.iterdir():
             if not await dirpath.is_dir():
                 continue
@@ -131,16 +138,20 @@ class FunBot(commands.AutoShardedBot):
             if dir_name.startswith("_"):
                 continue
 
-            # Check if it has __init__.py (is a package)
-            init_file = dirpath / "__init__.py"
-            if not await init_file.exists():
-                continue
+            # Load each .py file in the subdirectory as a separate cog
+            async for filepath in dirpath.glob("*.py"):
+                cog_name = filepath.stem
 
-            try:
-                await self.load_extension(f"funbot.cogs.{dir_name}")
-                logger.info(f"Loaded cog package: {dir_name!r}")
-            except Exception as e:
-                logger.exception(f"Failed to load cog package {dir_name!r}: {e}")
+                # Skip __init__.py and private modules
+                if cog_name.startswith("_"):
+                    continue
+
+                extension_name = f"funbot.cogs.{dir_name}.{cog_name}"
+                try:
+                    await self.load_extension(extension_name)
+                    logger.info(f"Loaded cog: {dir_name}/{cog_name}")
+                except Exception as e:
+                    logger.exception(f"Failed to load cog {dir_name}/{cog_name}: {e}")
 
     async def on_ready(self) -> None:
         """Called when the bot is ready and connected to Discord."""

@@ -96,3 +96,83 @@ REGION_ROUTES: dict[int, tuple[int, int]] = {
     7: (601, 610),  # Galar
     8: (701, 715),  # Paldea
 }
+
+# =============================================================================
+# Effort Points (EVs) Constants - Pokeclicker exact values
+# =============================================================================
+
+# EP to EV conversion ratio (from GameConstants.ts:443)
+EP_EV_RATIO: int = 1000  # EVs = effort_points / EP_EV_RATIO
+
+# Resistant threshold (EVs needed); from PartyPokemon.ts:94
+RESISTANT_EV_THRESHOLD: int = 50
+
+# Base EP yields per capture method (from GameConstants.ts:428-441)
+BASE_EP_YIELD: int = 100  # Standard route catch = 0.1 EVs
+WANDERER_EP_YIELD: int = 200  # Wandering Pokemon = 0.2 EVs
+DUNGEON_EP_YIELD: int = 300  # Dungeon catch = 0.3 EVs
+STONE_EP_YIELD: int = 1000  # Evolution stone = 1.0 EV
+SHOPMON_EP_YIELD: int = 1000  # Shop purchase = 1.0 EV
+SAFARI_EP_YIELD: int = 1000  # Safari catch = 1.0 EV
+BOSS_EP_YIELD: int = 1000  # Dungeon boss = 1.0 EV
+ROAMER_EP_YIELD: int = 5000  # Roaming Pokemon = 5.0 EVs
+
+# EP modifiers (from GameConstants.ts:434-441)
+SHINY_EP_MODIFIER: int = 5  # Shiny catch = 5x EP
+SHADOW_EP_MODIFIER: int = 2  # Shadow catch = 2x EP
+REPEATBALL_EP_MODIFIER: int = 5  # Repeat Ball = 5x EP
+DUNGEON_EP_MODIFIER: int = 3  # Dungeon multiplier
+DUNGEON_BOSS_EP_MODIFIER: int = 10  # Dungeon boss multiplier
+ROAMER_EP_MODIFIER: int = 50  # Roaming multiplier
+
+# =============================================================================
+# Hatchery/Breeding Constants - Pokeclicker exact values
+# =============================================================================
+
+# Egg step calculation (from Breeding.ts:463-468)
+# Steps = eggCycles * EGG_CYCLE_MULTIPLIER
+EGG_CYCLE_MULTIPLIER: int = 40
+
+# Max hatchery slots (start with 1, can buy up to 4)
+MAX_EGG_SLOTS: int = 4
+DEFAULT_EGG_SLOTS: int = 1
+
+# Attack bonus from hatching (from Egg.hatch() lines 134-136)
+# Each hatch: attackBonusPercent += BREEDING_ATTACK_BONUS + calcium
+BREEDING_ATTACK_BONUS: int = 25  # Base % attack increase per hatch
+BREEDING_SHINY_ATTACK_MULTIPLIER: int = 2  # Shiny hatch = 2x bonus
+
+# Steps per battle (from Breeding.ts:208-210)
+# progressEggsBattle: sqrt(route) steps per defeat
+# Simplified for Discord: use fixed amounts
+HATCHERY_STEPS_PER_BATTLE: int = 5  # Base steps per battle
+
+# Egg slot cost (Quest Points) - from Breeding.ts:484-486
+# Cost = 500 * slot_number
+EGG_SLOT_BASE_COST: int = 500
+
+# =============================================================================
+# Pokeball Constants - Exact Pokeclicker values (ItemList.ts:88-103)
+# =============================================================================
+
+# Pokeball prices (currency type, price)
+# Format: {ball_type: (price, currency_type)}
+# Currency: 0=PokéDollar, 3=QuestPoint (from enums.py)
+POKEBALL_PRICES: dict[int, tuple[int, int]] = {
+    1: (100, 0),  # Poké Ball: 100 PokéDollar
+    2: (500, 0),  # Great Ball: 500 PokéDollar
+    3: (2000, 0),  # Ultra Ball: 2000 PokéDollar
+    4: (2500, 3),  # Master Ball: 2500 Quest Points
+}
+
+# Pokeball catch bonuses (from Pokeballs.ts:17-20)
+POKEBALL_CATCH_BONUS: dict[int, int] = {
+    0: 0,  # None
+    1: 0,  # Poké Ball: +0%
+    2: 5,  # Great Ball: +5%
+    3: 10,  # Ultra Ball: +10%
+    4: 100,  # Master Ball: +100% (always catch)
+}
+
+# Starter Pokéballs (from Pokeballs.ts constructor, quantity = 25)
+STARTER_POKEBALL_COUNT: int = 25

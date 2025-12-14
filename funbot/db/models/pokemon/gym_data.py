@@ -52,10 +52,10 @@ class PlayerBadge(BaseModel):
 
     class Meta:
         table = "pokemon_player_badges"
-        unique_together = (("player", "badge"),)
+        unique_together = (("user", "badge"),)
 
     id = fields.IntField(primary_key=True)
-    player = fields.ForeignKeyField("models.User", related_name="badges", on_delete=fields.CASCADE)
+    user = fields.ForeignKeyField("models.User", related_name="badges", on_delete=fields.CASCADE)
     badge = fields.CharField(max_length=50)  # Badge name
     badge_id = fields.IntField(null=True)  # Badge enum value
     earned_at = fields.DatetimeField(auto_now_add=True)

@@ -116,3 +116,42 @@ async def unlocked_route_autocomplete(
             choices.append(app_commands.Choice(name=display_name, value=route_id))
 
     return choices[:25]
+
+
+async def gym_autocomplete(
+    interaction: Interaction, current: str
+) -> list[app_commands.Choice[str]]:
+    """Autocomplete for gym selection.
+
+    Shows available gyms in the current region with badge status.
+    """
+    from funbot.db.models.pokemon.gym_data import GymData, PlayerBadge
+
+    # Yield control for async
+    await asyncio.sleep(0)
+
+    # Get region from namespace (default to Kanto)
+    namespace = interaction.namespace
+    region = getattr(namespace, "region", 0)
+    user_id = interaction.user.id
+
+    # Get gyms for region
+    gyms = await GymData.filter(region=region).order_by("id").limit(25).all()
+
+    # Get player badges
+    player_badges = await PlayerBadge.filter(user_id=user_id).values_list("badge", flat=True)
+    player_badge_set = {str(b) for b in player_badges}
+
+    current_lower = current.lower()
+    choices = []
+
+    for gym in gyms:
+        has_badge = gym.badge in player_badge_set
+        status = "🏅" if has_badge else "⚔️"
+        is_elite = "👑 " if gym.is_elite else ""
+        display_name = f"{status} {is_elite}{gym.name} - {gym.leader}"
+
+        if current_lower in display_name.lower() or current_lower in gym.name.lower():
+            choices.append(app_commands.Choice(name=display_name[:100], value=gym.name))
+
+    return choices[:25]

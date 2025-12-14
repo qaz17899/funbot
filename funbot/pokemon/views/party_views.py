@@ -1,0 +1,153 @@
+"""Party display views.
+
+UI components for the /pokemon party command.
+"""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+import discord
+
+from funbot.pokemon.ui_utils import Emoji, get_type_emoji
+from funbot.ui.components_v2 import Container, Section, Separator, TextDisplay, Thumbnail
+from funbot.ui.components_v2.paginator import NavigationRow, Page, PaginatorView
+
+if TYPE_CHECKING:
+    from funbot.db.models.pokemon import PlayerPokemon, PokemonData
+    from funbot.types import Interaction
+
+# Pokemon per page
+POKEMON_PER_PAGE = 8
+
+
+class PartyPaginatorView(PaginatorView):
+    """Paginated party view with 8 Pokemon Sections per page."""
+
+    def __init__(
+        self,
+        pokemon_list: list[PlayerPokemon],
+        username: str,
+        total_attack: int,
+        author: discord.User | discord.Member,
+    ) -> None:
+        # Set instance attributes BEFORE super().__init__() because it calls _build_layout()
+        self.pokemon_list = pokemon_list
+        self.username = username
+        self.total_attack = total_attack
+        self._all_pokemon = pokemon_list
+
+        # Calculate pages
+        total_pokemon = len(pokemon_list)
+        total_pages = (total_pokemon + POKEMON_PER_PAGE - 1) // POKEMON_PER_PAGE
+        if total_pages == 0:
+            total_pages = 1
+        self._total_pages = total_pages  # Must be set before super().__init__()
+
+        # Initialize with placeholder pages (we override the layout building)
+        pages = [Page() for _ in range(total_pages)]
+        super().__init__(pages, author=author, timeout=300.0)
+
+    def _build_layout(self) -> None:
+        """Override to build custom layout with Sections."""
+        # Initialize nav_row first
+        self.nav_row = NavigationRow(self)
+
+        # Build content (including nav at bottom)
+        self._rebuild_content()
+
+    def _rebuild_content(self) -> None:
+        """Build content container for current page."""
+        # Remove existing container if any
+        self.content_container = Container(accent_color=discord.Color.blue())
+
+        # Header
+        page_info = f"(第{self._current_page + 1}頁/共{self._total_pages}頁)"
+        self.content_container.add_item(
+            TextDisplay(f"# 🎒 {self.username} 的寶可夢隊伍 {page_info}")
+        )
+        self.content_container.add_item(Separator(spacing=discord.SeparatorSpacing.small))
+
+        # Get Pokemon for current page
+        start_idx = self._current_page * POKEMON_PER_PAGE
+        end_idx = start_idx + POKEMON_PER_PAGE
+        page_pokemon = self._all_pokemon[start_idx:end_idx]
+
+        # Build Sections for each Pokemon
+        for poke in page_pokemon:
+            data: PokemonData = poke.pokemon_data  # type: ignore
+
+            # Calculate attack with exact Pokeclicker formula
+            total_attack = poke.calculate_attack(data.base_attack)
+
+            # Format text
+            shiny_mark = Emoji.SHINY if poke.shiny else ""
+            pokerus_mark = Emoji.POKERUS if poke.has_pokerus else ""
+            breeding_mark = Emoji.EGG if poke.breeding else ""
+            gender_mark = poke.gender_symbol
+            name = poke.nickname or data.name
+            type_emoji = get_type_emoji(data.type1)
+            type2_emoji = get_type_emoji(data.type2) if data.type2 else ""
+
+            # Attack bonus info
+            atk_bonus = f" (+{poke.attack_bonus_percent}%)" if poke.attack_bonus_percent > 0 else ""
+
+            # Line 1: Name with marks, Level, Attack
+            line1 = f"**{shiny_mark}{name}** {gender_mark}{pokerus_mark}{breeding_mark} Lv.{poke.level} | ATK: {total_attack:,}{atk_bonus}"
+
+            # Line 2: Types and EV info
+            ev_info = f" | EVs: {poke.evs:.1f}" if poke.evs > 0 else ""
+            line2 = f"-# {type_emoji}{type2_emoji}{ev_info}"
+
+            # Line 3: Statistics (if any captures)
+            stats_parts = []
+            if poke.stat_captured > 0:
+                stats_parts.append(f"捕捉: {poke.stat_captured}")
+            if poke.stat_defeated > 0:
+                stats_parts.append(f"擊敗: {poke.stat_defeated}")
+            if poke.caught_at:
+                caught_str = poke.caught_at.strftime("%Y/%m/%d")
+                stats_parts.append(f"首捕: {caught_str}")
+            line3 = f"-# 📊 {' | '.join(stats_parts)}" if stats_parts else ""
+
+            # Combine all lines into single TextDisplay to save components
+            all_lines = [line1, line2]
+            if line3:
+                all_lines.append(line3)
+            combined_text = "\n".join(all_lines)
+
+            # Create section with thumbnail if sprite available
+            sprite_url = (
+                data.sprite_shiny_url
+                if (poke.shiny and not poke.hide_shiny_sprite)
+                else data.sprite_url
+            )
+            if sprite_url:
+                # Section with single TextDisplay + Thumbnail = 3 components per Pokemon
+                section = Section(TextDisplay(combined_text), accessory=Thumbnail(sprite_url))
+                self.content_container.add_item(section)
+            else:
+                # No sprite - just text = 1 component per Pokemon
+                self.content_container.add_item(TextDisplay(combined_text))
+
+        # Footer with stats
+        stats = f"-# 📊 總計: {len(self._all_pokemon)} 隻 | 總攻擊力: {self.total_attack:,}"
+        self.content_container.add_item(TextDisplay(stats))
+
+        # Separator before navigation buttons
+        self.content_container.add_item(
+            Separator(divider=True, spacing=discord.SeparatorSpacing.small)
+        )
+
+        # Navigation buttons at bottom of container
+        self.nav_row.update_states(self._current_page, self.max_page)
+        self.content_container.add_item(self.nav_row)
+
+        # Add to view
+        self.clear_items()
+        self.add_item(self.content_container)
+
+    async def update_page(self, interaction: Interaction) -> None:
+        """Override to rebuild content on page change."""
+        self._rebuild_content()
+        await self.absolute_edit(interaction, view=self)

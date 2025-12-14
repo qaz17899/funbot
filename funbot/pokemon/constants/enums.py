@@ -1,8 +1,15 @@
-"""Pokemon system enums."""
+"""Pokemon system enums.
+
+Centralized location for all Pokemon-related enumerations.
+"""
 
 from __future__ import annotations
 
 from enum import IntEnum, auto
+
+# =============================================================================
+# Pokemon Types and Regions
+# =============================================================================
 
 
 class PokemonType(IntEnum):
@@ -44,6 +51,11 @@ class Region(IntEnum):
     PALDEA = 8  # Gen 9
 
 
+# =============================================================================
+# Items and Currency
+# =============================================================================
+
+
 class Currency(IntEnum):
     """Pokemon currency types."""
 
@@ -71,3 +83,32 @@ POKEBALL_BONUS: dict[Pokeball, float] = {
     Pokeball.ULTRABALL: 10.0,
     Pokeball.MASTERBALL: 100.0,  # Always catch
 }
+
+
+# =============================================================================
+# Pokemon Attributes
+# =============================================================================
+
+
+class Gender(IntEnum):
+    """Pokemon gender."""
+
+    GENDERLESS = 0
+    MALE = 1
+    FEMALE = 2
+
+
+class PokerusState(IntEnum):
+    """Pokerus infection state (exact Pokeclicker values).
+
+    From GameConstants.ts:2424-2429:
+    - UNINFECTED: Can contract virus, cannot gain EVs
+    - INFECTED: Just contracted, cannot gain EVs yet, cannot spread
+    - CONTAGIOUS: Can gain EVs, can spread to others in Hatchery
+    - RESISTANT: EVs >= 50, can gain EVs, can spread, counts for achievements
+    """
+
+    UNINFECTED = 0  # Base state, can contract virus
+    INFECTED = 1  # Just contracted, needs to hatch once
+    CONTAGIOUS = 2  # Can gain EVs and spread
+    RESISTANT = 3  # EVs >= 50, permanent EV gains
