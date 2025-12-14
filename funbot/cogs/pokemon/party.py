@@ -190,15 +190,16 @@ class PartyPaginatorView(PaginatorView):
                 # No sprite - just text = 1 component per Pokemon
                 self.content_container.add_item(TextDisplay(combined_text))
 
-        # Footer with stats (on last page or all pages)
-        self.content_container.add_item(Separator(spacing=discord.SeparatorSpacing.large))
+        # Footer with stats
         stats = f"-# 📊 總計: {len(self._all_pokemon)} 隻 | 總攻擊力: {self.total_attack:,}"
         self.content_container.add_item(TextDisplay(stats))
 
-        # Add navigation buttons at bottom of container
+        # Separator before navigation buttons
         self.content_container.add_item(
-            Separator(divider=False, spacing=discord.SeparatorSpacing.small)
+            Separator(divider=True, spacing=discord.SeparatorSpacing.small)
         )
+
+        # Navigation buttons at bottom of container
         self.nav_row.update_states(self._current_page, self.max_page)
         self.content_container.add_item(self.nav_row)
 
