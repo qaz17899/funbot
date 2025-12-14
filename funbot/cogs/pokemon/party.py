@@ -146,13 +146,17 @@ class PartyPaginatorView(PaginatorView):
             # Format text
             shiny_mark = Emoji.SHINY if poke.shiny else ""
             pokerus_mark = Emoji.POKERUS if poke.has_pokerus else ""
+            breeding_mark = Emoji.EGG if poke.breeding else ""
             gender_mark = poke.gender_symbol
             name = poke.nickname or data.name
             type_emoji = get_type_emoji(data.type1)
             type2_emoji = get_type_emoji(data.type2) if data.type2 else ""
 
+            # Attack bonus info
+            atk_bonus = f" (+{poke.attack_bonus_percent}%)" if poke.attack_bonus_percent > 0 else ""
+
             # Line 1: Name with marks, Level, Attack
-            line1 = f"**{shiny_mark}{name}** {gender_mark}{pokerus_mark} Lv.{poke.level} | ATK: {total_attack:,}"
+            line1 = f"**{shiny_mark}{name}** {gender_mark}{pokerus_mark}{breeding_mark} Lv.{poke.level} | ATK: {total_attack:,}{atk_bonus}"
 
             # Line 2: Types and EV info
             ev_info = f" | EVs: {poke.evs:.1f}" if poke.evs > 0 else ""
