@@ -99,8 +99,16 @@ class Gender(IntEnum):
 
 
 class PokerusState(IntEnum):
-    """Pokerus infection state."""
+    """Pokerus infection state (exact Pokeclicker values).
 
-    NONE = 0  # Never infected
-    INFECTED = 1  # Currently infected (spreads, doubles EV gain)
-    CURED = 2  # Was infected, now cured (permanent EVs boost remains)
+    From GameConstants.ts:2424-2429:
+    - UNINFECTED: Can contract virus, cannot gain EVs
+    - INFECTED: Just contracted, cannot gain EVs yet, cannot spread
+    - CONTAGIOUS: Can gain EVs, can spread to others in Hatchery
+    - RESISTANT: EVs >= 50, can gain EVs, can spread, counts for achievements
+    """
+
+    UNINFECTED = 0  # Base state, can contract virus
+    INFECTED = 1  # Just contracted, needs to hatch once
+    CONTAGIOUS = 2  # Can gain EVs and spread
+    RESISTANT = 3  # EVs >= 50, permanent EV gains

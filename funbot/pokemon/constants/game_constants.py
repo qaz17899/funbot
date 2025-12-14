@@ -96,3 +96,31 @@ REGION_ROUTES: dict[int, tuple[int, int]] = {
     7: (601, 610),  # Galar
     8: (701, 715),  # Paldea
 }
+
+# =============================================================================
+# Effort Points (EVs) Constants - Pokeclicker exact values
+# =============================================================================
+
+# EP to EV conversion ratio (from GameConstants.ts:443)
+EP_EV_RATIO: int = 1000  # EVs = effort_points / EP_EV_RATIO
+
+# Resistant threshold (EVs needed); from PartyPokemon.ts:94
+RESISTANT_EV_THRESHOLD: int = 50
+
+# Base EP yields per capture method (from GameConstants.ts:428-441)
+BASE_EP_YIELD: int = 100  # Standard route catch = 0.1 EVs
+WANDERER_EP_YIELD: int = 200  # Wandering Pokemon = 0.2 EVs
+DUNGEON_EP_YIELD: int = 300  # Dungeon catch = 0.3 EVs
+STONE_EP_YIELD: int = 1000  # Evolution stone = 1.0 EV
+SHOPMON_EP_YIELD: int = 1000  # Shop purchase = 1.0 EV
+SAFARI_EP_YIELD: int = 1000  # Safari catch = 1.0 EV
+BOSS_EP_YIELD: int = 1000  # Dungeon boss = 1.0 EV
+ROAMER_EP_YIELD: int = 5000  # Roaming Pokemon = 5.0 EVs
+
+# EP modifiers (from GameConstants.ts:434-441)
+SHINY_EP_MODIFIER: int = 5  # Shiny catch = 5x EP
+SHADOW_EP_MODIFIER: int = 2  # Shadow catch = 2x EP
+REPEATBALL_EP_MODIFIER: int = 5  # Repeat Ball = 5x EP
+DUNGEON_EP_MODIFIER: int = 3  # Dungeon multiplier
+DUNGEON_BOSS_EP_MODIFIER: int = 10  # Dungeon boss multiplier
+ROAMER_EP_MODIFIER: int = 50  # Roaming multiplier
