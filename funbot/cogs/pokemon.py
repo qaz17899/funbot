@@ -27,6 +27,7 @@ from funbot.db.models.pokemon import (
 from funbot.db.models.pokemon.player_ball_inventory import PlayerBallInventory
 from funbot.db.models.pokemon.route_data import RouteData
 from funbot.db.models.user import User
+from funbot.pokemon.autocomplete import region_autocomplete, route_autocomplete
 from funbot.pokemon.constants.enums import Pokeball
 from funbot.pokemon.constants.game_constants import DEFAULT_STARTER_REGION, STARTERS
 from funbot.pokemon.services.battle_service import BattleService
@@ -217,6 +218,7 @@ class PokemonCog(commands.Cog, name="Pokemon"):
 
     @pokemon.command(name="explore", description="探索路線並捕捉野生寶可夢")
     @app_commands.describe(region="地區編號 (0=關都)", route="路線編號", count="探索次數 (1-100)")
+    @app_commands.autocomplete(region=region_autocomplete, route=route_autocomplete)
     async def explore(
         self, interaction: Interaction, region: int = 0, route: int = 0, count: int = 1
     ) -> None:
