@@ -16,7 +16,7 @@ from discord.ext import commands
 from funbot.db.models.pokemon import PlayerEgg, PlayerPokemon, PokemonData
 from funbot.db.models.user import User
 from funbot.pokemon.services.hatchery_service import HatcheryService
-from funbot.pokemon.ui_utils import get_type_emoji
+from funbot.pokemon.ui_utils import Emoji, get_type_emoji
 from funbot.ui.components_v2 import Container, LayoutView, Separator, TextDisplay
 
 if TYPE_CHECKING:
@@ -56,32 +56,36 @@ class HatcheryCog(commands.Cog):
         pokemon_data = await PokemonData.filter(name__icontains=pokemon_name).first()
         if not pokemon_data:
             await interaction.followup.send(
-                f"❌ 找不到名為 `{pokemon_name}` 的寶可夢", ephemeral=True
+                f"{Emoji.CROSS} 找不到名為 `{pokemon_name}` 的寶可夢", ephemeral=True
             )
             return
 
         # Check if user owns this Pokemon
         player_pokemon = await PlayerPokemon.filter(user=user, pokemon_data=pokemon_data).first()
         if not player_pokemon:
-            await interaction.followup.send(f"❌ 你沒有 **{pokemon_data.name}**！", ephemeral=True)
+            await interaction.followup.send(
+                f"{Emoji.CROSS} 你沒有 **{pokemon_data.name}**！", ephemeral=True
+            )
             return
 
         # Check if already breeding
         if player_pokemon.breeding:
             await interaction.followup.send(
-                f"❌ **{pokemon_data.name}** 已經在孵化場中！", ephemeral=True
+                f"{Emoji.CROSS} **{pokemon_data.name}** 已經在孵化場中！", ephemeral=True
             )
             return
 
         # Try to add to hatchery
         egg = await HatcheryService.add_to_hatchery(user, player_pokemon, pokemon_data)
         if not egg:
-            await interaction.followup.send("❌ 孵化場已滿！請先孵化現有的蛋。", ephemeral=True)
+            await interaction.followup.send(
+                f"{Emoji.CROSS} 孵化場已滿！請先孵化現有的蛋。", ephemeral=True
+            )
             return
 
         type_emoji = get_type_emoji(pokemon_data.type1)
         await interaction.followup.send(
-            f"✅ {type_emoji} **{pokemon_data.name}** 已加入孵化場！\n"
+            f"{Emoji.CHECK} {type_emoji} **{pokemon_data.name}** 已加入孵化場！\n"
             f"-# 需要 {egg.steps_required:,} 步驟孵化。使用 `/pokemon-explore` 累積步數。"
         )
 
@@ -94,14 +98,14 @@ class HatcheryCog(commands.Cog):
         results = await HatcheryService.hatch_all_ready(user)
 
         if not results:
-            await interaction.followup.send("❌ 沒有已準備好孵化的蛋！", ephemeral=True)
+            await interaction.followup.send(f"{Emoji.CROSS} 沒有已準備好孵化的蛋！", ephemeral=True)
             return
 
         # Build result message
-        lines = ["# 🥚 孵化結果"]
+        lines = [f"# {Emoji.EGG} 孵化結果"]
         for result in results:
-            shiny_mark = "✨" if result.shiny else ""
-            pokerus_mark = " 🦠 **Pokerus 升級！**" if result.pokerus_upgraded else ""
+            shiny_mark = Emoji.SHINY if result.shiny else ""
+            pokerus_mark = f" {Emoji.POKERUS} **Pokerus 升級！**" if result.pokerus_upgraded else ""
             lines.append(
                 f"- {shiny_mark}**{result.pokemon_name}** +{result.attack_bonus_percent}% ATK{pokerus_mark}"
             )
@@ -117,7 +121,7 @@ class HatcheryListView(LayoutView):
         super().__init__(timeout=0)
 
         container = Container(accent_color=discord.Color.green())
-        container.add_item(TextDisplay(f"# 🥚 {username} 的孵化場"))
+        container.add_item(TextDisplay(f"# {Emoji.EGG} {username} 的孵化場"))
         container.add_item(TextDisplay(f"槽位: {len(eggs)}/{slots}"))
         container.add_item(Separator(spacing=discord.SeparatorSpacing.small))
 
@@ -129,7 +133,7 @@ class HatcheryListView(LayoutView):
                 data: PokemonData = egg.pokemon_data  # type: ignore
                 type_emoji = get_type_emoji(data.type1)
                 progress_bar = self._create_progress_bar(egg.progress)
-                ready_mark = " ✅ 準備孵化！" if egg.can_hatch else ""
+                ready_mark = f" {Emoji.CHECK} 準備孵化！" if egg.can_hatch else ""
 
                 container.add_item(
                     TextDisplay(f"**Slot {egg.slot + 1}**: {type_emoji} {data.name}{ready_mark}")
@@ -147,7 +151,7 @@ class HatcheryListView(LayoutView):
         """Create a text progress bar."""
         filled = int(progress / 100 * length)
         empty = length - filled
-        return "█" * filled + "░" * empty
+        return Emoji.PROGRESS * filled + Emoji.PROGRESS_EMPTY * empty
 
 
 async def setup(bot: FunBot) -> None:

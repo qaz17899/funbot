@@ -7,13 +7,53 @@ Discord custom emoji IDs are used for pokeballs, currencies, and items.
 from __future__ import annotations
 
 __all__ = (
+    # Badges
+    "BADGE_EMOJI_IDS",
+    # Currency
     "CURRENCY_EMOJI_IDS",
+    # Gems
+    "GEM_EMOJI_IDS",
+    # Pokeballs
     "POKEBALL_EMOJI_IDS",
+    # Types
     "TYPE_EMOJIS",
+    # Common emojis (new)
+    "Emoji",
+    "get_badge_emoji",
     "get_ball_emoji",
     "get_currency_emoji",
+    "get_gem_emoji",
     "get_type_emoji",
 )
+
+
+class Emoji:
+    """Common emoji constants for UI consistency."""
+
+    # Status/Success indicators
+    CHECK = "✅"
+    CROSS = "❌"
+    WARNING = "⚠️"
+
+    # Pokemon-specific
+    SHINY = "✨"
+    POKERUS = "🦠"
+    EGG = "🥚"
+    HATCH = "🐣"
+
+    # Actions
+    BATTLE = "⚔️"
+    CATCH = "🎯"
+    MAP = "🗺️"
+    EXP = "⭐"
+
+    # Gender
+    MALE = "♂"
+    FEMALE = "♀"
+
+    # Misc
+    PROGRESS = "█"
+    PROGRESS_EMPTY = "░"
 
 
 # Pokemon type to emoji mapping (all 18 types)

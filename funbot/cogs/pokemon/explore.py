@@ -37,6 +37,7 @@ from funbot.pokemon.services.catch_service import CatchService
 from funbot.pokemon.services.exp_service import ExpService
 from funbot.pokemon.services.hatchery_service import HatcheryService
 from funbot.pokemon.services.route_service import get_route_status_service
+from funbot.pokemon.ui_utils import Emoji, get_currency_emoji
 from funbot.types import Interaction
 from funbot.ui.components_v2 import Container, LayoutView, TextDisplay
 
@@ -363,27 +364,33 @@ class ExploreCog(commands.Cog):
         color = discord.Color.green() if results.caught_pokemon else discord.Color.blue()
 
         # Build content lines
+        money_emoji = get_currency_emoji("money")
         lines = [
-            f"## 🗺️ {route_data.name} 探索結果",
+            f"## {Emoji.MAP} {route_data.name} 探索結果",
             "",
-            f"⚔️ 擊敗: **{results.pokemon_defeated}** 隻寶可夢",
-            f"💰 獲得: **{results.total_money:,}** PokeDollar",
-            f"⭐ 經驗: **+{results.total_exp:,}** EXP (全隊)",
+            f"{Emoji.BATTLE} 擊敗: **{results.pokemon_defeated}** 隻寶可夢",
+            f"{money_emoji} 獲得: **{results.total_money:,}**",
+            f"{Emoji.EXP} 經驗: **+{results.total_exp:,}** EXP (全隊)",
         ]
 
         # Catch results
         if results.caught_pokemon:
-            caught_names = [f"{'✨' if s else ''}{name}" for name, _, s in results.caught_pokemon]
+            caught_names = [
+                f"{Emoji.SHINY if s else ''}{name}" for name, _, s in results.caught_pokemon
+            ]
             lines.extend(
-                [f"🎯 捕獲: **{results.pokemon_caught}** 隻", f"   {', '.join(caught_names[:5])}"]
+                [
+                    f"{Emoji.CATCH} 捕獲: **{results.pokemon_caught}** 隻",
+                    f"   {', '.join(caught_names[:5])}",
+                ]
             )
             if len(caught_names) > 5:
                 lines.append(f"   ...還有 {len(caught_names) - 5} 隻")
         else:
-            lines.append("🎯 捕獲: 0 隻")
+            lines.append(f"{Emoji.CATCH} 捕獲: 0 隻")
 
         if results.shiny_count > 0:
-            lines.append(f"✨ 異色: **{results.shiny_count}** 隻！")
+            lines.append(f"{Emoji.SHINY} 異色: **{results.shiny_count}** 隻！")
 
         lines.append(f"\n-# 探索者: {username}")
 
