@@ -1,6 +1,10 @@
 line-length = 100
-target-version = "py313"
+target-version = "py314"
 output-format = "concise"
+
+# Auto-fix settings
+fix = true
+unsafe-fixes = true
 
 [lint]
 preview = true
@@ -76,6 +80,18 @@ ignore = [
   "PLR0915", # Too many statements
   "PLR0912", # Too many branches
   "PLR0911", # Too many return statements
+  "PLR1702", # Too many nested blocks
+
+  # Import patterns
+  "PLC0415", # Import outside top-level (needed for circular import avoidance)
+
+  # Singleton patterns
+  "PLW0603", # Using global statement (needed for singleton pattern)
+
+  # Unused arguments in abstract/interface patterns
+  "ARG001",  # Unused function argument (often needed for interface compliance)
+  "ARG002",  # Unused method argument
+  "ARG004",  # Unused static method argument
 ]
 
 [lint.per-file-ignores]
@@ -85,6 +101,15 @@ ignore = [
 "test.py" = ["ALL"]
 "vulture_whitelist.py" = ["ALL"]
 "restart.py" = ["T201", "S602", "S404", "S603"]
+# Scripts directory - one-off import/parse scripts with relaxed rules
+"scripts/**/*.py" = [
+  "G004",     # Logging f-strings OK in scripts
+  "TRY401",   # Redundant exception in logging OK
+  "S110",     # try-except-pass OK in scripts
+  "ASYNC230", # Blocking file open OK in async scripts
+  "PLC0206",  # dict iteration without .items() OK
+  "B007",     # Unused loop variable OK
+]
 
 [lint.flake8-type-checking]
 quote-annotations = true

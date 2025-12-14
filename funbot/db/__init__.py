@@ -19,7 +19,7 @@ _LAZY_NAMES = {"Database", "build_query", "execute_raw", "fetch_all", "fetch_one
 def __getattr__(name: str) -> Any:
     """Lazy import to avoid circular imports with config."""
     if name == "Database":
-        from funbot.db.database import Database  # noqa: PLC0415
+        from funbot.db.database import Database
 
         return Database
     if name in {
@@ -30,7 +30,7 @@ def __getattr__(name: str) -> Any:
         "fetch_one",
         "fetch_val",
     }:
-        from funbot.db import utils  # noqa: PLC0415
+        from funbot.db import utils
 
         return getattr(utils, name)
     msg = f"module {_MODULE_NAME!r} has no attribute {name!r}"

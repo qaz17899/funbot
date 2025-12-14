@@ -15,10 +15,8 @@ from __future__ import annotations
 import contextlib
 import json
 import re
-import sys
 from pathlib import Path
 from typing import Any
-
 
 # =============================================================================
 # ENUM MAPPINGS
@@ -96,7 +94,7 @@ def parse_arguments(arg_string: str) -> list[str]:
 
     for char in arg_string:
         # Track string state - handle escaped quotes
-        if char in ("'", '"', "`") and prev_char != "\\":
+        if char in {"'", '"', "`"} and prev_char != "\\":
             if not in_string:
                 in_string = True
                 string_char = char
@@ -169,7 +167,7 @@ def parse_requirement(req_string: str) -> dict[str, Any] | None:
     node: dict[str, Any] = {"type": req_type, "params": {}, "children": []}
 
     # Handle logical containers (OR/AND)
-    if req_type in ("OneFromManyRequirement", "MultiRequirement"):
+    if req_type in {"OneFromManyRequirement", "MultiRequirement"}:
         # First argument is an array: [new Req1(), new Req2()]
         if args and args[0].strip().startswith("["):
             array_content = args[0].strip()[1:-1]  # Remove [ ]
@@ -368,10 +366,8 @@ def parse_routes(file_content: str) -> list[dict]:
         # Extract order_number (optional float after requirements)
         order_match = re.search(r"\],\s*([\d.]+)\s*,", rest)
         if order_match:
-            try:
+            with contextlib.suppress(ValueError):
                 route_data["order_number"] = float(order_match.group(1))
-            except ValueError:
-                pass
 
         # Extract sub_region and track which one
         sub_region_name = None
@@ -425,18 +421,14 @@ def main() -> None:
     )
 
     if not route_data_path.exists():
-        print(f"Error: {route_data_path} not found", file=sys.stderr)
         return
 
     content = route_data_path.read_text(encoding="utf-8")
     routes = parse_routes(content)
 
-    print(f"Parsed {len(routes)} routes", file=sys.stderr)
-
     # Write to file with UTF-8 encoding
     output_path = Path(__file__).parent / "routes_data.json"
     output_path.write_text(json.dumps(routes, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(f"Output written to {output_path}", file=sys.stderr)
 
 
 if __name__ == "__main__":

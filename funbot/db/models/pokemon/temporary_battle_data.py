@@ -33,7 +33,7 @@ class TemporaryBattleData(BaseModel):
     reset_daily = fields.BooleanField(default=False)  # Battle resets daily
 
     # Reverse relation for battle Pokemon
-    pokemon: fields.ReverseRelation["TemporaryBattlePokemon"]
+    pokemon: fields.ReverseRelation[TemporaryBattlePokemon]
 
     def __str__(self) -> str:
         return f"{self.display_name}"

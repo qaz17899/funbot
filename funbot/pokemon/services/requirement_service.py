@@ -8,16 +8,11 @@ This service implements the same logic as Pokeclicker's Requirement system:
 
 from __future__ import annotations
 
-import logging
-from datetime import datetime
-from typing import TYPE_CHECKING
+from datetime import UTC, datetime
+
+from loguru import logger
 
 from funbot.db.models.pokemon.route_requirement import RequirementType, RouteRequirement
-
-if TYPE_CHECKING:
-    from funbot.db.models.pokemon.player_route_progress import PlayerRouteProgress
-
-logger = logging.getLogger(__name__)
 
 
 class RequirementService:
@@ -90,11 +85,14 @@ class RequirementService:
         """
         children = await requirement.children.all()
         if not children:
+            logger.debug("MULTI requirement {}: no children, satisfied", requirement.id)
             return True  # No children = satisfied
 
         for child in children:
             if not await self.check_requirement(player_id, child):
+                logger.debug("MULTI requirement {}: child {} failed", requirement.id, child.id)
                 return False
+        logger.debug("MULTI requirement {}: all {} children passed", requirement.id, len(children))
         return True
 
     async def _check_one_from_many(self, player_id: int, requirement: RouteRequirement) -> bool:
@@ -104,11 +102,16 @@ class RequirementService:
         """
         children = await requirement.children.all()
         if not children:
+            logger.debug("ONE_FROM_MANY requirement {}: no children, satisfied", requirement.id)
             return True  # No children = satisfied
 
         for child in children:
             if await self.check_requirement(player_id, child):
+                logger.debug(
+                    "ONE_FROM_MANY requirement {}: child {} passed", requirement.id, child.id
+                )
                 return True
+        logger.debug("ONE_FROM_MANY requirement {}: no children passed", requirement.id)
         return False
 
     # =========================================================================
@@ -127,7 +130,7 @@ class RequirementService:
         amount = params.get("amount", 10)  # Default: 10 kills
 
         progress = await PlayerRouteProgress.filter(
-            player_id=player_id, route__region=region, route__number=route
+            user_id=player_id, route__region=region, route__number=route
         ).first()
 
         kills = progress.kills if progress else 0
@@ -145,9 +148,7 @@ class RequirementService:
             return True
 
         # Check if player has this badge
-        has_badge = await PlayerBadge.filter(player_id=player_id, badge=badge_name).exists()
-
-        return has_badge
+        return await PlayerBadge.filter(player_id=player_id, badge=badge_name).exists()
 
     async def _check_dungeon_clear(self, player_id: int, params: dict) -> bool:
         """Check if player has cleared a dungeon enough times.
@@ -282,11 +283,7 @@ class RequirementService:
         if not pokemon_name:
             return True
 
-        exists = await PlayerPokemon.filter(
-            player_id=player_id, pokemon__name=pokemon_name
-        ).exists()
-
-        return exists
+        return await PlayerPokemon.filter(player_id=player_id, pokemon__name=pokemon_name).exists()
 
     # =========================================================================
     # CONDITIONAL REQUIREMENTS (Real-time checks)
@@ -312,7 +309,7 @@ class RequirementService:
             return True
 
         # Get current day name
-        today = datetime.now().strftime("%A")  # e.g., "Monday"
+        today = datetime.now(tz=UTC).strftime("%A")  # e.g., "Monday"
         return today in days
 
     def _check_special_event(self, params: dict) -> bool:

@@ -24,7 +24,7 @@ class RoamingPokemon(Model):
 
     # Requirement to unlock this roaming Pokemon
     # Stored as JSON for flexibility
-    requirement_data: dict | None = fields.JSONField(
+    requirement_data = fields.JSONField(
         null=True, description='Requirement config {"type": "quest", "quest": "Celio\'s Errand"}'
     )
 

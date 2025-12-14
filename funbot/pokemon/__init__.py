@@ -6,5 +6,6 @@ This module contains:
 - constants/: Enums, game constants, type chart
 - services/: Battle, catch, exp calculation services
 """
+from __future__ import annotations
 
 from funbot.pokemon.constants import *

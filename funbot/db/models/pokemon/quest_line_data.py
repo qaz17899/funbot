@@ -6,9 +6,14 @@ Quest lines are story sequences that unlock features, Pokemon, and content.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, ClassVar
+
 from tortoise import fields
 
 from funbot.db.models.base import BaseModel
+
+if TYPE_CHECKING:
+    from funbot.db.models.pokemon.player_quest_progress import PlayerQuestProgress
 
 
 class QuestLineData(BaseModel):
@@ -40,8 +45,8 @@ class QuestLineData(BaseModel):
     )
 
     # Reverse relation to quests
-    quests: fields.ReverseRelation["QuestData"]
-    player_progress: fields.ReverseRelation["PlayerQuestProgress"]
+    quests: fields.ReverseRelation[QuestData]
+    player_progress: fields.ReverseRelation[PlayerQuestProgress]
 
     def __str__(self) -> str:
         return self.name
@@ -61,7 +66,7 @@ class QuestData(BaseModel):
 
     class Meta:
         table = "pokemon_quest_data"
-        ordering = ["quest_line_id", "quest_index"]
+        ordering: ClassVar[list[str]] = ["quest_line_id", "quest_index"]
 
     id = fields.IntField(primary_key=True)
     quest_line = fields.ForeignKeyField(

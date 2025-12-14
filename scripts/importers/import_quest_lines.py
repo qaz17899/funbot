@@ -67,7 +67,7 @@ async def create_requirement_tree(
     req_type = REQUIREMENT_TYPE_MAP.get(req_type_name)
 
     if req_type is None:
-        logger.warning(f"Unknown requirement type: {req_type_name}")
+        logger.warning("Unknown requirement type: %s", req_type_name)
         return None
 
     # Build parameters based on requirement type
@@ -99,7 +99,7 @@ async def create_requirement_tree(
         parent=parent,
         route=None,  # Quest line requirements don't link to routes
         requirement_type=req_type.value,
-        parameters=params if params else None,
+        parameters=params or None,
     )
 
     # Process children for compound requirements (Multi, OneFromMany)
@@ -124,11 +124,11 @@ async def import_quest_lines() -> tuple[int, int]:
     json_path = Path(__file__).parent.parent / "data" / "quest_lines_data.json"
 
     if not json_path.exists():
-        logger.error(f"Quest lines data file not found: {json_path}")
+        logger.error("Quest lines data file not found: %s", json_path)
         logger.error("Run 'npx tsx scripts/extract_quest_lines.ts' first")
         return 0, 0
 
-    with open(json_path, encoding="utf-8") as f:
+    with Path(json_path).open(encoding="utf-8") as f:
         quest_lines_data = json.load(f)
 
     logger.info(f"Loaded {len(quest_lines_data)} quest lines from JSON")
@@ -192,7 +192,7 @@ async def import_quest_lines() -> tuple[int, int]:
                 description=quest_description,
                 amount=amount,
                 points_reward=points_reward,
-                type_data=type_data if type_data else None,
+                type_data=type_data or None,
                 has_custom_reward=has_custom_reward,
             )
             quests_count += 1
@@ -221,7 +221,7 @@ async def main() -> None:
         # Clear existing quest line data first
         deleted_quests = await QuestData.all().delete()
         deleted_quest_lines = await QuestLineData.all().delete()
-        logger.info(f"Cleared {deleted_quest_lines} quest lines, {deleted_quests} quests")
+        logger.info("Cleared %s quest lines, %s quests", deleted_quest_lines, deleted_quests)
 
         # Use transaction for atomicity and performance
         async with in_transaction():
@@ -229,8 +229,8 @@ async def main() -> None:
 
         logger.info("=" * 50)
         logger.info("✅ Import complete!")
-        logger.info(f"   Quest Lines: {quest_lines_count}")
-        logger.info(f"   Quests: {quests_count}")
+        logger.info("   Quest Lines: %s", quest_lines_count)
+        logger.info("   Quests: %s", quests_count)
     except Exception as e:
         logger.exception("❌ Import failed, transaction rolled back: %s", e)
         raise

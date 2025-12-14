@@ -49,6 +49,6 @@ class PlayerPokemon(Model):
     updated_at = fields.DatetimeField(auto_now=True)
 
     def __str__(self) -> str:
-        name = self.nickname or f"Pokemon #{self.pokemon_data_id}"
+        name = self.nickname or f"Pokemon #{self.id}"
         shiny_mark = "✨" if self.shiny else ""
         return f"{shiny_mark}{name} Lv.{self.level}"

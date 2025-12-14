@@ -6,6 +6,8 @@ Uses Discord Components V2 with subclassing pattern.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import discord
 from discord import app_commands, ui
 from discord.ext import commands
@@ -14,16 +16,20 @@ from funbot.db.models.pokemon import PlayerPokeballSettings
 from funbot.db.models.user import User
 from funbot.pokemon.constants.enums import Pokeball
 from funbot.pokemon.ui_utils import get_ball_emoji
+from funbot.types import Interaction
+
+if TYPE_CHECKING:
+    from funbot.bot import FunBot
 
 
 class PokeballsCog(commands.Cog):
     """Commands for managing Pokeball settings."""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: FunBot) -> None:
         self.bot = bot
 
     @app_commands.command(name="pokemon-pokeballs", description="設定自動捕捉的寶貝球")
-    async def pokemon_pokeballs(self, interaction: discord.Interaction) -> None:
+    async def pokemon_pokeballs(self, interaction: Interaction) -> None:
         """View and edit Pokeball settings."""
         await interaction.response.defer()
 
@@ -44,7 +50,7 @@ class PokeballsCog(commands.Cog):
         await interaction.followup.send(view=view)
 
 
-class PokeballSelect(ui.Select["PokeballSelectActionRow"]):
+class PokeballSelect(ui.Select["PokeballSettingsLayout"]):
     """Select menu for choosing pokeball for a category."""
 
     def __init__(
@@ -91,7 +97,7 @@ class PokeballSelect(ui.Select["PokeballSelectActionRow"]):
 
         super().__init__(placeholder=f"{label}...", options=options)
 
-    async def callback(self, interaction: discord.Interaction) -> None:
+    async def callback(self, interaction: Interaction) -> None:
         """Handle pokeball selection."""
         if interaction.user.id != self.discord_user_id:
             await interaction.response.send_message("❌ 這不是你的設定！", ephemeral=True)
@@ -151,19 +157,16 @@ class PokeballSettingsLayout(ui.LayoutView):
             ball_emoji = get_ball_emoji(current_value)
             ball_name = Pokeball(current_value).name.replace("_", " ").title()
 
-            container.add_item(
-                ui.Section(
-                    ui.TextDisplay(f"### {name}"), ui.TextDisplay(f"目前: {ball_emoji} {ball_name}")
-                )
-            )
+            container.add_item(ui.TextDisplay(f"### {name}"))
+            container.add_item(ui.TextDisplay(f"目前: {ball_emoji} {ball_name}"))
             container.add_item(PokeballSelectActionRow(key, name, settings, discord_user_id))
 
-        container.add_item(ui.Separator(spacing=discord.SeparatorSpacing.large, divider=True))
+        container.add_item(ui.Separator(spacing=discord.SeparatorSpacing.large))
         container.add_item(ui.TextDisplay("-# 選擇後會自動儲存"))
 
         self.add_item(container)
 
 
-async def setup(bot: commands.Bot) -> None:
+async def setup(bot: FunBot) -> None:
     """Add cog to bot."""
     await bot.add_cog(PokeballsCog(bot))

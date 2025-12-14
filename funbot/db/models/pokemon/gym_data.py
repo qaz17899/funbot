@@ -24,7 +24,7 @@ class GymData(BaseModel):
     is_elite = fields.BooleanField(default=False)
 
     # Reverse relation for gym Pokemon
-    pokemon: fields.ReverseRelation["GymPokemon"]
+    pokemon: fields.ReverseRelation[GymPokemon]
 
     def __str__(self) -> str:
         return f"{self.name} ({self.leader})"

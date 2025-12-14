@@ -65,7 +65,7 @@ class CommandTree(app_commands.CommandTree["FunBot"]):
         logger.error(f"Command error in {i.command}: {original}", exc_info=original)
 
         # Send error response to user
-        from funbot.embeds import ErrorEmbed  # noqa: PLC0415
+        from funbot.embeds import ErrorEmbed
 
         embed = ErrorEmbed(title="Command Error", description=str(original))
 

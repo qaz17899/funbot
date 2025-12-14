@@ -37,7 +37,7 @@ class PlayerWallet(Model):
     updated_at = fields.DatetimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return f"Wallet(user={self.user_id}, ¥{self.pokedollar:,})"
+        return f"Wallet(id={self.id}, ¥{self.pokedollar:,})"
 
     async def add_pokedollar(self, amount: int) -> int:
         """Add pokedollar to wallet atomically.

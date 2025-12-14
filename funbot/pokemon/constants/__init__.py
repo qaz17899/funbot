@@ -1,5 +1,6 @@
 # Pokemon Constants
 """Constants and enums for the Pokemon system."""
+from __future__ import annotations
 
 from funbot.pokemon.constants.enums import Currency, Pokeball, PokemonType, Region
 from funbot.pokemon.constants.game_constants import (
@@ -14,11 +15,6 @@ from funbot.pokemon.constants.game_constants import (
 from funbot.pokemon.constants.type_chart import TYPE_EFFECTIVENESS
 
 __all__ = [
-    # Enums
-    "Currency",
-    "Pokeball",
-    "PokemonType",
-    "Region",
     # Constants
     "BASE_CATCH_RATE",
     "BASE_EXP_MODIFIER",
@@ -29,4 +25,9 @@ __all__ = [
     "SHINY_CHANCE",
     # Type chart
     "TYPE_EFFECTIVENESS",
+    # Enums
+    "Currency",
+    "Pokeball",
+    "PokemonType",
+    "Region",
 ]

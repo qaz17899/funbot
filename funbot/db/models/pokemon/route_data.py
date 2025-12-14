@@ -8,8 +8,13 @@ Each route has:
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from tortoise import fields
 from tortoise.models import Model
+
+if TYPE_CHECKING:
+    from funbot.db.models.pokemon.route_requirement import RouteRequirement
 
 
 class RouteData(Model):
@@ -24,20 +29,19 @@ class RouteData(Model):
     custom_health = fields.IntField(null=True, description="Override route health formula")
 
     # Pokemon distributions (JSON arrays of pokemon names)
-    land_pokemon: list[str] = fields.JSONField(
-        default=[], description='Land encounters ["Pidgey", "Rattata"]'
+    land_pokemon = fields.JSONField(
+        default=list, description='Land encounters ["Pidgey", "Rattata"]'
     )
-    water_pokemon: list[str] = fields.JSONField(
-        default=[], description="Water encounters (needs Super_rod)"
-    )
-    headbutt_pokemon: list[str] = fields.JSONField(
-        default=[], description="Headbutt tree encounters"
-    )
+    water_pokemon = fields.JSONField(default=list, description="Water encounters (needs Super_rod)")
+    headbutt_pokemon = fields.JSONField(default=list, description="Headbutt tree encounters")
 
     # Routes with DevelopmentRequirement are not fully implemented yet
     is_implemented = fields.BooleanField(
         default=True, description="False for routes with DevelopmentRequirement"
     )
+
+    # Reverse relation from RouteRequirement
+    requirements: fields.ReverseRelation[RouteRequirement]
 
     class Meta:
         table = "pokemon_route_data"

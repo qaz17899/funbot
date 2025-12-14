@@ -50,7 +50,7 @@ class PlayerPokeballSettings(Model):
     updated_at = fields.DatetimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return f"PokeballSettings(user={self.user_id})"
+        return f"PokeballSettings(id={self.id})"
 
     def to_dict(self) -> dict:
         """Convert settings to dict for CatchService."""

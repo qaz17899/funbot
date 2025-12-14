@@ -3,15 +3,18 @@
 
 from __future__ import annotations
 
-from discord.ext import commands
+from typing import TYPE_CHECKING
 
 from funbot.cogs.pokemon.explore import ExploreCog
 from funbot.cogs.pokemon.party import PartyCog
 from funbot.cogs.pokemon.pokeballs import PokeballsCog
 from funbot.cogs.pokemon.starter import StarterCog
 
+if TYPE_CHECKING:
+    from funbot.bot import FunBot
 
-async def setup(bot: commands.Bot) -> None:
+
+async def setup(bot: FunBot) -> None:
     """Load all Pokemon cogs."""
     await bot.add_cog(StarterCog(bot))
     await bot.add_cog(PartyCog(bot))

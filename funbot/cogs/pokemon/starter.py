@@ -6,6 +6,8 @@ Uses Discord Components V2 with subclassing pattern.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import discord
 from discord import app_commands, ui
 from discord.ext import commands
@@ -14,16 +16,20 @@ from funbot.db.models.pokemon import PlayerPokemon, PlayerWallet, PokemonData
 from funbot.db.models.user import User
 from funbot.pokemon.constants.game_constants import DEFAULT_STARTER_REGION, STARTERS
 from funbot.pokemon.ui_utils import get_type_emoji
+from funbot.types import Interaction
+
+if TYPE_CHECKING:
+    from funbot.bot import FunBot
 
 
 class StarterCog(commands.Cog):
     """Commands for selecting starter Pokemon."""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: FunBot) -> None:
         self.bot = bot
 
     @app_commands.command(name="pokemon-start", description="選擇你的初始寶可夢")
-    async def pokemon_start(self, interaction: discord.Interaction) -> None:
+    async def pokemon_start(self, interaction: Interaction) -> None:
         """Select your starter Pokemon."""
         await interaction.response.defer()
 
@@ -77,7 +83,7 @@ class StarterSelect(ui.Select["StarterSelectLayout"]):
 
         super().__init__(placeholder="選擇一隻寶可夢...", options=options)
 
-    async def callback(self, interaction: discord.Interaction) -> None:
+    async def callback(self, interaction: Interaction) -> None:
         """Handle starter selection."""
         # Verify it's the same user
         if interaction.user.id != self.discord_user_id:
@@ -131,12 +137,12 @@ class StarterSelectLayout(ui.LayoutView):
                     ui.TextDisplay(f"HP: {starter.base_hp} | ATK: {starter.base_attack}"),
                     accessory=ui.Thumbnail(starter.sprite_url),
                 )
+                container.add_item(section)
             else:
-                section = ui.Section(
-                    ui.TextDisplay(f"### {type_emoji} {starter.name}"),
-                    ui.TextDisplay(f"HP: {starter.base_hp} | ATK: {starter.base_attack}"),
+                container.add_item(ui.TextDisplay(f"### {type_emoji} {starter.name}"))
+                container.add_item(
+                    ui.TextDisplay(f"HP: {starter.base_hp} | ATK: {starter.base_attack}")
                 )
-            container.add_item(section)
 
         # Add action row with select menu
         container.add_item(StarterSelectActionRow(starters, user, discord_user_id))
@@ -159,12 +165,10 @@ class StarterSuccessLayout(ui.LayoutView):
                 ui.TextDisplay(f"你選擇了 **{pokemon.name}** 作為你的夥伴！"),
                 accessory=ui.Thumbnail(pokemon.sprite_url),
             )
+            container.add_item(header)
         else:
-            header = ui.Section(
-                ui.TextDisplay("# 🎉 恭喜！"),
-                ui.TextDisplay(f"你選擇了 **{pokemon.name}** 作為你的夥伴！"),
-            )
-        container.add_item(header)
+            container.add_item(ui.TextDisplay("# 🎉 恭喜！"))
+            container.add_item(ui.TextDisplay(f"你選擇了 **{pokemon.name}** 作為你的夥伴！"))
 
         container.add_item(ui.Separator(spacing=discord.SeparatorSpacing.small))
 
@@ -178,6 +182,6 @@ class StarterSuccessLayout(ui.LayoutView):
         self.add_item(container)
 
 
-async def setup(bot: commands.Bot) -> None:
+async def setup(bot: FunBot) -> None:
     """Add cog to bot."""
     await bot.add_cog(StarterCog(bot))

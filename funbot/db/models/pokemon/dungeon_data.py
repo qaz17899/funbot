@@ -20,8 +20,8 @@ class DungeonData(BaseModel):
     token_cost = fields.IntField(null=True)
 
     # Reverse relations
-    pokemon: fields.ReverseRelation["DungeonPokemon"]
-    loot: fields.ReverseRelation["DungeonLoot"]
+    pokemon: fields.ReverseRelation[DungeonPokemon]
+    loot: fields.ReverseRelation[DungeonLoot]
 
     def __str__(self) -> str:
         return f"Dungeon: {self.name}"

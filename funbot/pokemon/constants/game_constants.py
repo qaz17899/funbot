@@ -21,6 +21,10 @@ ROUTE_HEALTH_MIN: int = 20
 # Money = ROUTE_MONEY_BASE * route + 5 * route^1.15
 ROUTE_MONEY_BASE: int = 3
 
+# Number of Pokemon defeats needed to "complete" a route
+# Matches PokéClicker: GameConstants.ROUTE_KILLS_NEEDED = 10
+ROUTE_KILLS_NEEDED: int = 10
+
 # =============================================================================
 # Catch Constants
 # =============================================================================

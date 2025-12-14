@@ -75,7 +75,10 @@ class RouteRequirement(Model):
     #   TEMP_BATTLE: {"battle": "Blue 2"}
     #   QUEST_LINE_COMPLETED: {"quest": "Celio's Errand"}
     #   QUEST_LINE_STEP: {"quest": "Bill's Errand", "step": 0}
-    parameters: dict = fields.JSONField(null=True, description="Requirement-specific parameters")
+    parameters = fields.JSONField(null=True, description="Requirement-specific parameters")
+
+    # Reverse relation for tree structure
+    children: fields.ReverseRelation[RouteRequirement]
 
     class Meta:
         table = "pokemon_route_requirement"
@@ -91,7 +94,7 @@ class SpecialRoutePokemon(Model):
     route = fields.ForeignKeyField(
         "models.RouteData", related_name="special_pokemon", on_delete=fields.CASCADE
     )
-    pokemon_names: list[str] = fields.JSONField(description='Pokemon names ["Sunkern"]')
+    pokemon_names = fields.JSONField(description='Pokemon names ["Sunkern"]')
 
     # Root requirement node for this special Pokemon's condition
     # This allows reusing the same recursive evaluation logic

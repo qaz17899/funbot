@@ -50,7 +50,7 @@ class Modal(discord.ui.Modal):
         Raises:
             ValueError: If any TextInput with is_digit=True has invalid input.
         """
-        from funbot.ui.components.text_input import TextInput  # noqa: PLC0415
+        from funbot.ui.components.text_input import TextInput
 
         for item in self.children:
             if isinstance(item, TextInput):

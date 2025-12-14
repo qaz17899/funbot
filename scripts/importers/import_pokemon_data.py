@@ -90,7 +90,7 @@ async def fetch_pokemon_data(client: httpx.AsyncClient, pokemon_id: int) -> dict
             return response.json()
         logger.warning(f"Failed to fetch Pokemon {pokemon_id}: {response.status_code}")
     except Exception as e:
-        logger.error(f"Error fetching Pokemon {pokemon_id}: {e}")
+        logger.exception("Error fetching Pokemon %s: %s", pokemon_id, e)
     return None
 
 
@@ -160,7 +160,7 @@ def parse_pokemon_data(data: dict[str, Any], species_data: dict | None) -> dict:
 
 async def import_pokemon(start_id: int = 1, end_id: int = 1025) -> None:
     """Import Pokemon from PokeAPI to database."""
-    logger.info(f"Importing Pokemon {start_id} to {end_id}...")
+    logger.info("Importing Pokemon %s to %s...", start_id, end_id)
 
     # Use the same config as aerich for consistency
     from funbot.db.aerich_config import TORTOISE_CONFIG
@@ -174,11 +174,9 @@ async def import_pokemon(start_id: int = 1, end_id: int = 1025) -> None:
         batch_size = 20
         for batch_start in range(start_id, end_id + 1, batch_size):
             batch_end = min(batch_start + batch_size - 1, end_id)
-            logger.info(f"Processing batch {batch_start}-{batch_end}...")
+            logger.info("Processing batch %s-%s...", batch_start, batch_end)
 
-            tasks = []
-            for pokemon_id in range(batch_start, batch_end + 1):
-                tasks.append(process_pokemon(client, pokemon_id))
+            tasks = [process_pokemon(client, pokemon_id) for pokemon_id in range(batch_start, batch_end + 1)]
 
             await asyncio.gather(*tasks)
 
@@ -194,7 +192,7 @@ async def process_pokemon(client: httpx.AsyncClient, pokemon_id: int) -> None:
     # Check if already exists
     existing = await PokemonData.filter(id=pokemon_id).first()
     if existing:
-        logger.debug(f"Pokemon {pokemon_id} already exists, skipping")
+        logger.debug("Pokemon %s already exists, skipping", pokemon_id)
         return
 
     # Fetch data

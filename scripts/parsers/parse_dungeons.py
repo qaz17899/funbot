@@ -283,28 +283,22 @@ def extract_pokemon_names(enemy_block: str) -> list[dict]:
 
 def extract_boss_pokemon(boss_block: str) -> list[dict]:
     """Extract boss pokemon from boss list."""
-    bosses = []
 
     # Match: new DungeonBossPokemon('Name', health, level, ...)
     pattern = r"new\s+DungeonBossPokemon\s*\(\s*['\"]([^'\"]+)['\"],\s*(\d+),\s*(\d+)"
-    for match in re.finditer(pattern, boss_block):
-        bosses.append(
-            {
+    return [{
                 "name": match.group(1),
                 "health": int(match.group(2)),
                 "level": int(match.group(3)),
                 "is_boss": True,
-            }
-        )
-
-    return bosses
+            } for match in re.finditer(pattern, boss_block)]
 
 
 def extract_loot_table(loot_block: str) -> dict:
     """Extract loot table from dungeon."""
     loot = {"common": [], "rare": [], "epic": [], "legendary": [], "mythic": []}
 
-    for tier in loot.keys():
+    for tier in loot:
         # Match tier: [...]
         pattern = rf"{tier}:\s*\[(.*?)\]"
         match = re.search(pattern, loot_block, re.DOTALL)
@@ -337,10 +331,7 @@ def parse_dungeons(content: str) -> list[dict]:
         start_pos = match.end()
 
         # Find end of this dungeon definition
-        if i + 1 < len(matches):
-            end_pos = matches[i + 1].start()
-        else:
-            end_pos = len(content)
+        end_pos = matches[i + 1].start() if i + 1 < len(matches) else len(content)
 
         dungeon_content = content[start_pos:end_pos]
 
@@ -448,13 +439,10 @@ def main() -> None:
     )
 
     if not dungeon_path.exists():
-        print(f"Error: {dungeon_path} not found")
         return
 
     content = dungeon_path.read_text(encoding="utf-8")
     dungeons = parse_dungeons(content)
-
-    print(f"Parsed {len(dungeons)} dungeons")
 
     # Stats
     regions: dict[int, int] = {}
@@ -462,8 +450,8 @@ def main() -> None:
         r = d["region"]
         regions[r] = regions.get(r, 0) + 1
 
-    for r, count in sorted(regions.items()):
-        region_name = (
+    for r, _count in sorted(regions.items()):
+        (
             [
                 "Kanto",
                 "Johto",
@@ -479,19 +467,16 @@ def main() -> None:
             if r >= 0
             else "Event/Special"
         )
-        print(f"  Region {r} ({region_name}): {count} dungeons")
 
     # Count unmapped
     unmapped = sum(1 for d in dungeons if d["region"] == -1)
     if unmapped:
-        print(f"  Unmapped (events): {unmapped}")
+        pass
 
     # Output to JSON file
     output_path = Path(__file__).parent / "dungeons_data.json"
-    with open(output_path, "w", encoding="utf-8") as f:
+    with Path(output_path).open("w", encoding="utf-8") as f:
         json.dump(dungeons, f, indent=2, ensure_ascii=False)
-
-    print(f"Output written to {output_path}")
 
 
 if __name__ == "__main__":

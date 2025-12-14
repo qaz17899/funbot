@@ -125,10 +125,7 @@ def has_development_requirement(node: dict[str, Any]) -> bool:
     """Check if a requirement tree contains DevelopmentRequirement."""
     if node.get("type") in DEVELOPMENT_REQUIREMENT_TYPES:
         return True
-    for child in node.get("children", []):
-        if has_development_requirement(child):
-            return True
-    return False
+    return any(has_development_requirement(child) for child in node.get("children", []))
 
 
 def clean_pokemon_list(names: list[str]) -> list[str]:
@@ -155,7 +152,7 @@ async def save_requirement_tree(
     if req_type is None:
         # Unknown requirement type - store with _unknown flag
         req_type = RequirementType.ROUTE_KILL  # Fallback
-        logger.warning(f"Unknown requirement type: {req_type_str}")
+        logger.warning("Unknown requirement type: %s", req_type_str)
 
     # Clean and transform parameters
     params = clean_params(node.get("params") or {})
@@ -192,7 +189,7 @@ async def import_routes() -> None:
     json_path = Path(__file__).parent.parent / "data" / "routes_data.json"
 
     if not json_path.exists():
-        logger.error(f"Error: {json_path} not found. Run parse_routes.py first.")
+        logger.error("Error: %s not found. Run parse_routes.py first.", json_path)
         return
 
     routes_data = json.loads(json_path.read_text(encoding="utf-8"))

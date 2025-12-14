@@ -5,6 +5,7 @@ Uses official BadgeEnums.ts ordering from Pokeclicker source.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import re
 from pathlib import Path
@@ -310,17 +311,12 @@ def extract_gym_args(gym_content: str) -> list[str]:
 
 def parse_pokemon_array(arr_content: str) -> list[dict]:
     """Parse GymPokemon array."""
-    pokemon = []
     pattern = r"new\s+GymPokemon\s*\(\s*['\"]([^'\"]+)['\"],\s*(\d+),\s*(\d+)"
-    for match in re.finditer(pattern, arr_content):
-        pokemon.append(
-            {
+    return [{
                 "name": match.group(1).replace("\\'", "'"),
                 "max_health": int(match.group(2)),
                 "level": int(match.group(3)),
-            }
-        )
-    return pokemon
+            } for match in re.finditer(pattern, arr_content)]
 
 
 def clean_string(s: str) -> str:
@@ -336,9 +332,7 @@ def clean_string(s: str) -> str:
         s = s[1:-1]
 
     # Unescape
-    s = s.replace("\\'", "'").replace('\\"', '"').replace("\\n", "\n")
-
-    return s
+    return s.replace("\\'", "'").replace('\\"', '"').replace("\\n", "\n")
 
 
 def parse_badge(badge_str: str) -> tuple[str | None, int | None]:
@@ -485,7 +479,7 @@ def parse_single_requirement(req_str: str) -> dict | None:
             step = int(match.group(3)) if match.group(3) else 0
             result["params"] = {"quest": quest_name, "step": step}
 
-    elif req_type in ("MultiRequirement", "OneFromManyRequirement"):
+    elif req_type in {"MultiRequirement", "OneFromManyRequirement"}:
         # Find inner array
         arr_match = re.search(r"\[(.*)\]", args_str, re.DOTALL)
         if arr_match:
@@ -514,7 +508,6 @@ def parse_gyms(content: str) -> list[dict]:
         # Find the end of this Gym() call
         gym_end = find_matching_bracket(content, gym_start, "(", ")")
         if gym_end == -1:
-            print(f"Warning: Could not find end of Gym for {town}")
             continue
 
         gym_content = content[gym_start:gym_end]
@@ -527,7 +520,6 @@ def parse_gyms(content: str) -> list[dict]:
         args = extract_gym_args(gym_content)
 
         if len(args) < 6:
-            print(f"Warning: Not enough args for {town}: {len(args)} args")
             continue
 
         gym_data = {
@@ -552,10 +544,8 @@ def parse_gyms(content: str) -> list[dict]:
 
         # Money reward (arg 4)
         if len(args) > 4:
-            try:
+            with contextlib.suppress(ValueError):
                 gym_data["money_reward"] = int(args[4].strip())
-            except ValueError:
-                pass
 
         # Defeat message (arg 5)
         if len(args) > 5:
@@ -594,13 +584,10 @@ def main() -> None:
         )
 
     if not gym_list_path.exists():
-        print(f"Error: {gym_list_path} not found")
         return
 
     content = gym_list_path.read_text(encoding="utf-8")
     gyms = parse_gyms(content)
-
-    print(f"Parsed {len(gyms)} gyms")
 
     # Stats by region
     region_counts: dict[int, int] = {}
@@ -609,19 +596,15 @@ def main() -> None:
         region_counts[r] = region_counts.get(r, 0) + 1
 
     for r in sorted(region_counts.keys()):
-        print(f"  Region {r}: {region_counts[r]} gyms")
+        pass
 
     # Check for issues
-    empty_req = sum(1 for g in gyms if not g["requirements"])
-    null_badge = sum(1 for g in gyms if g["badge_id"] is None)
-    print(f"  Empty requirements: {empty_req}")
-    print(f"  Null badge_id: {null_badge}")
+    sum(1 for g in gyms if not g["requirements"])
+    sum(1 for g in gyms if g["badge_id"] is None)
 
     # Output to JSON file
     output_path = Path(__file__).parent / "gyms_data.json"
     output_path.write_text(json.dumps(gyms, indent=2, ensure_ascii=False), encoding="utf-8")
-
-    print(f"Output written to {output_path}")
 
 
 if __name__ == "__main__":
