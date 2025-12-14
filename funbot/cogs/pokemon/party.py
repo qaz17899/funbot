@@ -173,6 +173,12 @@ class PartyPaginatorView(PaginatorView):
                 stats_parts.append(f"首捕: {caught_str}")
             line3 = f"-# 📊 {' | '.join(stats_parts)}" if stats_parts else ""
 
+            # Combine all lines into single TextDisplay to save components
+            all_lines = [line1, line2]
+            if line3:
+                all_lines.append(line3)
+            combined_text = "\n".join(all_lines)
+
             # Create section with thumbnail if sprite available
             sprite_url = (
                 data.sprite_shiny_url
@@ -180,17 +186,12 @@ class PartyPaginatorView(PaginatorView):
                 else data.sprite_url
             )
             if sprite_url:
-                items = [TextDisplay(line1), TextDisplay(line2)]
-                if line3:
-                    items.append(TextDisplay(line3))
-                section = Section(*items, accessory=Thumbnail(sprite_url))
+                # Section with single TextDisplay + Thumbnail = 3 components per Pokemon
+                section = Section(TextDisplay(combined_text), accessory=Thumbnail(sprite_url))
                 self.content_container.add_item(section)
             else:
-                # No sprite - just text
-                self.content_container.add_item(TextDisplay(line1))
-                self.content_container.add_item(TextDisplay(line2))
-                if line3:
-                    self.content_container.add_item(TextDisplay(line3))
+                # No sprite - just text = 1 component per Pokemon
+                self.content_container.add_item(TextDisplay(combined_text))
 
         # Footer with stats (on last page or all pages)
         self.content_container.add_item(Separator(spacing=discord.SeparatorSpacing.large))
