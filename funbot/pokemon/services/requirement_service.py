@@ -148,7 +148,7 @@ class RequirementService:
             return True
 
         # Check if player has this badge
-        return await PlayerBadge.filter(player_id=player_id, badge=badge_name).exists()
+        return await PlayerBadge.filter(user_id=player_id, badge=badge_name).exists()
 
     async def _check_dungeon_clear(self, player_id: int, params: dict) -> bool:
         """Check if player has cleared a dungeon enough times.

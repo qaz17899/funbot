@@ -27,17 +27,19 @@ from funbot.db.models.pokemon import (
 from funbot.db.models.pokemon.player_ball_inventory import PlayerBallInventory
 from funbot.db.models.pokemon.route_data import RouteData
 from funbot.db.models.user import User
-from funbot.pokemon.autocomplete import region_autocomplete, route_autocomplete
-from funbot.pokemon.constants.enums import Pokeball
+from funbot.pokemon.autocomplete import gym_autocomplete, region_autocomplete, route_autocomplete
+from funbot.pokemon.constants.enums import Pokeball, Region
 from funbot.pokemon.constants.game_constants import DEFAULT_STARTER_REGION, STARTERS
 from funbot.pokemon.services.battle_service import BattleService
 from funbot.pokemon.services.catch_service import CatchService
 from funbot.pokemon.services.exp_service import ExpService
+from funbot.pokemon.services.gym_service import GymService
 from funbot.pokemon.services.hatchery_service import HatcheryService
 from funbot.pokemon.services.route_service import get_route_status_service
 from funbot.pokemon.services.shop_service import ShopService
 from funbot.pokemon.ui_utils import Emoji, get_type_emoji
 from funbot.pokemon.views.explore_views import ExploreResult, ExploreResultView
+from funbot.pokemon.views.gym_views import GymBattleView, GymListView
 from funbot.pokemon.views.hatchery_views import HatcheryListView
 from funbot.pokemon.views.party_views import PartyPaginatorView
 from funbot.pokemon.views.pokeball_views import PokeballSettingsLayout
@@ -427,6 +429,58 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             total_battles=count,
             balls_used=balls_used,
         )
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # /pokemon gym
+    # ═══════════════════════════════════════════════════════════════════════
+
+    @pokemon.command(name="gym", description="挑戰道館")
+    @app_commands.describe(
+        region="地區", gym_name="道館名稱 (留空顯示列表)", animated="是否顯示即時戰鬥動畫"
+    )
+    @app_commands.autocomplete(region=region_autocomplete, gym_name=gym_autocomplete)  # pyright: ignore[reportArgumentType]
+    async def gym(
+        self,
+        interaction: Interaction,
+        region: int = 0,
+        gym_name: str | None = None,
+        animated: bool = True,
+    ) -> None:
+        """Challenge a gym leader."""
+        await interaction.response.defer()
+
+        user_id = interaction.user.id
+
+        # If no gym specified, show list
+        if not gym_name:
+            gyms = await GymService.get_available_gyms(region)
+            badges = await GymService.get_player_badges(user_id)
+            # Get region display name from enum
+            try:
+                region_enum = Region(region)
+                region_name = f"{region_enum.name.title()}"
+            except ValueError:
+                region_name = "Unknown"
+            view = GymListView(gyms, badges, region_name)
+            await interaction.followup.send(view=view)
+            return
+
+        # Find the gym
+        gym = await GymService.get_gym_by_name(gym_name)
+        if not gym:
+            await interaction.followup.send(f"{Emoji.CROSS} 找不到道館: {gym_name}", ephemeral=True)
+            return
+
+        # Start battle
+        state = await GymService.start_battle(user_id, gym)
+        view = GymBattleView(user_id, gym, state)
+
+        if animated:
+            # Run with animation (updates every second)
+            await view.run_battle(interaction)
+        else:
+            # Instant result
+            await view.run_instant(interaction)
 
     # ═══════════════════════════════════════════════════════════════════════
     # /pokemon hatchery list
