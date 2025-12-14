@@ -101,7 +101,9 @@ class PokeballSelect(ui.Select["PokeballSettingsLayout"]):
     async def callback(self, interaction: Interaction) -> None:
         """Handle pokeball selection."""
         if interaction.user.id != self.discord_user_id:
-            await interaction.response.send_message("❌ 這不是你的設定！", ephemeral=True)
+            await interaction.response.send_message(
+                f"{Emoji.CROSS} 這不是你的設定！", ephemeral=True
+            )
             return
 
         # Update the setting

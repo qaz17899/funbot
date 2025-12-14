@@ -15,7 +15,7 @@ from discord.ext import commands
 from funbot.db.models.pokemon import PlayerPokemon, PokemonData
 from funbot.db.models.user import User
 from funbot.pokemon.services.exp_service import ExpService
-from funbot.pokemon.ui_utils import get_type_emoji
+from funbot.pokemon.ui_utils import Emoji, get_type_emoji
 from funbot.types import Interaction
 from funbot.ui.components_v2 import Container, Section, Separator, TextDisplay, Thumbnail
 from funbot.ui.components_v2.paginator import PaginatorView
@@ -42,7 +42,8 @@ class PartyCog(commands.Cog):
         user = await User.get_or_none(id=interaction.user.id)
         if not user:
             await interaction.followup.send(
-                "❌ 你還沒有開始寶可夢之旅！使用 `/pokemon-start` 選擇初始寶可夢。", ephemeral=True
+                f"{Emoji.CROSS} 你還沒有開始寶可夢之旅！使用 `/pokemon-start` 選擇初始寶可夢。",
+                ephemeral=True,
             )
             return
 
@@ -51,7 +52,8 @@ class PartyCog(commands.Cog):
 
         if not pokemon_list:
             await interaction.followup.send(
-                "❌ 你還沒有任何寶可夢！使用 `/pokemon-start` 選擇初始寶可夢。", ephemeral=True
+                f"{Emoji.CROSS} 你還沒有任何寶可夢！使用 `/pokemon-start` 選擇初始寶可夢。",
+                ephemeral=True,
             )
             return
 
@@ -142,8 +144,8 @@ class PartyPaginatorView(PaginatorView):
             total_attack = poke.calculate_attack(data.base_attack)
 
             # Format text
-            shiny_mark = "✨" if poke.shiny else ""
-            pokerus_mark = "🦠" if poke.has_pokerus else ""
+            shiny_mark = Emoji.SHINY if poke.shiny else ""
+            pokerus_mark = Emoji.POKERUS if poke.has_pokerus else ""
             gender_mark = poke.gender_symbol
             name = poke.nickname or data.name
             type_emoji = get_type_emoji(data.type1)

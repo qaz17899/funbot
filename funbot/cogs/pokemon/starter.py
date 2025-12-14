@@ -16,7 +16,7 @@ from funbot.db.models.pokemon import PlayerPokemon, PlayerWallet, PokemonData
 from funbot.db.models.user import User
 from funbot.pokemon.constants import PokerusState
 from funbot.pokemon.constants.game_constants import DEFAULT_STARTER_REGION, STARTERS
-from funbot.pokemon.ui_utils import get_type_emoji
+from funbot.pokemon.ui_utils import Emoji, get_type_emoji
 from funbot.types import Interaction
 
 if TYPE_CHECKING:
@@ -41,7 +41,8 @@ class StarterCog(commands.Cog):
         existing_count = await PlayerPokemon.filter(user=user).count()
         if existing_count > 0:
             await interaction.followup.send(
-                "❌ 你已經有寶可夢了！使用 `/pokemon-party` 查看你的隊伍。", ephemeral=True
+                f"{Emoji.CROSS} 你已經有寶可夢了！使用 `/pokemon-party` 查看你的隊伍。",
+                ephemeral=True,
             )
             return
 
@@ -51,7 +52,7 @@ class StarterCog(commands.Cog):
 
         if not starters:
             await interaction.followup.send(
-                "❌ 寶可夢資料尚未匯入，請先執行資料匯入腳本。", ephemeral=True
+                f"{Emoji.CROSS} 寶可夢資料尚未匯入，請先執行資料匯入腳本。", ephemeral=True
             )
             return
 
@@ -88,7 +89,9 @@ class StarterSelect(ui.Select["StarterSelectLayout"]):
         """Handle starter selection."""
         # Verify it's the same user
         if interaction.user.id != self.discord_user_id:
-            await interaction.response.send_message("❌ 這不是你的選擇！", ephemeral=True)
+            await interaction.response.send_message(
+                f"{Emoji.CROSS} 這不是你的選擇！", ephemeral=True
+            )
             return
 
         pokemon_id = int(self.values[0])

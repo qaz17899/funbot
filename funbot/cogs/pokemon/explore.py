@@ -72,7 +72,8 @@ class ExploreCog(commands.Cog):
         user = await User.get_or_none(id=interaction.user.id)
         if not user:
             await interaction.followup.send(
-                "❌ 你還沒有開始寶可夢之旅！使用 `/pokemon-start` 選擇初始寶可夢。", ephemeral=True
+                f"{Emoji.CROSS} 你還沒有開始寶可夢之旅！使用 `/pokemon-start` 選擇初始寶可夢。",
+                ephemeral=True,
             )
             return
 
@@ -80,7 +81,8 @@ class ExploreCog(commands.Cog):
         party = await PlayerPokemon.filter(user=user).prefetch_related("pokemon_data")
         if not party:
             await interaction.followup.send(
-                "❌ 你還沒有任何寶可夢！使用 `/pokemon-start` 選擇初始寶可夢。", ephemeral=True
+                f"{Emoji.CROSS} 你還沒有任何寶可夢！使用 `/pokemon-start` 選擇初始寶可夢。",
+                ephemeral=True,
             )
             return
 
@@ -91,7 +93,7 @@ class ExploreCog(commands.Cog):
             route_data = await RouteData.filter(region=region).order_by("order_number").first()
             if not route_data:
                 await interaction.followup.send(
-                    "❌ 找不到該路線。請使用自動補全選擇路線。", ephemeral=True
+                    f"{Emoji.CROSS} 找不到該路線。請使用自動補全選擇路線。", ephemeral=True
                 )
                 return
 
@@ -115,7 +117,7 @@ class ExploreCog(commands.Cog):
         wild_pokemon = await self._get_route_pokemon(route_data)
         if not wild_pokemon:
             await interaction.followup.send(
-                f"❌ {route_data.name} 暫無可遇見的寶可夢。", ephemeral=True
+                f"{Emoji.CROSS} {route_data.name} 暫無可遇見的寶可夢。", ephemeral=True
             )
             return
 
