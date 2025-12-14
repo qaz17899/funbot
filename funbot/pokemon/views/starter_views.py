@@ -1,7 +1,6 @@
-"""Starter Pokemon selection command.
+"""Starter Pokemon selection views.
 
-/pokemon start - Select your first Pokemon from the Kanto starters.
-Uses Discord Components V2 with subclassing pattern.
+UI components for the /pokemon start command.
 """
 
 from __future__ import annotations
@@ -9,59 +8,16 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import discord
-from discord import app_commands, ui
-from discord.ext import commands
+from discord import ui
 
 from funbot.db.models.pokemon import PlayerPokemon, PlayerWallet, PokemonData
-from funbot.db.models.user import User
+from funbot.db.models.pokemon.player_ball_inventory import PlayerBallInventory
 from funbot.pokemon.constants import PokerusState
-from funbot.pokemon.constants.game_constants import DEFAULT_STARTER_REGION, STARTERS
 from funbot.pokemon.ui_utils import Emoji, get_type_emoji
-from funbot.types import Interaction
 
 if TYPE_CHECKING:
-    from funbot.bot import FunBot
-
-
-class StarterCog(commands.Cog):
-    """Commands for selecting starter Pokemon."""
-
-    def __init__(self, bot: FunBot) -> None:
-        self.bot = bot
-
-    @app_commands.command(name="pokemon-start", description="選擇你的初始寶可夢")
-    async def pokemon_start(self, interaction: Interaction) -> None:
-        """Select your starter Pokemon."""
-        await interaction.response.defer()
-
-        # Get or create user
-        user, _ = await User.get_or_create(id=interaction.user.id)
-
-        # Check if user already has Pokemon
-        existing_count = await PlayerPokemon.filter(user=user).count()
-        if existing_count > 0:
-            await interaction.followup.send(
-                f"{Emoji.CROSS} 你已經有寶可夢了！使用 `/pokemon-party` 查看你的隊伍。",
-                ephemeral=True,
-            )
-            return
-
-        # Get starter Pokemon data
-        starter_ids = STARTERS[DEFAULT_STARTER_REGION]
-        starters = await PokemonData.filter(id__in=starter_ids)
-
-        if not starters:
-            await interaction.followup.send(
-                f"{Emoji.CROSS} 寶可夢資料尚未匯入，請先執行資料匯入腳本。", ephemeral=True
-            )
-            return
-
-        # Create V2 layout with starter selection
-        view = StarterSelectLayout(
-            starters=list(starters), user=user, discord_user_id=interaction.user.id
-        )
-
-        await interaction.followup.send(view=view)
+    from funbot.db.models.user import User
+    from funbot.types import Interaction
 
 
 class StarterSelect(ui.Select["StarterSelectLayout"]):
@@ -111,8 +67,9 @@ class StarterSelect(ui.Select["StarterSelectLayout"]):
             pokerus=PokerusState.CONTAGIOUS,  # TEMPORARY: Should be UNINFECTED until quest
         )
 
-        # Create wallet for user
+        # Create wallet and ball inventory for user
         await PlayerWallet.get_or_create(user=self.user)
+        await PlayerBallInventory.get_or_create(user=self.user)
 
         # Create success view and edit message
         success_view = StarterSuccessLayout(pokemon_data)
@@ -189,14 +146,9 @@ class StarterSuccessLayout(ui.LayoutView):
 
         container.add_item(
             ui.TextDisplay(
-                "使用 `/pokemon-party` 查看你的隊伍\n"
-                "使用 `/pokemon-explore` 探索路線捕捉更多寶可夢！"
+                "使用 `/pokemon party` 查看你的隊伍\n"
+                "使用 `/pokemon explore` 探索路線捕捉更多寶可夢！"
             )
         )
 
         self.add_item(container)
-
-
-async def setup(bot: FunBot) -> None:
-    """Add cog to bot."""
-    await bot.add_cog(StarterCog(bot))

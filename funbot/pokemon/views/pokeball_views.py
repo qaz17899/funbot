@@ -1,7 +1,6 @@
-"""Pokeball settings command.
+"""Pokeball settings views.
 
-/pokemon pokeballs - View and edit auto-catch settings.
-Uses Discord Components V2 with subclassing pattern.
+UI components for the /pokemon pokeballs command.
 """
 
 from __future__ import annotations
@@ -9,46 +8,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import discord
-from discord import app_commands, ui
-from discord.ext import commands
+from discord import ui
 
-from funbot.db.models.pokemon import PlayerPokeballSettings
-from funbot.db.models.user import User
 from funbot.pokemon.constants.enums import Pokeball
 from funbot.pokemon.ui_utils import POKEBALL_EMOJI_IDS, Emoji, get_ball_emoji
-from funbot.types import Interaction
 
 if TYPE_CHECKING:
-    from funbot.bot import FunBot
-
-
-class PokeballsCog(commands.Cog):
-    """Commands for managing Pokeball settings."""
-
-    def __init__(self, bot: FunBot) -> None:
-        self.bot = bot
-
-    @app_commands.command(name="pokemon-pokeballs", description="設定自動捕捉的寶貝球")
-    async def pokemon_pokeballs(self, interaction: Interaction) -> None:
-        """View and edit Pokeball settings."""
-        await interaction.response.defer()
-
-        # Get user
-        user = await User.get_or_none(id=interaction.user.id)
-        if not user:
-            await interaction.followup.send(
-                f"{Emoji.CROSS} 你還沒有開始寶可夢之旅！使用 `/pokemon-start` 選擇初始寶可夢。",
-                ephemeral=True,
-            )
-            return
-
-        # Get or create settings
-        settings, _ = await PlayerPokeballSettings.get_or_create(user=user)
-
-        # Create V2 layout
-        view = PokeballSettingsLayout(settings, interaction.user.id)
-
-        await interaction.followup.send(view=view)
+    from funbot.db.models.pokemon import PlayerPokeballSettings
+    from funbot.types import Interaction
 
 
 class PokeballSelect(ui.Select["PokeballSettingsLayout"]):
@@ -168,8 +135,3 @@ class PokeballSettingsLayout(ui.LayoutView):
         container.add_item(ui.TextDisplay("-# 選擇後會自動儲存"))
 
         self.add_item(container)
-
-
-async def setup(bot: FunBot) -> None:
-    """Add cog to bot."""
-    await bot.add_cog(PokeballsCog(bot))

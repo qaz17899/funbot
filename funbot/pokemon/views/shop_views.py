@@ -1,7 +1,6 @@
-"""Pokemon Shop commands.
+"""Shop views.
 
-Provides shop interface for purchasing Pokeballs and other items.
-Matches Pokeclicker's Poké Mart system with beautiful V2 UI.
+UI components for the /pokemon shop command.
 """
 
 from __future__ import annotations
@@ -9,23 +8,20 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import discord
-from discord import app_commands, ui
-from discord.ext import commands
+from discord import ui
 
-from funbot.cogs.pokemon.pokeballs import get_ball_emoji
-from funbot.db.models.pokemon.player_ball_inventory import PlayerBallInventory
-from funbot.db.models.user import User
 from funbot.pokemon.constants.enums import Currency, Pokeball
 from funbot.pokemon.constants.game_constants import POKEBALL_CATCH_BONUS, POKEBALL_PRICES
 from funbot.pokemon.services.shop_service import ShopService
-from funbot.pokemon.ui_utils import Emoji, get_currency_emoji
-from funbot.types import Interaction
+from funbot.pokemon.ui_utils import Emoji, get_ball_emoji, get_currency_emoji
 from funbot.ui.components_v2 import ActionRow, Container, LayoutView, Separator, TextDisplay
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from funbot.bot import FunBot
+    from funbot.db.models.pokemon.player_ball_inventory import PlayerBallInventory
+    from funbot.db.models.user import User
+    from funbot.types import Interaction
 
 
 class BuyBallModal(ui.Modal, title="購買寶貝球"):
@@ -129,15 +125,11 @@ class ShopView(LayoutView):
         # Main container with gradient blue
         container = Container(accent_color=discord.Color.from_rgb(66, 133, 244))
 
-        # ═══════════════════════════════════════════════════════════════════
         # Header
-        # ═══════════════════════════════════════════════════════════════════
         container.add_item(TextDisplay("# 🏪 寶貝球商店\n-# Poké Mart - 購買捕捉寶可夢的必需品"))
         container.add_item(Separator(spacing=discord.SeparatorSpacing.small))
 
-        # ═══════════════════════════════════════════════════════════════════
         # Wallet Section
-        # ═══════════════════════════════════════════════════════════════════
         wallet_text = (
             f"### 💰 錢包餘額\n"
             f"{money_emoji} **{self.wallet['pokedollar']:,}** PokéDollar\n"
@@ -146,9 +138,7 @@ class ShopView(LayoutView):
         container.add_item(TextDisplay(wallet_text))
         container.add_item(Separator(spacing=discord.SeparatorSpacing.small))
 
-        # ═══════════════════════════════════════════════════════════════════
         # Inventory Section with detailed ball info
-        # ═══════════════════════════════════════════════════════════════════
         container.add_item(TextDisplay("### 🎒 背包庫存"))
 
         for ball_type in [
@@ -182,16 +172,12 @@ class ShopView(LayoutView):
 
         container.add_item(Separator(spacing=discord.SeparatorSpacing.small))
 
-        # ═══════════════════════════════════════════════════════════════════
         # Footer hint
-        # ═══════════════════════════════════════════════════════════════════
         container.add_item(TextDisplay("-# 💡 點擊下方按鈕購買寶貝球"))
 
         self.add_item(container)
 
-        # ═══════════════════════════════════════════════════════════════════
         # Action Row with buy buttons
-        # ═══════════════════════════════════════════════════════════════════
         action_row = ActionRow()
         for ball_type in [
             Pokeball.POKEBALL,
@@ -218,38 +204,3 @@ class ShopView(LayoutView):
             await interaction.followup.send(f"{Emoji.CHECK} {success_message}", ephemeral=True)
         else:
             await interaction.response.edit_message(view=self)
-
-
-class ShopCog(commands.Cog, name="Shop"):
-    """Shop commands for purchasing items."""
-
-    def __init__(self, bot: FunBot) -> None:
-        self.bot = bot
-
-    @app_commands.command(name="pokemon-shop", description="寶貝球商店 - 購買寶貝球")
-    async def shop(self, interaction: Interaction) -> None:
-        """Open the Poké Mart shop."""
-        await interaction.response.defer()
-
-        # Get user
-        user = await User.get_or_none(id=interaction.user.id)
-        if not user:
-            await interaction.followup.send(
-                f"{Emoji.CROSS} 你還沒有開始寶可夢之旅！使用 `/pokemon-start` 選擇初始寶可夢。",
-                ephemeral=True,
-            )
-            return
-
-        # Get shop data
-        shop_data = await ShopService.get_shop_inventory(user)
-        inventory, _ = await PlayerBallInventory.get_or_create(user=user)
-
-        # Create beautiful V2 shop view
-        view = ShopView(user, shop_data["wallet"], inventory)
-
-        await interaction.followup.send(view=view)
-
-
-async def setup(bot: FunBot) -> None:
-    """Add the cog to the bot."""
-    await bot.add_cog(ShopCog(bot))

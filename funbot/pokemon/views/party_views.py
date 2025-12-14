@@ -1,7 +1,6 @@
-"""Party display command.
+"""Party display views.
 
-/pokemon party - Display all owned Pokemon with stats.
-Uses Discord Components V2 with PaginatorView for modern UI.
+UI components for the /pokemon party command.
 """
 
 from __future__ import annotations
@@ -9,72 +8,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import discord
-from discord import app_commands
-from discord.ext import commands
 
-from funbot.db.models.pokemon import PlayerPokemon, PokemonData
-from funbot.db.models.user import User
-from funbot.pokemon.services.exp_service import ExpService
 from funbot.pokemon.ui_utils import Emoji, get_type_emoji
-from funbot.types import Interaction
 from funbot.ui.components_v2 import Container, Section, Separator, TextDisplay, Thumbnail
-from funbot.ui.components_v2.paginator import PaginatorView
+from funbot.ui.components_v2.paginator import NavigationRow, Page, PaginatorView
 
 if TYPE_CHECKING:
-    from funbot.bot import FunBot
+    from funbot.db.models.pokemon import PlayerPokemon, PokemonData
+    from funbot.types import Interaction
 
 # Pokemon per page
 POKEMON_PER_PAGE = 8
-
-
-class PartyCog(commands.Cog):
-    """Commands for viewing party Pokemon."""
-
-    def __init__(self, bot: FunBot) -> None:
-        self.bot = bot
-
-    @app_commands.command(name="pokemon-party", description="查看你的寶可夢隊伍")
-    async def pokemon_party(self, interaction: Interaction) -> None:
-        """Display all owned Pokemon."""
-        await interaction.response.defer()
-
-        # Get user
-        user = await User.get_or_none(id=interaction.user.id)
-        if not user:
-            await interaction.followup.send(
-                f"{Emoji.CROSS} 你還沒有開始寶可夢之旅！使用 `/pokemon-start` 選擇初始寶可夢。",
-                ephemeral=True,
-            )
-            return
-
-        # Get all Pokemon
-        pokemon_list = await PlayerPokemon.filter(user=user).prefetch_related("pokemon_data")
-
-        if not pokemon_list:
-            await interaction.followup.send(
-                f"{Emoji.CROSS} 你還沒有任何寶可夢！使用 `/pokemon-start` 選擇初始寶可夢。",
-                ephemeral=True,
-            )
-            return
-
-        # Sort by Pokemon ID
-        sorted_pokemon = sorted(pokemon_list, key=lambda p: p.pokemon_data.id)
-
-        # Calculate total attack
-        total_attack = sum(
-            ExpService.calculate_attack_from_level(p.pokemon_data.base_attack, p.level)
-            for p in sorted_pokemon
-        )
-
-        # Build the paginator view
-        view = PartyPaginatorView(
-            pokemon_list=sorted_pokemon,
-            username=interaction.user.display_name,
-            total_attack=total_attack,
-            author=interaction.user,
-        )
-
-        await view.start(interaction)
 
 
 class PartyPaginatorView(PaginatorView):
@@ -101,16 +45,12 @@ class PartyPaginatorView(PaginatorView):
         self._total_pages = total_pages  # Must be set before super().__init__()
 
         # Initialize with placeholder pages (we override the layout building)
-        from funbot.ui.components_v2.paginator import Page
-
         pages = [Page() for _ in range(total_pages)]
         super().__init__(pages, author=author, timeout=300.0)
 
     def _build_layout(self) -> None:
         """Override to build custom layout with Sections."""
         # Initialize nav_row first
-        from funbot.ui.components_v2.paginator import NavigationRow
-
         self.nav_row = NavigationRow(self)
 
         # Build content (including nav at bottom)
@@ -211,8 +151,3 @@ class PartyPaginatorView(PaginatorView):
         """Override to rebuild content on page change."""
         self._rebuild_content()
         await self.absolute_edit(interaction, view=self)
-
-
-async def setup(bot: FunBot) -> None:
-    """Add cog to bot."""
-    await bot.add_cog(PartyCog(bot))
