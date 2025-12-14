@@ -138,10 +138,8 @@ class PartyPaginatorView(PaginatorView):
         for poke in page_pokemon:
             data: PokemonData = poke.pokemon_data  # type: ignore
 
-            # Calculate attack with EV bonus
-            base_attack = ExpService.calculate_attack_from_level(data.base_attack, poke.level)
-            ev_multiplier = poke.ev_bonus  # Pokeclicker formula
-            total_attack = int(base_attack * ev_multiplier) + poke.vitamin_bonus
+            # Calculate attack with exact Pokeclicker formula
+            total_attack = poke.calculate_attack(data.base_attack)
 
             # Format text
             shiny_mark = "✨" if poke.shiny else ""

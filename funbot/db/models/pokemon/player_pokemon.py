@@ -195,6 +195,46 @@ class PlayerPokemon(BaseModel):
         """Calculate vitamin attack bonus."""
         return self.vitamins_total
 
+    def calculate_attack(self, base_attack: int, ignore_level: bool = False) -> int:
+        """Calculate total attack (exact Pokeclicker formula).
+
+        From PartyPokemon.ts:140-146:
+        attackBonusMultiplier = 1 + (attackBonusPercent / 100)
+        levelMultiplier = level / 100
+        return (baseAttack * attackBonusMultiplier + attackBonusAmount)
+               * levelMultiplier * evsMultiplier * heldItem * shadow
+
+        Args:
+            base_attack: The Pokemon's base attack from PokemonData
+            ignore_level: If True, use 1.0 for level multiplier (for breeding efficiency)
+
+        Returns:
+            Final attack value
+        """
+        # Breeding attack bonus multiplier: +1% per point of attackBonusPercent
+        attack_bonus_multiplier = 1.0 + (self.attack_bonus_percent / 100)
+
+        # Level multiplier: level/100 (Lv.100 = 1.0x)
+        level_multiplier = 1.0 if ignore_level else self.level / 100
+
+        # EV bonus (requires Contagious+ Pokerus)
+        ev_multiplier = self.ev_bonus
+
+        # TODO: held_item_multiplier and shadow_multiplier when implemented
+        held_item_multiplier = 1.0
+        shadow_multiplier = 1.0
+
+        return max(
+            1,
+            int(
+                (base_attack * attack_bonus_multiplier + self.attack_bonus_amount)
+                * level_multiplier
+                * ev_multiplier
+                * held_item_multiplier
+                * shadow_multiplier
+            ),
+        )
+
     @property
     def is_resistant(self) -> bool:
         """Check if Pokemon has reached Resistant status (EVs >= 50)."""
