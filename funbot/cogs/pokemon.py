@@ -238,7 +238,7 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             return
 
         # Get route data
-        route_data = await RouteData.filter(region=region, route_number=route).first()
+        route_data = await RouteData.filter(region=region, number=route).first()
         if not route_data:
             await interaction.followup.send(
                 f"{Emoji.CROSS} 找不到路線。請確認地區和路線編號。", ephemeral=True
