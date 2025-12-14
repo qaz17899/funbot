@@ -140,7 +140,7 @@ async def gym_autocomplete(
 
     # Get player badges
     player_badges = await PlayerBadge.filter(user_id=user_id).values_list("badge", flat=True)
-    player_badge_set = set(player_badges)
+    player_badge_set = {str(b) for b in player_badges}
 
     current_lower = current.lower()
     choices = []

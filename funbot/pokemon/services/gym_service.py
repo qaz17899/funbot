@@ -352,15 +352,16 @@ class GymService:
             state.status = GymBattleStatus.LOST
             state.time_remaining = 0
 
-            # Calculate how much damage was dealt
-            remaining_hp = total_gym_hp - (state.player_attack * GYM_TIME_LIMIT)
-            running_hp = remaining_hp
-            for gp in state.gym_pokemon:
-                if running_hp >= gp.max_hp:
-                    gp.current_hp = gp.max_hp
-                    running_hp -= gp.max_hp
+            # Calculate damage dealt and update HP sequentially
+            damage_dealt = state.player_attack * GYM_TIME_LIMIT
+            for i, gp in enumerate(state.gym_pokemon):
+                if damage_dealt >= gp.max_hp:
+                    damage_dealt -= gp.max_hp
+                    gp.current_hp = 0
+                    state.current_pokemon_index = i + 1
                 else:
-                    gp.current_hp = running_hp
-                    running_hp = 0
+                    gp.current_hp = gp.max_hp - damage_dealt
+                    state.current_pokemon_index = i
+                    break
 
         return state

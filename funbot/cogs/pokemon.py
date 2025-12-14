@@ -145,11 +145,8 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         # Sort by Pokemon ID
         sorted_pokemon = sorted(pokemon_list, key=lambda p: p.pokemon_data.id)
 
-        # Calculate total attack
-        total_attack = sum(
-            ExpService.calculate_attack_from_level(p.pokemon_data.base_attack, p.level)
-            for p in sorted_pokemon
-        )
+        # Calculate total attack (includes EVs, breeding bonuses, etc.)
+        total_attack = sum(p.calculate_attack(p.pokemon_data.base_attack) for p in sorted_pokemon)
 
         # Build the paginator view
         view = PartyPaginatorView(
@@ -321,7 +318,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         wild_pokemon: list[PokemonData],
         count: int,
     ) -> ExploreResult:
-        """Simulate multiple encounters."""
+        """Simulate multiple encounters with batched DB operations."""
+        from funbot.pokemon.constants.game_constants import SHINY_CHANCE_BATTLE
+
         total_exp = 0
         total_money = 0
         pokedex_new: list[str] = []
@@ -333,13 +332,15 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         # Get owned Pokemon IDs for "new" detection
         owned_ids = {p.pokemon_data.id for p in party}
 
+        # Batch collections for DB operations
+        new_pokemon_to_create: list[dict] = []
+        ball_usage: dict[int, int] = {}  # ball_type -> count
+
         for _ in range(count):
             # Pick random wild Pokemon
             wild = random.choice(wild_pokemon)
 
-            # Calculate battle rewards (simplified - use route-based money)
-            party_attack = sum(p.calculate_attack(p.pokemon_data.base_attack) for p in party)
-            _ticks = BattleService.calculate_ticks_to_defeat(wild.base_hp, party_attack)
+            # Calculate battle rewards
             money_earned = BattleService.calculate_route_money(route_data.number, route_data.region)
             exp_earned = wild.base_hp // 10  # Simplified EXP
 
@@ -347,8 +348,8 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             total_exp += exp_earned
             total_money += money_earned
 
-            # Determine shiny
-            is_shiny = random.random() < 1 / 8192
+            # Determine shiny using constant
+            is_shiny = random.randint(1, SHINY_CHANCE_BATTLE) == 1
             is_new = wild.id not in owned_ids
 
             # Determine which ball to use
@@ -372,7 +373,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
                 Pokeball.GREATBALL,
                 Pokeball.POKEBALL,
             ]:
-                if ball_type <= preferred_ball and ball_inventory.get_quantity(ball_type) > 0:
+                current_used = ball_usage.get(ball_type, 0)
+                available = ball_inventory.get_quantity(ball_type) - current_used
+                if ball_type <= preferred_ball and available > 0:
                     actual_ball = ball_type
                     break
 
@@ -380,20 +383,21 @@ class PokemonCog(commands.Cog, name="Pokemon"):
                 failed_catches += 1
                 continue
 
-            # Attempt catch
-            catch_result = CatchService.attempt_catch(255, actual_ball)  # Use max catch rate
-            catch_success = catch_result.success
+            # Track ball usage locally
+            ball_usage[actual_ball] = ball_usage.get(actual_ball, 0) + 1
+            balls_used[actual_ball] = balls_used.get(actual_ball, 0) + 1
 
-            if catch_success:
-                # Track ball usage
-                balls_used[actual_ball] = balls_used.get(actual_ball, 0) + 1
-                await ball_inventory.use_ball(actual_ball)
+            # Attempt catch using actual catch_rate
+            catch_result = CatchService.attempt_catch(wild.catch_rate, actual_ball)
 
+            if catch_result.success:
                 if is_new:
                     pokedex_new.append(wild.name)
                     owned_ids.add(wild.id)
-                    # Create new Pokemon record
-                    await PlayerPokemon.create(user=user, pokemon_data=wild, shiny=is_shiny)
+                    # Queue for batch creation
+                    new_pokemon_to_create.append(
+                        {"user_id": user.id, "pokemon_data_id": wild.id, "shiny": is_shiny}
+                    )
                 else:
                     already_caught += 1
 
@@ -401,22 +405,35 @@ class PokemonCog(commands.Cog, name="Pokemon"):
                     shiny_caught.append(wild.name)
             else:
                 failed_catches += 1
-                # Still consume ball on failure
-                balls_used[actual_ball] = balls_used.get(actual_ball, 0) + 1
-                await ball_inventory.use_ball(actual_ball)
 
-        # Update wallet
+        # === Batch DB Operations ===
+
+        # 1. Create new Pokemon in batch
+        if new_pokemon_to_create:
+            await PlayerPokemon.bulk_create(
+                [PlayerPokemon(**data) for data in new_pokemon_to_create]
+            )
+
+        # 2. Update ball inventory in batch
+        for ball_type, used_count in ball_usage.items():
+            for _ in range(used_count):
+                await ball_inventory.use_ball(ball_type)
+
+        # 3. Update wallet
         wallet.pokedollar += total_money
         await wallet.save(update_fields=["pokedollar"])
 
-        # Update party EXP (simplified - just add some levels based on EXP)
+        # 4. Update party EXP in batch
         exp_per_pokemon = total_exp // len(party) if party else 0
+        updated_party: list[PlayerPokemon] = []
         for poke in party:
-            # Add EXP and level up
             level_result = ExpService.add_exp_and_level_up(poke.level, 0, exp_per_pokemon)
             if level_result.leveled_up:
                 poke.level = level_result.new_level
-                await poke.save(update_fields=["level"])
+                updated_party.append(poke)
+
+        if updated_party:
+            await PlayerPokemon.bulk_update(updated_party, fields=["level"])
 
         return ExploreResult(
             total_exp=total_exp,

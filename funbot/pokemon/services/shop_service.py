@@ -141,14 +141,7 @@ class ShopService:
         if currency_type == Currency.POKEDOLLAR:
             new_balance = await wallet.add_pokedollar(-total_cost)
         elif currency_type == Currency.QUEST_POINT:
-            # Need to add quest_point method to wallet
-            from tortoise.expressions import F
-
-            await PlayerWallet.filter(id=wallet.id).update(
-                quest_point=F("quest_point") - total_cost
-            )
-            await wallet.refresh_from_db(fields=["quest_point"])
-            new_balance = wallet.quest_point
+            new_balance = await wallet.add_quest_point(-total_cost)
         else:
             new_balance = 0
 

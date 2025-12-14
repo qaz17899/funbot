@@ -12,10 +12,7 @@ from tortoise import fields
 
 from funbot.db.models.base import BaseModel
 from funbot.pokemon.constants import Gender, PokerusState
-
-# Pokeclicker constants
-EP_EV_RATIO = 1000  # effort_points / 1000 = EVs
-RESISTANT_EV_THRESHOLD = 50  # EVs >= 50 triggers Resistant status
+from funbot.pokemon.constants.game_constants import EP_EV_RATIO, RESISTANT_EV_THRESHOLD
 
 
 class PlayerPokemon(BaseModel):
@@ -74,19 +71,6 @@ class PlayerPokemon(BaseModel):
     # EVs = effort_points / EP_EV_RATIO (1000)
     # EVs are gained by RE-CATCHING Pokemon, not by defeating
     effort_points = fields.IntField(default=0, description="Raw effort points (EVs = EP/1000)")
-
-    # =========================================================================
-    # Pokeclicker: Vitamins System
-    # =========================================================================
-
-    vitamins_protein = fields.IntField(default=0, description="Protein vitamins used")
-    vitamins_calcium = fields.IntField(default=0, description="Calcium vitamins used")
-    vitamins_carbos = fields.IntField(default=0, description="Carbos vitamins used")
-
-    @property
-    def vitamins_total(self) -> int:
-        """Total vitamins used on this Pokemon."""
-        return self.vitamins_protein + self.vitamins_calcium + self.vitamins_carbos
 
     # =========================================================================
     # Pokeclicker: Gender System

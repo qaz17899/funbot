@@ -6,9 +6,31 @@ Matches Pokeclicker's pokeballs[ball].quantity() system.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
 from tortoise import fields
 from tortoise.expressions import F
 from tortoise.models import Model
+
+if TYPE_CHECKING:
+    from funbot.pokemon.constants.enums import Pokeball
+
+# Ball type to field name mappings
+_BALL_QTY_FIELDS = {1: "pokeball", 2: "greatball", 3: "ultraball", 4: "masterball"}
+
+_BALL_USED_FIELDS = {
+    1: "pokeball_used",
+    2: "greatball_used",
+    3: "ultraball_used",
+    4: "masterball_used",
+}
+
+_BALL_PURCHASED_FIELDS = {
+    1: "pokeball_purchased",
+    2: "greatball_purchased",
+    3: "ultraball_purchased",
+    4: "masterball_purchased",
+}
 
 
 class PlayerBallInventory(Model):
@@ -55,23 +77,25 @@ class PlayerBallInventory(Model):
     def __str__(self) -> str:
         return f"BallInventory(pokeball={self.pokeball})"
 
-    def get_quantity(self, ball_type: int) -> int:
+    def get_quantity(self, ball_type: Pokeball | int) -> int:
         """Get quantity of a ball type.
 
         Args:
-            ball_type: Pokeball enum value (1=POKEBALL, 2=GREATBALL, etc.)
+            ball_type: Pokeball enum or int value (1=POKEBALL, 2=GREATBALL, etc.)
 
         Returns:
             Quantity of that ball type
         """
-        field_map = {1: self.pokeball, 2: self.greatball, 3: self.ultraball, 4: self.masterball}
-        return field_map.get(ball_type, 0)
+        qty_field = _BALL_QTY_FIELDS.get(int(ball_type))
+        if qty_field is None:
+            return 0
+        return getattr(self, qty_field, 0)
 
-    def has_ball(self, ball_type: int) -> bool:
+    def has_ball(self, ball_type: Pokeball | int) -> bool:
         """Check if player has at least 1 of this ball type."""
         return self.get_quantity(ball_type) > 0
 
-    async def use_ball(self, ball_type: int) -> bool:
+    async def use_ball(self, ball_type: Pokeball | int) -> bool:
         """Use one ball of the specified type.
 
         Matches Pokeclicker Pokeballs.ts:222-225:
@@ -79,22 +103,17 @@ class PlayerBallInventory(Model):
         - Increment used statistic
 
         Args:
-            ball_type: Pokeball enum value
+            ball_type: Pokeball enum or int value
 
         Returns:
             True if ball was used, False if no balls available
         """
-        field_map = {
-            1: ("pokeball", "pokeball_used"),
-            2: ("greatball", "greatball_used"),
-            3: ("ultraball", "ultraball_used"),
-            4: ("masterball", "masterball_used"),
-        }
+        ball_int = int(ball_type)
+        qty_field = _BALL_QTY_FIELDS.get(ball_int)
+        used_field = _BALL_USED_FIELDS.get(ball_int)
 
-        if ball_type not in field_map:
+        if qty_field is None or used_field is None:
             return False
-
-        qty_field, used_field = field_map[ball_type]
 
         # Check if we have any
         if getattr(self, qty_field) <= 0:
@@ -111,7 +130,9 @@ class PlayerBallInventory(Model):
 
         return True
 
-    async def gain_balls(self, ball_type: int, amount: int, purchased: bool = False) -> int:
+    async def gain_balls(
+        self, ball_type: Pokeball | int, amount: int, purchased: bool = False
+    ) -> int:
         """Add balls to inventory.
 
         Matches Pokeclicker Pokeballs.ts:214-220:
@@ -119,34 +140,30 @@ class PlayerBallInventory(Model):
         - If purchased, increment purchased statistic
 
         Args:
-            ball_type: Pokeball enum value
+            ball_type: Pokeball enum or int value
             amount: Number of balls to add
             purchased: Whether this was a purchase (for statistics)
 
         Returns:
             New quantity of that ball type
         """
-        field_map = {
-            1: ("pokeball", "pokeball_purchased"),
-            2: ("greatball", "greatball_purchased"),
-            3: ("ultraball", "ultraball_purchased"),
-            4: ("masterball", "masterball_purchased"),
-        }
+        ball_int = int(ball_type)
+        qty_field = _BALL_QTY_FIELDS.get(ball_int)
+        purchased_field = _BALL_PURCHASED_FIELDS.get(ball_int)
 
-        if ball_type not in field_map:
+        if qty_field is None:
             return 0
 
-        qty_field, purchased_field = field_map[ball_type]
-
-        update_dict = {qty_field: F(qty_field) + amount}
-        if purchased:
+        update_dict: dict[str, Any] = {qty_field: F(qty_field) + amount}
+        if purchased and purchased_field:
             update_dict[purchased_field] = F(purchased_field) + amount
 
         await PlayerBallInventory.filter(id=self.id).update(**update_dict)
 
         # Refresh local state
-        await self.refresh_from_db(
-            fields=[qty_field, purchased_field] if purchased else [qty_field]
-        )
+        fields_to_refresh = [qty_field]
+        if purchased and purchased_field:
+            fields_to_refresh.append(purchased_field)
+        await self.refresh_from_db(fields=fields_to_refresh)
 
         return getattr(self, qty_field)

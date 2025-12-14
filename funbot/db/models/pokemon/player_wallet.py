@@ -68,3 +68,21 @@ class PlayerWallet(Model):
             await PlayerWallet.filter(id=self.id).update(dungeon_token=0)
             self.dungeon_token = 0
         return self.dungeon_token
+
+    async def add_quest_point(self, amount: int) -> int:
+        """Add quest points to wallet atomically."""
+        await PlayerWallet.filter(id=self.id).update(quest_point=F("quest_point") + amount)
+        await self.refresh_from_db(fields=["quest_point"])
+        if self.quest_point < 0:
+            await PlayerWallet.filter(id=self.id).update(quest_point=0)
+            self.quest_point = 0
+        return self.quest_point
+
+    async def add_battle_point(self, amount: int) -> int:
+        """Add battle points to wallet atomically."""
+        await PlayerWallet.filter(id=self.id).update(battle_point=F("battle_point") + amount)
+        await self.refresh_from_db(fields=["battle_point"])
+        if self.battle_point < 0:
+            await PlayerWallet.filter(id=self.id).update(battle_point=0)
+            self.battle_point = 0
+        return self.battle_point

@@ -106,9 +106,9 @@ class HatcheryService:
         # extraCycles = (calcium + protein) / 2
         # steps = eggCycles * 40
         # if steps > 300: steps = ((steps/300)^(1 - carbos/70)) * 300
-        egg_cycles = pokemon_data.egg_cycles if hasattr(pokemon_data, "egg_cycles") else 20
+        egg_cycles = pokemon_data.egg_cycles
         extra_cycles = (pokemon.vitamin_calcium + pokemon.vitamin_protein) / 2
-        base_steps = int((egg_cycles + extra_cycles) * EGG_CYCLE_MULTIPLIER)
+        base_steps = round((egg_cycles + extra_cycles) * EGG_CYCLE_MULTIPLIER)
 
         # Apply Carbos reduction (only affects steps > 300)
         carbos = pokemon.vitamin_carbos
@@ -176,13 +176,25 @@ class HatcheryService:
         if not eggs:
             return
 
+        # Prefetch all party Pokemon for these eggs in ONE query
+        # Use pokemon_data.id since eggs are prefetched with pokemon_data
+        pokemon_data_ids = [egg.pokemon_data.id for egg in eggs]
+        party_pokemon_list = (
+            await PlayerPokemon.filter(user=user, pokemon_data_id__in=pokemon_data_ids)
+            .prefetch_related("pokemon_data")
+            .all()
+        )
+
+        # Build lookup dict: pokemon_data.id -> PlayerPokemon
+        pokemon_lookup: dict[int, PlayerPokemon] = {
+            p.pokemon_data.id: p
+            for p in party_pokemon_list  # type: ignore[union-attr]
+        }
+
         # Get all contagious Pokemon types from eggs
         contagious_types: set[int] = set()
         for egg in eggs:
-            # Get the party pokemon for this egg
-            party_pokemon = await PlayerPokemon.filter(
-                user=user, pokemon_data=egg.pokemon_data
-            ).first()
+            party_pokemon = pokemon_lookup.get(egg.pokemon_data.id)
             if party_pokemon and party_pokemon.pokerus >= PokerusState.CONTAGIOUS:
                 data = egg.pokemon_data
                 contagious_types.add(data.type1)
@@ -192,18 +204,20 @@ class HatcheryService:
         if not contagious_types:
             return
 
-        # Infect uninfected eggs that share a type
+        # Infect uninfected eggs that share a type (batch update)
+        to_update: list[PlayerPokemon] = []
         for egg in eggs:
-            party_pokemon = await PlayerPokemon.filter(
-                user=user, pokemon_data=egg.pokemon_data
-            ).first()
+            party_pokemon = pokemon_lookup.get(egg.pokemon_data.id)
             if party_pokemon and party_pokemon.pokerus == PokerusState.UNINFECTED:
                 data = egg.pokemon_data
                 if data.type1 in contagious_types or (
                     data.type2 and data.type2 in contagious_types
                 ):
                     party_pokemon.pokerus = PokerusState.INFECTED
-                    await party_pokemon.save()
+                    to_update.append(party_pokemon)
+
+        if to_update:
+            await PlayerPokemon.bulk_update(to_update, fields=["pokerus"])
 
     @staticmethod
     async def hatch_egg(egg: PlayerEgg) -> HatchResult | None:
