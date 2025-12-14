@@ -96,10 +96,19 @@ class CatchService:
         return Pokeball(settings.get("caught_pokemon", Pokeball.NONE))
 
     @staticmethod
-    def roll_shiny() -> bool:
+    def roll_shiny(shiny_chance: int = SHINY_CHANCE) -> bool:
         """Roll for shiny encounter.
 
+        Uses context-based shiny chances from Pokeclicker:
+        - SHINY_CHANCE_BATTLE (8192) for wild routes
+        - SHINY_CHANCE_DUNGEON (4096) for dungeons
+        - SHINY_CHANCE_BREEDING (1024) for breeding
+        etc.
+
+        Args:
+            shiny_chance: The 1 in N chance (default: SHINY_CHANCE_BATTLE=8192)
+
         Returns:
-            True if shiny (1/SHINY_CHANCE)
+            True if shiny
         """
-        return random.randint(1, SHINY_CHANCE) == 1
+        return random.randint(1, shiny_chance) == 1

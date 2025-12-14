@@ -1,0 +1,7239 @@
+[
+  {
+    "town": "Pewter City",
+    "leader": "Brock",
+    "pokemon": [
+      {
+        "name": "Geodude",
+        "max_health": 693,
+        "level": 12
+      },
+      {
+        "name": "Onix",
+        "max_health": 1399,
+        "level": 14
+      }
+    ],
+    "badge": "Boulder",
+    "badge_id": 1,
+    "money_reward": 250,
+    "defeat_message": "I took you for granted, and so I lost. As proof of your victory, I confer on you this... the official Pokémon League BoulderBadge.",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "kanto",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": false
+  },
+  {
+    "town": "Cerulean City",
+    "leader": "Misty",
+    "pokemon": [
+      {
+        "name": "Staryu",
+        "max_health": 4000,
+        "level": 18
+      },
+      {
+        "name": "Starmie",
+        "max_health": 6800,
+        "level": 21
+      }
+    ],
+    "badge": "Cascade",
+    "badge_id": 2,
+    "money_reward": 500,
+    "defeat_message": "Wow! You're too much, all right! You can have the CascadeBadge to show that you beat me.",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "kanto",
+          "route": 4
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": false
+  },
+  {
+    "town": "Vermilion City",
+    "leader": "Lt. Surge",
+    "pokemon": [
+      {
+        "name": "Voltorb",
+        "max_health": 10780,
+        "level": 21
+      },
+      {
+        "name": "Pikachu",
+        "max_health": 13540,
+        "level": 18
+      },
+      {
+        "name": "Raichu",
+        "max_health": 15675,
+        "level": 24
+      }
+    ],
+    "badge": "Thunder",
+    "badge_id": 3,
+    "money_reward": 1000,
+    "defeat_message": "Now that's a shocker! You're the real deal, kid! Fine, then, take the ThunderBadge!",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Blue 3"
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Cascade",
+          "badge_id": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": false
+  },
+  {
+    "town": "Celadon City",
+    "leader": "Erika",
+    "pokemon": [
+      {
+        "name": "Victreebel",
+        "max_health": 38810,
+        "level": 29
+      },
+      {
+        "name": "Tangela",
+        "max_health": 30340,
+        "level": 24
+      },
+      {
+        "name": "Vileplume",
+        "max_health": 36400,
+        "level": 29
+      }
+    ],
+    "badge": "Rainbow",
+    "badge_id": 4,
+    "money_reward": 1500,
+    "defeat_message": "Oh! I concede defeat. You are remarkably strong. I must confer on you the RainbowBadge.",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "kanto",
+          "route": 7
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": false
+  },
+  {
+    "town": "Saffron City",
+    "leader": "Sabrina",
+    "pokemon": [
+      {
+        "name": "Kadabra",
+        "max_health": 23040,
+        "level": 38
+      },
+      {
+        "name": "Mr. Mime",
+        "max_health": 25600,
+        "level": 37
+      },
+      {
+        "name": "Venomoth",
+        "max_health": 28400,
+        "level": 38
+      },
+      {
+        "name": "Alakazam",
+        "max_health": 35380,
+        "level": 43
+      }
+    ],
+    "badge": "Marsh",
+    "badge_id": 6,
+    "money_reward": 2500,
+    "defeat_message": "This loss shocks me! But a loss is a loss. I admit I didn't work hard enough to win. You earned the MarshBadge.",
+    "requirements": [
+      {
+        "type": "QuestLineStepCompletedRequirement",
+        "params": {
+          "quest": "Team Rocket",
+          "step": 0
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": false
+  },
+  {
+    "town": "Fuchsia City",
+    "leader": "Koga",
+    "pokemon": [
+      {
+        "name": "Koffing",
+        "max_health": 30780,
+        "level": 37
+      },
+      {
+        "name": "Muk",
+        "max_health": 32460,
+        "level": 39
+      },
+      {
+        "name": "Koffing",
+        "max_health": 36430,
+        "level": 37
+      },
+      {
+        "name": "Weezing",
+        "max_health": 37430,
+        "level": 43
+      }
+    ],
+    "badge": "Soul",
+    "badge_id": 5,
+    "money_reward": 3500,
+    "defeat_message": "Humph! You have proven your worth! Here! Take the Soul Badge!",
+    "requirements": [
+      {
+        "type": "OneFromManyRequirement",
+        "params": {},
+        "children": [
+          {
+            "type": "RouteKillRequirement",
+            "params": {
+              "amount": 10,
+              "region": "kanto",
+              "route": 18
+            },
+            "children": []
+          },
+          {
+            "type": "RouteKillRequirement",
+            "params": {
+              "amount": 10,
+              "region": "kanto",
+              "route": 15
+            },
+            "children": []
+          }
+        ]
+      }
+    ],
+    "region": 0,
+    "is_elite": false
+  },
+  {
+    "town": "Cinnabar Island",
+    "leader": "Blaine",
+    "pokemon": [
+      {
+        "name": "Growlithe",
+        "max_health": 37430,
+        "level": 42
+      },
+      {
+        "name": "Ponyta",
+        "max_health": 42340,
+        "level": 40
+      },
+      {
+        "name": "Rapidash",
+        "max_health": 45230,
+        "level": 42
+      },
+      {
+        "name": "Arcanine",
+        "max_health": 50290,
+        "level": 47
+      }
+    ],
+    "badge": "Volcano",
+    "badge_id": 7,
+    "money_reward": 5000,
+    "defeat_message": "I have burned down to nothing! Not even ashes remain! You have earned the VolcanoBadge.",
+    "requirements": [
+      {
+        "type": "ClearDungeonRequirement",
+        "params": {
+          "clears": 1,
+          "dungeon": "Pokémon Mansion"
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": false
+  },
+  {
+    "town": "Viridian City",
+    "leader": "Giovanni",
+    "pokemon": [
+      {
+        "name": "Rhyhorn",
+        "max_health": 45230,
+        "level": 45
+      },
+      {
+        "name": "Dugtrio",
+        "max_health": 47530,
+        "level": 42
+      },
+      {
+        "name": "Nidoqueen",
+        "max_health": 48740,
+        "level": 44
+      },
+      {
+        "name": "Nidoking",
+        "max_health": 48350,
+        "level": 45
+      },
+      {
+        "name": "Rhyhorn",
+        "max_health": 55000,
+        "level": 50
+      }
+    ],
+    "badge": "Earth",
+    "badge_id": 8,
+    "money_reward": 6000,
+    "defeat_message": "Ha! That was a truly intense fight. You have won! As proof, here is the Earth Badge!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Thunder",
+          "badge_id": 3
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Rainbow",
+          "badge_id": 4
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Marsh",
+          "badge_id": 6
+        },
+        "children": []
+      },
+      {
+        "type": "QuestLineCompletedRequirement",
+        "params": {
+          "quest": "Bill's Errand"
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": false
+  },
+  {
+    "town": "Elite Lorelei",
+    "leader": "Lorelei",
+    "pokemon": [
+      {
+        "name": "Dewgong",
+        "max_health": 45330,
+        "level": 52
+      },
+      {
+        "name": "Cloyster",
+        "max_health": 48300,
+        "level": 51
+      },
+      {
+        "name": "Slowbro",
+        "max_health": 52000,
+        "level": 52
+      },
+      {
+        "name": "Jynx",
+        "max_health": 57000,
+        "level": 54
+      },
+      {
+        "name": "Lapras",
+        "max_health": 60250,
+        "level": 54
+      }
+    ],
+    "badge": "Elite_Lorelei",
+    "badge_id": 9,
+    "money_reward": 7500,
+    "defeat_message": "...Things shouldn't be this way!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Earth",
+          "badge_id": 8
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Bruno",
+    "leader": "Bruno",
+    "pokemon": [
+      {
+        "name": "Onix",
+        "max_health": 45330,
+        "level": 51
+      },
+      {
+        "name": "Hitmonchan",
+        "max_health": 48300,
+        "level": 53
+      },
+      {
+        "name": "Hitmonlee",
+        "max_health": 52000,
+        "level": 53
+      },
+      {
+        "name": "Onix",
+        "max_health": 57000,
+        "level": 54
+      },
+      {
+        "name": "Machamp",
+        "max_health": 60250,
+        "level": 56
+      }
+    ],
+    "badge": "Elite_Bruno",
+    "badge_id": 10,
+    "money_reward": 7500,
+    "defeat_message": "Why? How could I lose?",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Lorelei",
+          "badge_id": 9
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Agatha",
+    "leader": "Agatha",
+    "pokemon": [
+      {
+        "name": "Gengar",
+        "max_health": 45330,
+        "level": 54
+      },
+      {
+        "name": "Golbat",
+        "max_health": 48300,
+        "level": 54
+      },
+      {
+        "name": "Haunter",
+        "max_health": 52000,
+        "level": 53
+      },
+      {
+        "name": "Arbok",
+        "max_health": 57000,
+        "level": 56
+      },
+      {
+        "name": "Gengar",
+        "max_health": 60250,
+        "level": 58
+      }
+    ],
+    "badge": "Elite_Agatha",
+    "badge_id": 11,
+    "money_reward": 7500,
+    "defeat_message": "Oh, my! You're something special, child!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Bruno",
+          "badge_id": 10
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Lance",
+    "leader": "Lance",
+    "pokemon": [
+      {
+        "name": "Gyarados",
+        "max_health": 48300,
+        "level": 56
+      },
+      {
+        "name": "Dragonair",
+        "max_health": 52000,
+        "level": 54
+      },
+      {
+        "name": "Dragonair",
+        "max_health": 57000,
+        "level": 54
+      },
+      {
+        "name": "Aerodactyl",
+        "max_health": 60250,
+        "level": 58
+      },
+      {
+        "name": "Dragonite",
+        "max_health": 66000,
+        "level": 60
+      }
+    ],
+    "badge": "Elite_Lance",
+    "badge_id": 12,
+    "money_reward": 7500,
+    "defeat_message": "That's it! I hate to admit it, but you are a Pokémon master!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Agatha",
+          "badge_id": 11
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": true
+  },
+  {
+    "town": "Champion Blue",
+    "leader": "Blue",
+    "pokemon": [
+      {
+        "name": "Pidgeot",
+        "max_health": 52340,
+        "level": 59
+      },
+      {
+        "name": "Alakazam",
+        "max_health": 56320,
+        "level": 57
+      },
+      {
+        "name": "Rhydon",
+        "max_health": 58340,
+        "level": 59
+      },
+      {
+        "name": "Exeggutor",
+        "max_health": 57520,
+        "level": 59
+      },
+      {
+        "name": "Gyarados",
+        "max_health": 65340,
+        "level": 61
+      },
+      {
+        "name": "Charizard",
+        "max_health": 70000,
+        "level": 63
+      },
+      {
+        "name": "Arcanine",
+        "max_health": 57520,
+        "level": 59
+      },
+      {
+        "name": "Exeggutor",
+        "max_health": 65340,
+        "level": 61
+      },
+      {
+        "name": "Blastoise",
+        "max_health": 70000,
+        "level": 63
+      },
+      {
+        "name": "Gyarados",
+        "max_health": 57520,
+        "level": 59
+      },
+      {
+        "name": "Arcanine",
+        "max_health": 65340,
+        "level": 61
+      },
+      {
+        "name": "Venusaur",
+        "max_health": 70000,
+        "level": 63
+      },
+      {
+        "name": "Gyarados",
+        "max_health": 57520,
+        "level": 59
+      },
+      {
+        "name": "Arcanine",
+        "max_health": 65340,
+        "level": 61
+      },
+      {
+        "name": "Venusaur",
+        "max_health": 70000,
+        "level": 63
+      }
+    ],
+    "badge": "Elite_KantoChampion",
+    "badge_id": 13,
+    "money_reward": 10000,
+    "defeat_message": "NO! That can't be! You beat me at my best! After all that work to become the League Champ? My reign is over already? It's not fair!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Lance",
+          "badge_id": 12
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": true
+  },
+  {
+    "town": "Violet City",
+    "leader": "Falkner",
+    "pokemon": [
+      {
+        "name": "Pidgey",
+        "max_health": 108000,
+        "level": 7
+      },
+      {
+        "name": "Pidgeotto",
+        "max_health": 112000,
+        "level": 9
+      }
+    ],
+    "badge": "Zephyr",
+    "badge_id": 14,
+    "money_reward": 500,
+    "defeat_message": "...Darn! My Dad's cherished bird Pokémon... All right. Take this. It's the official Pokémon League Zephyr Badge.",
+    "requirements": [
+      {
+        "type": "ClearDungeonRequirement",
+        "params": {
+          "clears": 1,
+          "dungeon": "Sprout Tower"
+        },
+        "children": []
+      }
+    ],
+    "region": 1,
+    "is_elite": false
+  },
+  {
+    "town": "Azalea Town",
+    "leader": "Bugsy",
+    "pokemon": [
+      {
+        "name": "Metapod",
+        "max_health": 103000,
+        "level": 14
+      },
+      {
+        "name": "Kakuna",
+        "max_health": 101500,
+        "level": 14
+      },
+      {
+        "name": "Scyther",
+        "max_health": 119000,
+        "level": 16
+      }
+    ],
+    "badge": "Hive",
+    "badge_id": 15,
+    "money_reward": 1000,
+    "defeat_message": "Whoa, amazing! You're an expert on Pokémon! My research isn't complete yet. Ok, you win. Take this Badge.",
+    "requirements": [
+      {
+        "type": "ClearDungeonRequirement",
+        "params": {
+          "clears": 1,
+          "dungeon": "Slowpoke Well"
+        },
+        "children": []
+      }
+    ],
+    "region": 1,
+    "is_elite": false
+  },
+  {
+    "town": "Goldenrod City",
+    "leader": "Whitney",
+    "pokemon": [
+      {
+        "name": "Clefairy",
+        "max_health": 130000,
+        "level": 18
+      },
+      {
+        "name": "Miltank",
+        "max_health": 170000,
+        "level": 20
+      }
+    ],
+    "badge": "Plain",
+    "badge_id": 16,
+    "money_reward": 1500,
+    "defeat_message": "...Sniff... What? What do you want? A badge? Oh, right. I forgot. Here's the Plain Badge.",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "johto",
+          "route": 34
+        },
+        "children": []
+      }
+    ],
+    "region": 1,
+    "is_elite": false
+  },
+  {
+    "town": "Ecruteak City",
+    "leader": "Morty",
+    "pokemon": [
+      {
+        "name": "Gastly",
+        "max_health": 127000,
+        "level": 21
+      },
+      {
+        "name": "Haunter",
+        "max_health": 128000,
+        "level": 21
+      },
+      {
+        "name": "Gengar",
+        "max_health": 132000,
+        "level": 25
+      },
+      {
+        "name": "Haunter",
+        "max_health": 130000,
+        "level": 23
+      }
+    ],
+    "badge": "Fog",
+    "badge_id": 17,
+    "money_reward": 2500,
+    "defeat_message": "I'm not good enough yet... All right. This Badge is yours.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Plain",
+          "badge_id": 16
+        },
+        "children": []
+      }
+    ],
+    "region": 1,
+    "is_elite": false
+  },
+  {
+    "town": "Cianwood City",
+    "leader": "Chuck",
+    "pokemon": [
+      {
+        "name": "Primeape",
+        "max_health": 177000,
+        "level": 27
+      },
+      {
+        "name": "Poliwrath",
+        "max_health": 183000,
+        "level": 30
+      }
+    ],
+    "badge": "Storm",
+    "badge_id": 18,
+    "money_reward": 3500,
+    "defeat_message": "Wha? Huh? I lost? How about that! You're worthy of the Storm Badge!",
+    "requirements": [
+      {
+        "type": "QuestLineStepCompletedRequirement",
+        "params": {
+          "quest": "The Sick Ampharos",
+          "step": 0
+        },
+        "children": []
+      }
+    ],
+    "region": 1,
+    "is_elite": false
+  },
+  {
+    "town": "Olivine City",
+    "leader": "Jasmine",
+    "pokemon": [
+      {
+        "name": "Magnemite",
+        "max_health": 177000,
+        "level": 30
+      },
+      {
+        "name": "Magnemite",
+        "max_health": 178000,
+        "level": 30
+      },
+      {
+        "name": "Steelix",
+        "max_health": 182000,
+        "level": 35
+      }
+    ],
+    "badge": "Mineral",
+    "badge_id": 19,
+    "money_reward": 4000,
+    "defeat_message": "...You are a better trainer than me, in both skill and kindness. In accordance with League rules, I confer upon you this Badge.",
+    "requirements": [
+      {
+        "type": "QuestLineCompletedRequirement",
+        "params": {
+          "quest": "The Sick Ampharos"
+        },
+        "children": []
+      }
+    ],
+    "region": 1,
+    "is_elite": false
+  },
+  {
+    "town": "Mahogany Town",
+    "leader": "Pryce",
+    "pokemon": [
+      {
+        "name": "Seel",
+        "max_health": 190000,
+        "level": 27
+      },
+      {
+        "name": "Dewgong",
+        "max_health": 192500,
+        "level": 29
+      },
+      {
+        "name": "Piloswine",
+        "max_health": 196000,
+        "level": 31
+      }
+    ],
+    "badge": "Glacier",
+    "badge_id": 20,
+    "money_reward": 5000,
+    "defeat_message": "Ah, I am impressed by your prowess. With your strong will, I know you will overcome all life's obstacles. You are worthy of this Badge!",
+    "requirements": [
+      {
+        "type": "ClearDungeonRequirement",
+        "params": {
+          "clears": 1,
+          "dungeon": "Team Rocket's Hideout"
+        },
+        "children": []
+      }
+    ],
+    "region": 1,
+    "is_elite": false
+  },
+  {
+    "town": "Blackthorn City",
+    "leader": "Clair",
+    "pokemon": [
+      {
+        "name": "Dragonair",
+        "max_health": 205000,
+        "level": 37
+      },
+      {
+        "name": "Dragonair",
+        "max_health": 205000,
+        "level": 37
+      },
+      {
+        "name": "Dragonair",
+        "max_health": 218000,
+        "level": 37
+      },
+      {
+        "name": "Kingdra",
+        "max_health": 220000,
+        "level": 40
+      }
+    ],
+    "badge": "Rising",
+    "badge_id": 21,
+    "money_reward": 7500,
+    "defeat_message": "Here, this is the Rising Badge... Hurry up! Take it!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Glacier",
+          "badge_id": 20
+        },
+        "children": []
+      }
+    ],
+    "region": 1,
+    "is_elite": false
+  },
+  {
+    "town": "Elite Will",
+    "leader": "Will",
+    "pokemon": [
+      {
+        "name": "Xatu",
+        "max_health": 245330,
+        "level": 40
+      },
+      {
+        "name": "Exeggutor",
+        "max_health": 248300,
+        "level": 41
+      },
+      {
+        "name": "Slowbro",
+        "max_health": 252000,
+        "level": 41
+      },
+      {
+        "name": "Jynx",
+        "max_health": 257000,
+        "level": 41
+      },
+      {
+        "name": "Xatu",
+        "max_health": 260250,
+        "level": 42
+      }
+    ],
+    "badge": "Elite_Will",
+    "badge_id": 22,
+    "money_reward": 10000,
+    "defeat_message": "Even though I was defeated, I won't change my course. I will continue battling until I stand above all Trainers! Now move on and experience the true ferocity of the Elite Four.",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Silver 5"
+        },
+        "children": []
+      }
+    ],
+    "region": 1,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Koga",
+    "leader": "Koga2",
+    "pokemon": [
+      {
+        "name": "Ariados",
+        "max_health": 245330,
+        "level": 40
+      },
+      {
+        "name": "Venomoth",
+        "max_health": 248300,
+        "level": 41
+      },
+      {
+        "name": "Forretress",
+        "max_health": 252000,
+        "level": 43
+      },
+      {
+        "name": "Muk",
+        "max_health": 257000,
+        "level": 42
+      },
+      {
+        "name": "Crobat",
+        "max_health": 260250,
+        "level": 44
+      }
+    ],
+    "badge": "Elite_Koga",
+    "badge_id": 23,
+    "money_reward": 10000,
+    "defeat_message": "I subjected you to everything I could muster. But my efforts failed. I must hone my skills. Go on to the next room, and put your abilities to the test!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Will",
+          "badge_id": 22
+        },
+        "children": []
+      }
+    ],
+    "region": 1,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Bruno2",
+    "leader": "Bruno2",
+    "pokemon": [
+      {
+        "name": "Hitmontop",
+        "max_health": 245330,
+        "level": 42
+      },
+      {
+        "name": "Hitmonlee",
+        "max_health": 248300,
+        "level": 42
+      },
+      {
+        "name": "Hitmonchan",
+        "max_health": 252000,
+        "level": 42
+      },
+      {
+        "name": "Onix",
+        "max_health": 257000,
+        "level": 43
+      },
+      {
+        "name": "Machamp",
+        "max_health": 260250,
+        "level": 46
+      }
+    ],
+    "badge": "Elite_Bruno2",
+    "badge_id": 24,
+    "money_reward": 10000,
+    "defeat_message": "Having lost, I have no right to say anything… Go face your next challenge!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Koga",
+          "badge_id": 23
+        },
+        "children": []
+      }
+    ],
+    "region": 1,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Karen",
+    "leader": "Karen",
+    "pokemon": [
+      {
+        "name": "Umbreon",
+        "max_health": 248300,
+        "level": 42
+      },
+      {
+        "name": "Vileplume",
+        "max_health": 252000,
+        "level": 42
+      },
+      {
+        "name": "Murkrow",
+        "max_health": 257000,
+        "level": 44
+      },
+      {
+        "name": "Gengar",
+        "max_health": 260250,
+        "level": 45
+      },
+      {
+        "name": "Houndoom",
+        "max_health": 266000,
+        "level": 47
+      }
+    ],
+    "badge": "Elite_Karen",
+    "badge_id": 25,
+    "money_reward": 10000,
+    "defeat_message": "Strong Pokémon. Weak Pokémon. That is only the selfish perception of people. Truly skilled Trainers should try to win with the Pokémon they love best. I like your style. You understand what's important. Go on — — the Champion is waiting.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Bruno2",
+          "badge_id": 24
+        },
+        "children": []
+      }
+    ],
+    "region": 1,
+    "is_elite": true
+  },
+  {
+    "town": "Champion Lance",
+    "leader": "Lance2",
+    "pokemon": [
+      {
+        "name": "Gyarados",
+        "max_health": 258300,
+        "level": 44
+      },
+      {
+        "name": "Dragonite",
+        "max_health": 262000,
+        "level": 47
+      },
+      {
+        "name": "Charizard",
+        "max_health": 264000,
+        "level": 46
+      },
+      {
+        "name": "Aerodactyl",
+        "max_health": 260250,
+        "level": 46
+      },
+      {
+        "name": "Dragonite",
+        "max_health": 270000,
+        "level": 47
+      },
+      {
+        "name": "Dragonite",
+        "max_health": 270000,
+        "level": 50
+      }
+    ],
+    "badge": "Elite_JohtoChampion",
+    "badge_id": 26,
+    "money_reward": 13000,
+    "defeat_message": "…It's over. But it's an odd feeling. I'm not angry that I lost. In fact, I feel happy. Happy that I witnessed the rise of a great new Champion!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Karen",
+          "badge_id": 25
+        },
+        "children": []
+      }
+    ],
+    "region": 1,
+    "is_elite": true
+  },
+  {
+    "town": "Rustboro City",
+    "leader": "Roxanne",
+    "pokemon": [
+      {
+        "name": "Geodude",
+        "max_health": 382900,
+        "level": 12
+      },
+      {
+        "name": "Geodude",
+        "max_health": 382900,
+        "level": 12
+      },
+      {
+        "name": "Nosepass",
+        "max_health": 410200,
+        "level": 15
+      }
+    ],
+    "badge": "Stone",
+    "badge_id": 27,
+    "money_reward": 1000,
+    "defeat_message": "So… I lost… It seems that I still have much more to learn… I understand. The Pokémon League's rules state that Trainers are to be given this if they defeat a Gym Leader. Please accept the official Pokémon League Stone Badge.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_JohtoChampion",
+          "badge_id": 26
+        },
+        "children": []
+      }
+    ],
+    "region": 2,
+    "is_elite": false
+  },
+  {
+    "town": "Dewford Town",
+    "leader": "Brawly",
+    "pokemon": [
+      {
+        "name": "Machop",
+        "max_health": 424000,
+        "level": 16
+      },
+      {
+        "name": "Meditite",
+        "max_health": 424000,
+        "level": 16
+      },
+      {
+        "name": "Makuhita",
+        "max_health": 444000,
+        "level": 19
+      }
+    ],
+    "badge": "Knuckle",
+    "badge_id": 28,
+    "money_reward": 2000,
+    "defeat_message": "Whoah, wow! You made a much bigger splash than I expected! You swamped me! Okay, you've got me. Take this Gym Badge!",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "May 2"
+        },
+        "children": []
+      }
+    ],
+    "region": 2,
+    "is_elite": false
+  },
+  {
+    "town": "Mauville City",
+    "leader": "Wattson",
+    "pokemon": [
+      {
+        "name": "Voltorb",
+        "max_health": 452000,
+        "level": 20
+      },
+      {
+        "name": "Electrike",
+        "max_health": 448000,
+        "level": 20
+      },
+      {
+        "name": "Magneton",
+        "max_health": 483000,
+        "level": 22
+      },
+      {
+        "name": "Manectric",
+        "max_health": 448000,
+        "level": 24
+      }
+    ],
+    "badge": "Dynamo",
+    "badge_id": 29,
+    "money_reward": 3000,
+    "defeat_message": "Wahahahah! Fine, I lost! You ended up giving me a thrill! Take this Badge!",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Wally 1"
+        },
+        "children": []
+      }
+    ],
+    "region": 2,
+    "is_elite": false
+  },
+  {
+    "town": "Lavaridge Town",
+    "leader": "Flannery",
+    "pokemon": [
+      {
+        "name": "Numel",
+        "max_health": 472000,
+        "level": 24
+      },
+      {
+        "name": "Slugma",
+        "max_health": 472000,
+        "level": 24
+      },
+      {
+        "name": "Camerupt",
+        "max_health": 492000,
+        "level": 26
+      },
+      {
+        "name": "Torkoal",
+        "max_health": 524000,
+        "level": 29
+      }
+    ],
+    "badge": "Heat",
+    "badge_id": 30,
+    "money_reward": 4000,
+    "defeat_message": "Oh... I guess I was trying too hard... I... I've only recently become a Gym Leader. I tried too hard to be someone I'm not. I have to do things my natural way. If I don't, my Pokémon will be confused. Thanks for teaching me that. For that, you deserve this.",
+    "requirements": [
+      {
+        "type": "ClearDungeonRequirement",
+        "params": {
+          "clears": 1,
+          "dungeon": "Jagged Pass"
+        },
+        "children": []
+      }
+    ],
+    "region": 2,
+    "is_elite": false
+  },
+  {
+    "town": "Petalburg City",
+    "leader": "Norman",
+    "pokemon": [
+      {
+        "name": "Spinda",
+        "max_health": 490000,
+        "level": 27
+      },
+      {
+        "name": "Vigoroth",
+        "max_health": 530000,
+        "level": 27
+      },
+      {
+        "name": "Linoone",
+        "max_health": 560000,
+        "level": 29
+      },
+      {
+        "name": "Slaking",
+        "max_health": 596000,
+        "level": 31
+      }
+    ],
+    "badge": "Balance",
+    "badge_id": 31,
+    "money_reward": 5000,
+    "defeat_message": "… I… I can't… I can't believe it. I lost to you? But, rules are rules! Here, take this.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Knuckle",
+          "badge_id": 28
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Heat",
+          "badge_id": 30
+        },
+        "children": []
+      }
+    ],
+    "region": 2,
+    "is_elite": false
+  },
+  {
+    "town": "Fortree City",
+    "leader": "Winona",
+    "pokemon": [
+      {
+        "name": "Swablu",
+        "max_health": 605000,
+        "level": 29
+      },
+      {
+        "name": "Tropius",
+        "max_health": 650000,
+        "level": 29
+      },
+      {
+        "name": "Pelipper",
+        "max_health": 630000,
+        "level": 30
+      },
+      {
+        "name": "Skarmory",
+        "max_health": 667000,
+        "level": 31
+      },
+      {
+        "name": "Altaria",
+        "max_health": 669000,
+        "level": 33
+      }
+    ],
+    "badge": "Feather",
+    "badge_id": 32,
+    "money_reward": 6000,
+    "defeat_message": "Never before have I seen a Trainer command Pokémon with more grace than I... In recognition of your prowess, I present to you this Gym Badge.",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Kecleon 1"
+        },
+        "children": []
+      }
+    ],
+    "region": 2,
+    "is_elite": false
+  },
+  {
+    "town": "Mossdeep City",
+    "leader": "Tate & Liza",
+    "pokemon": [
+      {
+        "name": "Claydol",
+        "max_health": 702000,
+        "level": 41
+      },
+      {
+        "name": "Xatu",
+        "max_health": 703000,
+        "level": 41
+      },
+      {
+        "name": "Lunatone",
+        "max_health": 702000,
+        "level": 42
+      },
+      {
+        "name": "Solrock",
+        "max_health": 703000,
+        "level": 42
+      }
+    ],
+    "badge": "Mind",
+    "badge_id": 33,
+    "money_reward": 8000,
+    "defeat_message": "What? Our combination... was shattered! It can't be helped. You've won... So, in recognition, take this Gym Badge.",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "hoenn",
+          "route": 125
+        },
+        "children": []
+      }
+    ],
+    "region": 2,
+    "is_elite": false
+  },
+  {
+    "town": "Sootopolis City",
+    "leader": "Juan",
+    "pokemon": [
+      {
+        "name": "Luvdisc",
+        "max_health": 798000,
+        "level": 41
+      },
+      {
+        "name": "Whiscash",
+        "max_health": 813000,
+        "level": 41
+      },
+      {
+        "name": "Sealeo",
+        "max_health": 823400,
+        "level": 43
+      },
+      {
+        "name": "Crawdaunt",
+        "max_health": 842000,
+        "level": 43
+      },
+      {
+        "name": "Kingdra",
+        "max_health": 865000,
+        "level": 46
+      }
+    ],
+    "badge": "Rain",
+    "badge_id": 34,
+    "money_reward": 10000,
+    "defeat_message": "Ahahaha, excellent! Very well, you are the winner. From you, I sense the brilliant shine of skill that will overcome all. However, compared with me or even Wallace, you are lacking in elegance. Perhaps I should make you a loan of my outfit? ... Hahaha, I merely jest! Rather than my clothes, I shall reward you with this, the Rain Badge.",
+    "requirements": [
+      {
+        "type": "ClearDungeonRequirement",
+        "params": {
+          "clears": 1,
+          "dungeon": "Sky Pillar"
+        },
+        "children": []
+      }
+    ],
+    "region": 2,
+    "is_elite": false
+  },
+  {
+    "town": "Elite Sidney",
+    "leader": "Sidney",
+    "pokemon": [
+      {
+        "name": "Mightyena",
+        "max_health": 972000,
+        "level": 46
+      },
+      {
+        "name": "Shiftry",
+        "max_health": 980000,
+        "level": 48
+      },
+      {
+        "name": "Cacturne",
+        "max_health": 1002000,
+        "level": 46
+      },
+      {
+        "name": "Crawdaunt",
+        "max_health": 1015000,
+        "level": 48
+      },
+      {
+        "name": "Absol",
+        "max_health": 1020000,
+        "level": 49
+      }
+    ],
+    "badge": "Elite_Sidney",
+    "badge_id": 35,
+    "money_reward": 15000,
+    "defeat_message": "Well, listen to what this loser has to say. You've got what it takes to go far. Now, go on to the next room and enjoy your next battle!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Feather",
+          "badge_id": 32
+        },
+        "children": []
+      },
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Wally 2"
+        },
+        "children": []
+      }
+    ],
+    "region": 2,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Phoebe",
+    "leader": "Phoebe",
+    "pokemon": [
+      {
+        "name": "Dusclops",
+        "max_health": 1036700,
+        "level": 48
+      },
+      {
+        "name": "Banette",
+        "max_health": 1038000,
+        "level": 49
+      },
+      {
+        "name": "Sableye",
+        "max_health": 1052000,
+        "level": 50
+      },
+      {
+        "name": "Banette",
+        "max_health": 1038000,
+        "level": 49
+      },
+      {
+        "name": "Dusclops",
+        "max_health": 1063000,
+        "level": 51
+      }
+    ],
+    "badge": "Elite_Phoebe",
+    "badge_id": 36,
+    "money_reward": 15000,
+    "defeat_message": "There's a definite bond between you and your Pokémon, too. I didn't recognize it, so it's only natural that I lost. Yup, I'd like to see how far your bond will carry you. Go ahead, move to the next room.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Sidney",
+          "badge_id": 35
+        },
+        "children": []
+      }
+    ],
+    "region": 2,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Glacia",
+    "leader": "Glacia",
+    "pokemon": [
+      {
+        "name": "Sealeo",
+        "max_health": 1082000,
+        "level": 50
+      },
+      {
+        "name": "Glalie",
+        "max_health": 1072000,
+        "level": 50
+      },
+      {
+        "name": "Sealeo",
+        "max_health": 1086000,
+        "level": 52
+      },
+      {
+        "name": "Glalie",
+        "max_health": 1076000,
+        "level": 52
+      },
+      {
+        "name": "Walrein",
+        "max_health": 1100000,
+        "level": 53
+      }
+    ],
+    "badge": "Elite_Glacia",
+    "badge_id": 37,
+    "money_reward": 15000,
+    "defeat_message": "Advance to the next room. And there, confirm the truly fearsome side of the Pokémon League.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Phoebe",
+          "badge_id": 36
+        },
+        "children": []
+      }
+    ],
+    "region": 2,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Drake",
+    "leader": "Drake",
+    "pokemon": [
+      {
+        "name": "Shelgon",
+        "max_health": 1064000,
+        "level": 52
+      },
+      {
+        "name": "Altaria",
+        "max_health": 1072000,
+        "level": 54
+      },
+      {
+        "name": "Kingdra",
+        "max_health": 1076000,
+        "level": 53
+      },
+      {
+        "name": "Flygon",
+        "max_health": 1076000,
+        "level": 53
+      },
+      {
+        "name": "Salamence",
+        "max_health": 1157000,
+        "level": 55
+      }
+    ],
+    "badge": "Elite_Drake",
+    "badge_id": 38,
+    "money_reward": 15000,
+    "defeat_message": "You deserve every credit for coming this far as a Trainer of Pokémon. You do seem to know what is needed. Yes, what a Trainer needs is a virtuous heart. Pokémon touch the good hearts of Trainers and learn good from wrong. They touch the good hearts of Trainers and grow strong. Go! Go onwards! The Champion is waiting!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Glacia",
+          "badge_id": 37
+        },
+        "children": []
+      }
+    ],
+    "region": 2,
+    "is_elite": true
+  },
+  {
+    "town": "Champion Wallace",
+    "leader": "Wallace",
+    "pokemon": [
+      {
+        "name": "Wailord",
+        "max_health": 1202000,
+        "level": 57
+      },
+      {
+        "name": "Tentacruel",
+        "max_health": 1164000,
+        "level": 55
+      },
+      {
+        "name": "Ludicolo",
+        "max_health": 1184000,
+        "level": 56
+      },
+      {
+        "name": "Whiscash",
+        "max_health": 1172000,
+        "level": 56
+      },
+      {
+        "name": "Gyarados",
+        "max_health": 1163000,
+        "level": 56
+      },
+      {
+        "name": "Milotic",
+        "max_health": 1182000,
+        "level": 58
+      }
+    ],
+    "badge": "Elite_HoennChampion",
+    "badge_id": 39,
+    "money_reward": 16000,
+    "defeat_message": "I, the Champion, fall in defeat… That was wonderful work. You were elegant, infuriatingly so. And yet it was utterly glorious! Kudos to you! You are a truly noble Pokémon Trainer!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Drake",
+          "badge_id": 38
+        },
+        "children": []
+      }
+    ],
+    "region": 2,
+    "is_elite": true
+  },
+  {
+    "town": "Mikan Island",
+    "leader": "Cissy",
+    "pokemon": [
+      {
+        "name": "Seadra",
+        "max_health": 2307500,
+        "level": 24
+      },
+      {
+        "name": "Blastoise",
+        "max_health": 2307500,
+        "level": 24
+      }
+    ],
+    "badge": "Coral-Eye",
+    "badge_id": 40,
+    "money_reward": 10000,
+    "defeat_message": "I can see why you made it so far in the Indigo League, and I bet you'll do pretty well in the Orange League.\n' +\n    'This is the Coral-Eye Badge of the Mikan Gym, to prove that you won your match!",
+    "requirements": [
+      {
+        "type": "ClearDungeonRequirement",
+        "params": {
+          "clears": 1,
+          "dungeon": "Tanoby Ruins"
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": false
+  },
+  {
+    "town": "Navel Island",
+    "leader": "Danny",
+    "pokemon": [
+      {
+        "name": "Geodude",
+        "max_health": 923000,
+        "level": 24
+      },
+      {
+        "name": "Nidoqueen",
+        "max_health": 923000,
+        "level": 24
+      },
+      {
+        "name": "Machoke",
+        "max_health": 923000,
+        "level": 24
+      },
+      {
+        "name": "Scyther",
+        "max_health": 923000,
+        "level": 24
+      },
+      {
+        "name": "Electrode",
+        "max_health": 923000,
+        "level": 24
+      }
+    ],
+    "badge": "Sea_Ruby",
+    "badge_id": 41,
+    "money_reward": 10000,
+    "defeat_message": "You and the others were great.\nNow I'd like to give you and your fellow challengers something you really deserve. The Sea Ruby badge. It's yours.",
+    "requirements": [
+      {
+        "type": "ClearDungeonRequirement",
+        "params": {
+          "clears": 1,
+          "dungeon": "Lost Cave"
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": false
+  },
+  {
+    "town": "Trovita Island",
+    "leader": "Rudy",
+    "pokemon": [
+      {
+        "name": "Electabuzz",
+        "max_health": 1538333,
+        "level": 24
+      },
+      {
+        "name": "Exeggutor",
+        "max_health": 1538333,
+        "level": 24
+      },
+      {
+        "name": "Starmie",
+        "max_health": 1538333,
+        "level": 24
+      }
+    ],
+    "badge": "Spike_Shell",
+    "badge_id": 42,
+    "money_reward": 10000,
+    "defeat_message": "Nice job, guys. Here are your Spike Shell badges, guys.",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "kanto",
+          "route": 41
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": false
+  },
+  {
+    "town": "Kumquat Island",
+    "leader": "Luana",
+    "pokemon": [
+      {
+        "name": "Alakazam",
+        "max_health": 2307500,
+        "level": 24
+      },
+      {
+        "name": "Marowak",
+        "max_health": 2307500,
+        "level": 24
+      }
+    ],
+    "badge": "Jade_Star",
+    "badge_id": 43,
+    "money_reward": 10000,
+    "defeat_message": "You did a fine job.\nAnd now, as Kumquat Island gym leader, and a member of the Orange Crew, I happily present this token of your victory.",
+    "requirements": [
+      {
+        "type": "ClearDungeonRequirement",
+        "params": {
+          "clears": 1,
+          "dungeon": "Icefall Cave"
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": false
+  },
+  {
+    "town": "Supreme Gym Leader Drake",
+    "leader": "Supreme Gym Leader Drake",
+    "pokemon": [
+      {
+        "name": "Ditto",
+        "max_health": 899520,
+        "level": 38
+      },
+      {
+        "name": "Onix",
+        "max_health": 899520,
+        "level": 39
+      },
+      {
+        "name": "Gengar",
+        "max_health": 899520,
+        "level": 40
+      },
+      {
+        "name": "Venusaur",
+        "max_health": 899520,
+        "level": 40
+      },
+      {
+        "name": "Electabuzz",
+        "max_health": 899520,
+        "level": 41
+      },
+      {
+        "name": "Dragonite",
+        "max_health": 1124400,
+        "level": 37
+      }
+    ],
+    "badge": "Elite_OrangeChampion",
+    "badge_id": 44,
+    "money_reward": 12000,
+    "defeat_message": "You really deserve that trophy. You're a great Pokémon trainer.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Coral-Eye",
+          "badge_id": 40
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Sea_Ruby",
+          "badge_id": 41
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Spike_Shell",
+          "badge_id": 42
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Jade_Star",
+          "badge_id": 43
+        },
+        "children": []
+      }
+    ],
+    "region": 0,
+    "is_elite": false
+  },
+  {
+    "town": "Cipher Admin Ein",
+    "leader": "Cipher Admin Ein",
+    "pokemon": [
+      {
+        "name": "Crobat",
+        "max_health": 12099520,
+        "level": 48
+      },
+      {
+        "name": "Pelipper",
+        "max_health": 12099520,
+        "level": 49
+      },
+      {
+        "name": "Rhydon",
+        "max_health": 12099520,
+        "level": 50
+      },
+      {
+        "name": "Starmie",
+        "max_health": 12099520,
+        "level": 49
+      },
+      {
+        "name": "Manectric",
+        "max_health": 12099520,
+        "level": 50
+      }
+    ],
+    "badge": "Elite_F_Disk",
+    "badge_id": 45,
+    "money_reward": 12000,
+    "defeat_message": "Urrrgh… What unbelievable power…",
+    "requirements": [
+      {
+        "type": "QuestLineCompletedRequirement",
+        "params": {
+          "quest": "Shadows in the Desert"
+        },
+        "children": []
+      }
+    ],
+    "region": 10,
+    "is_elite": false
+  },
+  {
+    "town": "Cipher Admin Miror B.",
+    "leader": "Cipher Admin Miror B",
+    "pokemon": [
+      {
+        "name": "Ludicolo",
+        "max_health": 11599520,
+        "level": 44
+      },
+      {
+        "name": "Ludicolo",
+        "max_health": 11599520,
+        "level": 45
+      },
+      {
+        "name": "Loudred",
+        "max_health": 11599520,
+        "level": 46
+      },
+      {
+        "name": "Golduck",
+        "max_health": 11599520,
+        "level": 45
+      },
+      {
+        "name": "Armaldo",
+        "max_health": 11599520,
+        "level": 43
+      }
+    ],
+    "badge": "Elite_L_Disk",
+    "badge_id": 46,
+    "money_reward": 12000,
+    "defeat_message": "I'm an awesome dancer… But I can't win in battles!",
+    "requirements": [
+      {
+        "type": "QuestLineCompletedRequirement",
+        "params": {
+          "quest": "Shadows in the Desert"
+        },
+        "children": []
+      }
+    ],
+    "region": 10,
+    "is_elite": false
+  },
+  {
+    "town": "Cipher Admin Dakim",
+    "leader": "Cipher Admin Dakim",
+    "pokemon": [
+      {
+        "name": "Claydol",
+        "max_health": 11999520,
+        "level": 46
+      },
+      {
+        "name": "Forretress",
+        "max_health": 11999520,
+        "level": 45
+      },
+      {
+        "name": "Flygon",
+        "max_health": 11999520,
+        "level": 46
+      },
+      {
+        "name": "Whiscash",
+        "max_health": 11999520,
+        "level": 46
+      },
+      {
+        "name": "Houndoom",
+        "max_health": 11999520,
+        "level": 47
+      }
+    ],
+    "badge": "Elite_R_Disk",
+    "badge_id": 47,
+    "money_reward": 12000,
+    "defeat_message": "This can't be! The mighty Dakim loses again?",
+    "requirements": [
+      {
+        "type": "QuestLineCompletedRequirement",
+        "params": {
+          "quest": "Shadows in the Desert"
+        },
+        "children": []
+      }
+    ],
+    "region": 10,
+    "is_elite": false
+  },
+  {
+    "town": "Cipher Admin Venus",
+    "leader": "Cipher Admin Venus",
+    "pokemon": [
+      {
+        "name": "Bellossom",
+        "max_health": 12299520,
+        "level": 47
+      },
+      {
+        "name": "Misdreavus",
+        "max_health": 12299520,
+        "level": 47
+      },
+      {
+        "name": "Raichu",
+        "max_health": 12299520,
+        "level": 48
+      },
+      {
+        "name": "Wigglytuff",
+        "max_health": 12299520,
+        "level": 48
+      },
+      {
+        "name": "Milotic",
+        "max_health": 12299520,
+        "level": 48
+      }
+    ],
+    "badge": "Elite_U_Disk",
+    "badge_id": 48,
+    "money_reward": 12000,
+    "defeat_message": "I shall forget that I ever battled with you. Yes, that's what I'll do. Ohohohoh!",
+    "requirements": [
+      {
+        "type": "QuestLineCompletedRequirement",
+        "params": {
+          "quest": "Shadows in the Desert"
+        },
+        "children": []
+      }
+    ],
+    "region": 10,
+    "is_elite": false
+  },
+  {
+    "town": "Cipher Admin Lovrina",
+    "leader": "Cipher Admin Lovrina",
+    "pokemon": [
+      {
+        "name": "Shuckle",
+        "max_health": 30994948,
+        "level": 100
+      },
+      {
+        "name": "Milotic",
+        "max_health": 30994948,
+        "level": 100
+      },
+      {
+        "name": "Wobbuffet",
+        "max_health": 30994948,
+        "level": 100
+      },
+      {
+        "name": "Blissey",
+        "max_health": 30994948,
+        "level": 100
+      },
+      {
+        "name": "Misdreavus",
+        "max_health": 30994948,
+        "level": 100
+      },
+      {
+        "name": "Meganium",
+        "max_health": 30994948,
+        "level": 100
+      }
+    ],
+    "badge": "Elite_ColosseumLovrina",
+    "badge_id": 49,
+    "money_reward": 65000,
+    "defeat_message": "I was so impressed by your toughness! Because you are so tough, I'll let you be the first member in my fan club! Doesn't that so make your day?",
+    "requirements": [
+      {
+        "type": "QuestLineCompletedRequirement",
+        "params": {
+          "quest": "Gale of Darkness"
+        },
+        "children": []
+      }
+    ],
+    "region": 10,
+    "is_elite": false
+  },
+  {
+    "town": "Cipher Admin Snattle",
+    "leader": "Cipher Admin Snattle",
+    "pokemon": [
+      {
+        "name": "Electrode",
+        "max_health": 34094443,
+        "level": 100
+      },
+      {
+        "name": "Gengar",
+        "max_health": 34094443,
+        "level": 100
+      },
+      {
+        "name": "Muk",
+        "max_health": 34094443,
+        "level": 100
+      },
+      {
+        "name": "Glalie",
+        "max_health": 34094443,
+        "level": 100
+      },
+      {
+        "name": "Regirock",
+        "max_health": 34094443,
+        "level": 100
+      },
+      {
+        "name": "Regice",
+        "max_health": 34094443,
+        "level": 100
+      }
+    ],
+    "badge": "Elite_ColosseumSnattle",
+    "badge_id": 50,
+    "money_reward": 70000,
+    "defeat_message": "In the near future, when I become the Governor of Orre, I shall appoint you as my official secretary. Let that be a motivation for you to constantly better your skills!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_ColosseumLovrina",
+          "badge_id": 49
+        },
+        "children": []
+      }
+    ],
+    "region": 10,
+    "is_elite": false
+  },
+  {
+    "town": "Cipher Admin Gorigan",
+    "leader": "Cipher Admin Gorigan",
+    "pokemon": [
+      {
+        "name": "Salamence",
+        "max_health": 37503887,
+        "level": 100
+      },
+      {
+        "name": "Granbull",
+        "max_health": 37503887,
+        "level": 100
+      },
+      {
+        "name": "Arcanine",
+        "max_health": 37503887,
+        "level": 100
+      },
+      {
+        "name": "Tauros",
+        "max_health": 37503887,
+        "level": 100
+      },
+      {
+        "name": "Hitmontop",
+        "max_health": 37503887,
+        "level": 100
+      },
+      {
+        "name": "Gyarados",
+        "max_health": 37503887,
+        "level": 100
+      }
+    ],
+    "badge": "Elite_ColosseumGorigan",
+    "badge_id": 51,
+    "money_reward": 85000,
+    "defeat_message": "You're some kind of special! You're worthy of sharing my camaraderie as a friend.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_ColosseumSnattle",
+          "badge_id": 50
+        },
+        "children": []
+      }
+    ],
+    "region": 10,
+    "is_elite": false
+  },
+  {
+    "town": "Cipher Admin Ardos",
+    "leader": "Cipher Admin Ardos",
+    "pokemon": [
+      {
+        "name": "Sceptile",
+        "max_health": 41254276,
+        "level": 100
+      },
+      {
+        "name": "Charizard",
+        "max_health": 41254276,
+        "level": 100
+      },
+      {
+        "name": "Gengar",
+        "max_health": 41254276,
+        "level": 100
+      },
+      {
+        "name": "Aerodactyl",
+        "max_health": 41254276,
+        "level": 100
+      },
+      {
+        "name": "Tauros",
+        "max_health": 41254276,
+        "level": 100
+      },
+      {
+        "name": "Starmie",
+        "max_health": 41254276,
+        "level": 100
+      }
+    ],
+    "badge": "Elite_ColosseumArdos",
+    "badge_id": 52,
+    "money_reward": 100000,
+    "defeat_message": "In all of Orre, I've never seen a Pokémon Trainer of your caliber. You appear to be the biggest threat to Cipher. To make sure my underlings watch you with caution, I give you the title “Cipher's Biggest Enemy.”",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_ColosseumGorigan",
+          "badge_id": 51
+        },
+        "children": []
+      }
+    ],
+    "region": 10,
+    "is_elite": false
+  },
+  {
+    "town": "Cipher Admin Eldes",
+    "leader": "Cipher Admin Eldes",
+    "pokemon": [
+      {
+        "name": "Latios",
+        "max_health": 45379704,
+        "level": 100
+      },
+      {
+        "name": "Latias",
+        "max_health": 45379704,
+        "level": 100
+      },
+      {
+        "name": "Gengar",
+        "max_health": 45379704,
+        "level": 100
+      },
+      {
+        "name": "Metagross",
+        "max_health": 45379704,
+        "level": 100
+      },
+      {
+        "name": "Snorlax",
+        "max_health": 45379704,
+        "level": 100
+      },
+      {
+        "name": "Tauros",
+        "max_health": 45379704,
+        "level": 100
+      }
+    ],
+    "badge": "Elite_ColosseumEldes",
+    "badge_id": 53,
+    "money_reward": 128000,
+    "defeat_message": "I'm satisfied that I was able to battle to my heart's content. I would like to confer on you the title “Eldes's Top Rival.”",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_ColosseumArdos",
+          "badge_id": 52
+        },
+        "children": []
+      }
+    ],
+    "region": 10,
+    "is_elite": false
+  },
+  {
+    "town": "Oreburgh City",
+    "leader": "Roark",
+    "pokemon": [
+      {
+        "name": "Geodude",
+        "max_health": 1338000,
+        "level": 12
+      },
+      {
+        "name": "Onix",
+        "max_health": 1342000,
+        "level": 12
+      },
+      {
+        "name": "Cranidos",
+        "max_health": 1342000,
+        "level": 14
+      }
+    ],
+    "badge": "Coal",
+    "badge_id": 54,
+    "money_reward": 250,
+    "defeat_message": "This is embarrassing... I went and lost to a Trainer who didn't have a single Gym Badge... But that's tough. You were strong, and I was weak. That's all there is. According to Pokémon League rules, I have to give you our Gym Badge since you've beaten me, the Leader. Heres your official Pokémon League Coal Badge.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_HoennChampion",
+          "badge_id": 39
+        },
+        "children": []
+      }
+    ],
+    "region": 3,
+    "is_elite": false
+  },
+  {
+    "town": "Eterna City",
+    "leader": "Gardenia",
+    "pokemon": [
+      {
+        "name": "Turtwig",
+        "max_health": 1433000,
+        "level": 20
+      },
+      {
+        "name": "Cherrim (Overcast)",
+        "max_health": 1437500,
+        "level": 20
+      },
+      {
+        "name": "Roserade",
+        "max_health": 1439000,
+        "level": 22
+      }
+    ],
+    "badge": "Forest",
+    "badge_id": 55,
+    "money_reward": 400,
+    "defeat_message": "I might've said it before, but you're really tough! Wasn't it hard for you to raise your Pokémon to be so good? I guess that's a measure of how much you love your Pokémon. In recognition of that, I proudly grant you this!\"",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Coal",
+          "badge_id": 54
+        },
+        "children": []
+      }
+    ],
+    "region": 3,
+    "is_elite": false
+  },
+  {
+    "town": "Hearthome City",
+    "leader": "Fantina",
+    "pokemon": [
+      {
+        "name": "Duskull",
+        "max_health": 1450000,
+        "level": 24
+      },
+      {
+        "name": "Haunter",
+        "max_health": 1480000,
+        "level": 24
+      },
+      {
+        "name": "Mismagius",
+        "max_health": 1480000,
+        "level": 26
+      }
+    ],
+    "badge": "Relic",
+    "badge_id": 56,
+    "money_reward": 740,
+    "defeat_message": "I am dumbfounded! So very, very strong! You, your Pokémon, so strong! Your power is admirable! I shall honor it with this Gym Badge!\"",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Forest",
+          "badge_id": 55
+        },
+        "children": []
+      }
+    ],
+    "region": 3,
+    "is_elite": false
+  },
+  {
+    "town": "Veilstone City",
+    "leader": "Maylene",
+    "pokemon": [
+      {
+        "name": "Meditite",
+        "max_health": 1537000,
+        "level": 28
+      },
+      {
+        "name": "Machoke",
+        "max_health": 1538000,
+        "level": 29
+      },
+      {
+        "name": "Lucario",
+        "max_health": 1540000,
+        "level": 32
+      }
+    ],
+    "badge": "Cobble",
+    "badge_id": 57,
+    "money_reward": 1200,
+    "defeat_message": "...OK. You win. That was a tough loss. I learned a lot from it. Please, accept this Gym Badge.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Relic",
+          "badge_id": 56
+        },
+        "children": []
+      }
+    ],
+    "region": 3,
+    "is_elite": false
+  },
+  {
+    "town": "Pastoria City",
+    "leader": "Crasher Wake",
+    "pokemon": [
+      {
+        "name": "Gyarados",
+        "max_health": 1687000,
+        "level": 33
+      },
+      {
+        "name": "Quagsire",
+        "max_health": 1693000,
+        "level": 34
+      },
+      {
+        "name": "Floatzel",
+        "max_health": 1693000,
+        "level": 37
+      }
+    ],
+    "badge": "Fen",
+    "badge_id": 58,
+    "money_reward": 2500,
+    "defeat_message": "It seems the undertow pulled me under... But I had a great time battling with you! You've earned this!",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Barry 4"
+        },
+        "children": []
+      }
+    ],
+    "region": 3,
+    "is_elite": false
+  },
+  {
+    "town": "Canalave City",
+    "leader": "Byron",
+    "pokemon": [
+      {
+        "name": "Magneton",
+        "max_health": 1767000,
+        "level": 37
+      },
+      {
+        "name": "Steelix",
+        "max_health": 1772000,
+        "level": 38
+      },
+      {
+        "name": "Bastiodon",
+        "max_health": 1768000,
+        "level": 41
+      }
+    ],
+    "badge": "Mine",
+    "badge_id": 59,
+    "money_reward": 4800,
+    "defeat_message": "You were strong enough to take down my prized team of Pokémon. In recognition of that power, I give you this: the Mine Badge!",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Barry 5"
+        },
+        "children": []
+      }
+    ],
+    "region": 3,
+    "is_elite": false
+  },
+  {
+    "town": "Snowpoint City",
+    "leader": "Candice",
+    "pokemon": [
+      {
+        "name": "Sneasel",
+        "max_health": 1872500,
+        "level": 40
+      },
+      {
+        "name": "Piloswine",
+        "max_health": 1876000,
+        "level": 40
+      },
+      {
+        "name": "Abomasnow",
+        "max_health": 1870000,
+        "level": 42
+      },
+      {
+        "name": "Froslass",
+        "max_health": 1870000,
+        "level": 44
+      }
+    ],
+    "badge": "Icicle",
+    "badge_id": 60,
+    "money_reward": 8000,
+    "defeat_message": "Wow! You're great! You've earned my respect! I think your focus and will bowled us over totally. Oh, that's right! I'm supposed to give you this!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Mine",
+          "badge_id": 59
+        },
+        "children": []
+      }
+    ],
+    "region": 3,
+    "is_elite": false
+  },
+  {
+    "town": "Sunyshore City",
+    "leader": "Volkner",
+    "pokemon": [
+      {
+        "name": "Jolteon",
+        "max_health": 1965000,
+        "level": 46
+      },
+      {
+        "name": "Raichu",
+        "max_health": 1965000,
+        "level": 46
+      },
+      {
+        "name": "Luxray",
+        "max_health": 1978000,
+        "level": 48
+      },
+      {
+        "name": "Electivire",
+        "max_health": 1980000,
+        "level": 50
+      }
+    ],
+    "badge": "Beacon",
+    "badge_id": 61,
+    "money_reward": 12000,
+    "defeat_message": "...Hehehe. Hahahah! ...That was the most fun I've had in a battle since...I don't know when! It's also made me excited to know you and your team will keep battling to greater heights! This is your eighth Gym Badge. You've earned this!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Icicle",
+          "badge_id": 60
+        },
+        "children": []
+      }
+    ],
+    "region": 3,
+    "is_elite": false
+  },
+  {
+    "town": "Elite Aaron",
+    "leader": "Aaron",
+    "pokemon": [
+      {
+        "name": "Yanmega",
+        "max_health": 2545330,
+        "level": 49
+      },
+      {
+        "name": "Scizor",
+        "max_health": 2548300,
+        "level": 49
+      },
+      {
+        "name": "Vespiquen",
+        "max_health": 2552000,
+        "level": 50
+      },
+      {
+        "name": "Heracross",
+        "max_health": 2557000,
+        "level": 51
+      },
+      {
+        "name": "Drapion",
+        "max_health": 2560250,
+        "level": 53
+      }
+    ],
+    "badge": "Elite_Aaron",
+    "badge_id": 62,
+    "money_reward": 18000,
+    "defeat_message": "I lost with the most beautiful and toughest of the bug Pokémon... We lost because I wasn't good enough... That's it! Back to training camp! Let's hear it for me! No... That was wrong... Anyway... Go on to the next room! Three Trainers are waiting for you. They are all tougher than me.",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Barry 6"
+        },
+        "children": []
+      }
+    ],
+    "region": 3,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Bertha",
+    "leader": "Bertha",
+    "pokemon": [
+      {
+        "name": "Whiscash",
+        "max_health": 2645330,
+        "level": 50
+      },
+      {
+        "name": "Gliscor",
+        "max_health": 2648300,
+        "level": 53
+      },
+      {
+        "name": "Hippowdon",
+        "max_health": 2652000,
+        "level": 52
+      },
+      {
+        "name": "Golem",
+        "max_health": 2657000,
+        "level": 52
+      },
+      {
+        "name": "Rhyperior",
+        "max_health": 2660250,
+        "level": 55
+      }
+    ],
+    "badge": "Elite_Bertha",
+    "badge_id": 63,
+    "money_reward": 18000,
+    "defeat_message": "You're quite something, youngster. I like how you and your Pokémon earned the win by working as one. That's what makes you so strong. Ahahaha! I think that you can go as far as you want.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Aaron",
+          "badge_id": 62
+        },
+        "children": []
+      }
+    ],
+    "region": 3,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Flint",
+    "leader": "Flint",
+    "pokemon": [
+      {
+        "name": "Houndoom",
+        "max_health": 2845330,
+        "level": 52
+      },
+      {
+        "name": "Flareon",
+        "max_health": 2848300,
+        "level": 55
+      },
+      {
+        "name": "Rapidash",
+        "max_health": 2852000,
+        "level": 53
+      },
+      {
+        "name": "Infernape",
+        "max_health": 2857000,
+        "level": 55
+      },
+      {
+        "name": "Magmortar",
+        "max_health": 2860250,
+        "level": 57
+      }
+    ],
+    "badge": "Elite_Flint",
+    "badge_id": 64,
+    "money_reward": 18000,
+    "defeat_message": ".........Keep going...I know your spirit burns hot. Your whole team does.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Bertha",
+          "badge_id": 63
+        },
+        "children": []
+      }
+    ],
+    "region": 3,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Lucian",
+    "leader": "Lucian",
+    "pokemon": [
+      {
+        "name": "Mr. Mime",
+        "max_health": 3048300,
+        "level": 53
+      },
+      {
+        "name": "Espeon",
+        "max_health": 3052000,
+        "level": 55
+      },
+      {
+        "name": "Bronzong",
+        "max_health": 3057000,
+        "level": 54
+      },
+      {
+        "name": "Alakazam",
+        "max_health": 3060250,
+        "level": 56
+      },
+      {
+        "name": "Gallade",
+        "max_health": 3066000,
+        "level": 59
+      }
+    ],
+    "badge": "Elite_Lucian",
+    "badge_id": 65,
+    "money_reward": 18000,
+    "defeat_message": "Congratulations. You have beaten the Elite Four. However, that doesn't mean you're done with the Pokémon league. There remains the Champion. I should warn you—the Champion is far stronger than the Elite Four. Now, go on. Step through the doorway to your final battle.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Flint",
+          "badge_id": 64
+        },
+        "children": []
+      }
+    ],
+    "region": 3,
+    "is_elite": true
+  },
+  {
+    "town": "Champion Cynthia",
+    "leader": "Cynthia",
+    "pokemon": [
+      {
+        "name": "Spiritomb",
+        "max_health": 3458300,
+        "level": 58
+      },
+      {
+        "name": "Roserade",
+        "max_health": 3462000,
+        "level": 58
+      },
+      {
+        "name": "Togekiss",
+        "max_health": 3464000,
+        "level": 60
+      },
+      {
+        "name": "Lucario",
+        "max_health": 3460250,
+        "level": 60
+      },
+      {
+        "name": "Milotic",
+        "max_health": 3470000,
+        "level": 58
+      },
+      {
+        "name": "Garchomp",
+        "max_health": 3570000,
+        "level": 62
+      }
+    ],
+    "badge": "Elite_SinnohChampion",
+    "badge_id": 66,
+    "money_reward": 32000,
+    "defeat_message": "That was excellent. Truly, an outstanding battle. You gave the support your Pokémon needed to maximize their power. And you guided them with certainty to secure victory. You have both passion and calculating coolness. Together, you and your Pokémon can overcome any challenge that may come your way. Those are the impressions I got from our battle. I'm glad I got to take part in the crowning of Sinnoh's new Champion!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Lucian",
+          "badge_id": 65
+        },
+        "children": []
+      }
+    ],
+    "region": 3,
+    "is_elite": true
+  },
+  {
+    "town": "Aspertia City",
+    "leader": "Cheren",
+    "pokemon": [
+      {
+        "name": "Patrat",
+        "max_health": 3458300,
+        "level": 12
+      },
+      {
+        "name": "Pidove",
+        "max_health": 3462000,
+        "level": 12
+      },
+      {
+        "name": "Lillipup",
+        "max_health": 3464000,
+        "level": 14
+      }
+    ],
+    "badge": "Basic",
+    "badge_id": 67,
+    "money_reward": 500,
+    "defeat_message": "That battle has made me feel really glad you were my first challenger as a Gym Leader… I give you this in honor of the strength you and your Pokémon showed!",
+    "requirements": [
+      {
+        "type": "ClearDungeonRequirement",
+        "params": {
+          "clears": 1,
+          "dungeon": "Floccesy Ranch"
+        },
+        "children": []
+      }
+    ],
+    "region": 4,
+    "is_elite": false
+  },
+  {
+    "town": "Virbank City",
+    "leader": "Roxie",
+    "pokemon": [
+      {
+        "name": "Koffing",
+        "max_health": 3658300,
+        "level": 17
+      },
+      {
+        "name": "Grimer",
+        "max_health": 3662000,
+        "level": 17
+      },
+      {
+        "name": "Whirlipede",
+        "max_health": 3664000,
+        "level": 19
+      }
+    ],
+    "badge": "Toxic",
+    "badge_id": 68,
+    "money_reward": 800,
+    "defeat_message": "Sigh! What are you doing losing, Roxie?! Well…I guess that means you're strong! This stinks, but I gave it everything I had, and I feel revitalized and refreshed now! Here! Proof that you beat me!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Basic",
+          "badge_id": 67
+        },
+        "children": []
+      }
+    ],
+    "region": 4,
+    "is_elite": false
+  },
+  {
+    "town": "Castelia City",
+    "leader": "Burgh",
+    "pokemon": [
+      {
+        "name": "Dwebble",
+        "max_health": 3858300,
+        "level": 24
+      },
+      {
+        "name": "Shelmet",
+        "max_health": 3862000,
+        "level": 24
+      },
+      {
+        "name": "Karrablast",
+        "max_health": 3964000,
+        "level": 24
+      },
+      {
+        "name": "Leavanny",
+        "max_health": 4064000,
+        "level": 26
+      }
+    ],
+    "badge": "Insect",
+    "badge_id": 69,
+    "money_reward": 1500,
+    "defeat_message": "Oh hoo… You are very strong indeed! I guess it's no surprise I lost. Here! Take this Insect Badge! I think it'll suit you!",
+    "requirements": [
+      {
+        "type": "ClearDungeonRequirement",
+        "params": {
+          "clears": 1,
+          "dungeon": "Castelia Sewers"
+        },
+        "children": []
+      }
+    ],
+    "region": 4,
+    "is_elite": false
+  },
+  {
+    "town": "Nimbasa City",
+    "leader": "Elesa",
+    "pokemon": [
+      {
+        "name": "Emolga",
+        "max_health": 4258300,
+        "level": 30
+      },
+      {
+        "name": "Flaaffy",
+        "max_health": 4262000,
+        "level": 30
+      },
+      {
+        "name": "Joltik",
+        "max_health": 4464000,
+        "level": 30
+      },
+      {
+        "name": "Zebstrika",
+        "max_health": 4464000,
+        "level": 32
+      }
+    ],
+    "badge": "Bolt",
+    "badge_id": 70,
+    "money_reward": 2600,
+    "defeat_message": "Well… Now you… you're an even more wonderful Trainer than I expected. Your sweet fighting style swept me off my feet! Take this!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Insect",
+          "badge_id": 69
+        },
+        "children": []
+      }
+    ],
+    "region": 4,
+    "is_elite": false
+  },
+  {
+    "town": "Driftveil City",
+    "leader": "Clay",
+    "pokemon": [
+      {
+        "name": "Krokorok",
+        "max_health": 4658300,
+        "level": 34
+      },
+      {
+        "name": "Sandslash",
+        "max_health": 4662000,
+        "level": 34
+      },
+      {
+        "name": "Onix",
+        "max_health": 4864000,
+        "level": 34
+      },
+      {
+        "name": "Excadrill",
+        "max_health": 5064000,
+        "level": 36
+      }
+    ],
+    "badge": "Quake",
+    "badge_id": 71,
+    "money_reward": 4800,
+    "defeat_message": "Phew… You're really somethin'! Li'l whippersnapper Trainers who pack a real punch keep showin' up one after another. Mrmph. Here! Take this!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Bolt",
+          "badge_id": 70
+        },
+        "children": []
+      }
+    ],
+    "region": 4,
+    "is_elite": false
+  },
+  {
+    "town": "Mistralton City",
+    "leader": "Skyla",
+    "pokemon": [
+      {
+        "name": "Swoobat",
+        "max_health": 5458300,
+        "level": 40
+      },
+      {
+        "name": "Skarmory",
+        "max_health": 6062000,
+        "level": 40
+      },
+      {
+        "name": "Sigilyph",
+        "max_health": 5664000,
+        "level": 40
+      },
+      {
+        "name": "Swanna",
+        "max_health": 5864000,
+        "level": 42
+      }
+    ],
+    "badge": "Jet",
+    "badge_id": 72,
+    "money_reward": 7600,
+    "defeat_message": "You're an amazing Pokémon Trainer. My Pokémon and I are happy because for the first time in quite a while--about two years, I'd say--we could fight with our full strength. This is an official League Gym Badge. But this is just a stepping-stone.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Quake",
+          "badge_id": 71
+        },
+        "children": []
+      }
+    ],
+    "region": 4,
+    "is_elite": false
+  },
+  {
+    "town": "Opelucid City",
+    "leader": "Drayden",
+    "pokemon": [
+      {
+        "name": "Druddigon",
+        "max_health": 6558300,
+        "level": 50
+      },
+      {
+        "name": "Flygon",
+        "max_health": 6662000,
+        "level": 50
+      },
+      {
+        "name": "Altaria",
+        "max_health": 6464000,
+        "level": 50
+      },
+      {
+        "name": "Haxorus",
+        "max_health": 6964000,
+        "level": 52
+      }
+    ],
+    "badge": "Legend",
+    "badge_id": 73,
+    "money_reward": 14000,
+    "defeat_message": "Wonderful. I'm grateful that we had a chance to meet and battle. It reminded me that Pokémon battles are about working with others to meet our challenges together.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Jet",
+          "badge_id": 72
+        },
+        "children": []
+      }
+    ],
+    "region": 4,
+    "is_elite": false
+  },
+  {
+    "town": "Humilau City",
+    "leader": "Marlon",
+    "pokemon": [
+      {
+        "name": "Wailord",
+        "max_health": 7458300,
+        "level": 53
+      },
+      {
+        "name": "Mantine",
+        "max_health": 7262000,
+        "level": 53
+      },
+      {
+        "name": "Carracosta",
+        "max_health": 7064000,
+        "level": 53
+      },
+      {
+        "name": "Jellicent",
+        "max_health": 7464000,
+        "level": 55
+      }
+    ],
+    "badge": "Wave",
+    "badge_id": 74,
+    "money_reward": 27000,
+    "defeat_message": "You don't just look strong, you're strong fo' reals! Eh, I was swept away, too! Oh yeah, yo. I was so surprised that I forgot! I gotta give this to you!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Legend",
+          "badge_id": 73
+        },
+        "children": []
+      }
+    ],
+    "region": 4,
+    "is_elite": false
+  },
+  {
+    "town": "Elite Shauntal",
+    "leader": "Shauntal",
+    "pokemon": [
+      {
+        "name": "Cofagrigus",
+        "max_health": 10957000,
+        "level": 60
+      },
+      {
+        "name": "Drifblim",
+        "max_health": 10957000,
+        "level": 60
+      },
+      {
+        "name": "Golurk",
+        "max_health": 10957000,
+        "level": 60
+      },
+      {
+        "name": "Banette",
+        "max_health": 10957000,
+        "level": 60
+      },
+      {
+        "name": "Chandelure",
+        "max_health": 11960250,
+        "level": 62
+      }
+    ],
+    "badge": "Elite_Shauntal",
+    "badge_id": 75,
+    "money_reward": 32000,
+    "defeat_message": "My Pokémon and the challenger's Pokémon. Everyone battled even though they were hurt... Thank you.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Wave",
+          "badge_id": 74
+        },
+        "children": []
+      }
+    ],
+    "region": 4,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Marshal",
+    "leader": "Marshal",
+    "pokemon": [
+      {
+        "name": "Throh",
+        "max_health": 10957000,
+        "level": 60
+      },
+      {
+        "name": "Sawk",
+        "max_health": 10957000,
+        "level": 60
+      },
+      {
+        "name": "Mienshao",
+        "max_health": 10957000,
+        "level": 60
+      },
+      {
+        "name": "Lucario",
+        "max_health": 10957000,
+        "level": 60
+      },
+      {
+        "name": "Conkeldurr",
+        "max_health": 11960250,
+        "level": 62
+      }
+    ],
+    "badge": "Elite_Marshal",
+    "badge_id": 76,
+    "money_reward": 32000,
+    "defeat_message": "Whew! Well done! As your battles continue, aim for even greater heights!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Wave",
+          "badge_id": 74
+        },
+        "children": []
+      }
+    ],
+    "region": 4,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Grimsley",
+    "leader": "Grimsley",
+    "pokemon": [
+      {
+        "name": "Liepard",
+        "max_health": 10945330,
+        "level": 60
+      },
+      {
+        "name": "Scrafty",
+        "max_health": 10948300,
+        "level": 60
+      },
+      {
+        "name": "Krookodile",
+        "max_health": 10952000,
+        "level": 60
+      },
+      {
+        "name": "Absol",
+        "max_health": 10957000,
+        "level": 60
+      },
+      {
+        "name": "Bisharp",
+        "max_health": 11960250,
+        "level": 62
+      }
+    ],
+    "badge": "Elite_Grimsley",
+    "badge_id": 77,
+    "money_reward": 32000,
+    "defeat_message": "Whether or not you get to fight at full strength, whether or not luck smiles on you--none of that matters. Only results matter. And a loss is a loss. See, victory shines like a bright light. And right now, you and your Pokémon are shining brilliantly.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Wave",
+          "badge_id": 74
+        },
+        "children": []
+      }
+    ],
+    "region": 4,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Caitlin",
+    "leader": "Caitlin",
+    "pokemon": [
+      {
+        "name": "Musharna",
+        "max_health": 10957000,
+        "level": 60
+      },
+      {
+        "name": "Sigilyph",
+        "max_health": 10957000,
+        "level": 60
+      },
+      {
+        "name": "Reuniclus",
+        "max_health": 10957000,
+        "level": 60
+      },
+      {
+        "name": "Gothitelle",
+        "max_health": 10957000,
+        "level": 60
+      },
+      {
+        "name": "Metagross",
+        "max_health": 11960250,
+        "level": 62
+      }
+    ],
+    "badge": "Elite_Caitlin",
+    "badge_id": 78,
+    "money_reward": 32000,
+    "defeat_message": "You and your Pokémon are both excellent and elegant. To have been able to battle against such a splendid team... My Pokémon and I learned a lot! I offer you my thanks.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Wave",
+          "badge_id": 74
+        },
+        "children": []
+      }
+    ],
+    "region": 4,
+    "is_elite": true
+  },
+  {
+    "town": "Champion Iris",
+    "leader": "Iris",
+    "pokemon": [
+      {
+        "name": "Hydreigon",
+        "max_health": 12458300,
+        "level": 61
+      },
+      {
+        "name": "Druddigon",
+        "max_health": 12462000,
+        "level": 61
+      },
+      {
+        "name": "Archeops",
+        "max_health": 12464000,
+        "level": 61
+      },
+      {
+        "name": "Aggron",
+        "max_health": 12460250,
+        "level": 61
+      },
+      {
+        "name": "Lapras",
+        "max_health": 12470000,
+        "level": 61
+      },
+      {
+        "name": "Haxorus",
+        "max_health": 14570000,
+        "level": 63
+      }
+    ],
+    "badge": "Elite_UnovaChampion",
+    "badge_id": 79,
+    "money_reward": 64000,
+    "defeat_message": "I'm upset I couldn't win! But you know what? More than that, I'm happy! I mean, come on. By having a serious battle, you and your Pokémon, and me and my Pokémon, we all got to know one another better than before! Yep, we sure did! OK, let's go!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Shauntal",
+          "badge_id": 75
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Marshal",
+          "badge_id": 76
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Grimsley",
+          "badge_id": 77
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Caitlin",
+          "badge_id": 78
+        },
+        "children": []
+      }
+    ],
+    "region": 4,
+    "is_elite": true
+  },
+  {
+    "town": "Santalune City",
+    "leader": "Viola",
+    "pokemon": [
+      {
+        "name": "Surskit",
+        "max_health": 13737400,
+        "level": 10
+      },
+      {
+        "name": "Vivillon (Meadow)",
+        "max_health": 17395730,
+        "level": 12
+      }
+    ],
+    "badge": "Bug",
+    "badge_id": 80,
+    "money_reward": 800,
+    "defeat_message": "Young Trainer, you... No, it wasn't you alone. You and your Pokémon have shown me a whole new depth of field! Fantastic! Just fantastic!",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "kalos",
+          "route": 3
+        },
+        "children": []
+      }
+    ],
+    "region": 5,
+    "is_elite": false
+  },
+  {
+    "town": "Cyllage City",
+    "leader": "Grant",
+    "pokemon": [
+      {
+        "name": "Amaura",
+        "max_health": 16937530,
+        "level": 25
+      },
+      {
+        "name": "Tyrunt",
+        "max_health": 19837400,
+        "level": 25
+      }
+    ],
+    "badge": "Cliff",
+    "badge_id": 81,
+    "money_reward": 1700,
+    "defeat_message": "There are some things that seem out of reach no matter how hard you try. However, it's important that you never give up--no matter the opponent or the odds. I could tell from our battle that you and your Pokémon understand that. To commemorate such an impressive show of teamwork, please accept the Cliff Badge!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Bug",
+          "badge_id": 80
+        },
+        "children": []
+      }
+    ],
+    "region": 5,
+    "is_elite": false
+  },
+  {
+    "town": "Shalour City",
+    "leader": "Korrina",
+    "pokemon": [
+      {
+        "name": "Mienfoo",
+        "max_health": 21558300,
+        "level": 29
+      },
+      {
+        "name": "Machoke",
+        "max_health": 22062000,
+        "level": 28
+      },
+      {
+        "name": "Hawlucha",
+        "max_health": 22362000,
+        "level": 32
+      }
+    ],
+    "badge": "Rumble",
+    "badge_id": 82,
+    "money_reward": 3800,
+    "defeat_message": "Oh! I have been defeated! Alack, alay! Lady Korrina gave a terrible display! This is it. I must give up my title and admit that your strength far exceeds-- Just teasing! But here's your Badge. Boy, you'll be rolling in 'em soon!",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Calem 1"
+        },
+        "children": []
+      }
+    ],
+    "region": 5,
+    "is_elite": false
+  },
+  {
+    "town": "Coumarine City",
+    "leader": "Ramos",
+    "pokemon": [
+      {
+        "name": "Jumpluff",
+        "max_health": 25508300,
+        "level": 30
+      },
+      {
+        "name": "Weepinbell",
+        "max_health": 27562000,
+        "level": 31
+      },
+      {
+        "name": "Gogoat",
+        "max_health": 29502000,
+        "level": 34
+      }
+    ],
+    "badge": "Plant",
+    "badge_id": 83,
+    "money_reward": 5500,
+    "defeat_message": "Yeh believe in yer Pokémon... And they believe in yeh, too... Mighty oaks from acorns grow. Go on, then. Yeh've earned it. Here's yer own Plant Badge, sprout.",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Calem 2"
+        },
+        "children": []
+      }
+    ],
+    "region": 5,
+    "is_elite": false
+  },
+  {
+    "town": "Lumiose City",
+    "leader": "Clemont",
+    "pokemon": [
+      {
+        "name": "Emolga",
+        "max_health": 30058300,
+        "level": 35
+      },
+      {
+        "name": "Magneton",
+        "max_health": 31062000,
+        "level": 35
+      },
+      {
+        "name": "Heliolisk",
+        "max_health": 32062000,
+        "level": 37
+      }
+    ],
+    "badge": "Voltage",
+    "badge_id": 84,
+    "money_reward": 9000,
+    "defeat_message": "Oh, Bonnie... When will you learn there's no shame in losing? I'm glad whenever I get to learn something new thanks to strong challengers like you here.",
+    "requirements": [
+      {
+        "type": "QuestLineStepCompletedRequirement",
+        "params": {
+          "quest": "A Beautiful World",
+          "step": 0
+        },
+        "children": []
+      }
+    ],
+    "region": 5,
+    "is_elite": false
+  },
+  {
+    "town": "Laverre City",
+    "leader": "Valerie",
+    "pokemon": [
+      {
+        "name": "Mawile",
+        "max_health": 33058300,
+        "level": 38
+      },
+      {
+        "name": "Mr. Mime",
+        "max_health": 36462000,
+        "level": 38
+      },
+      {
+        "name": "Sylveon",
+        "max_health": 38062000,
+        "level": 42
+      }
+    ],
+    "badge": "Fairy",
+    "badge_id": 85,
+    "money_reward": 16000,
+    "defeat_message": "Yes... That was a fine battle. I shall reward you for this great victory. This is the Fairy Badge. It is yours now. Its beauty is captivating, is it not? ... ... ... ... ... ... Ah... Do forgive me. I was so captivated, I forgot for a moment that it is yours.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Voltage",
+          "badge_id": 84
+        },
+        "children": []
+      }
+    ],
+    "region": 5,
+    "is_elite": false
+  },
+  {
+    "town": "Anistar City",
+    "leader": "Olympia",
+    "pokemon": [
+      {
+        "name": "Sigilyph",
+        "max_health": 40058300,
+        "level": 44
+      },
+      {
+        "name": "Slowking",
+        "max_health": 42062000,
+        "level": 45
+      },
+      {
+        "name": "Meowstic",
+        "max_health": 44462000,
+        "level": 48
+      }
+    ],
+    "badge": "Psychic",
+    "badge_id": 86,
+    "money_reward": 30000,
+    "defeat_message": "Now, the Psychic Badge. A testament to your skill. Proof of your power.",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Calem 4"
+        },
+        "children": []
+      }
+    ],
+    "region": 5,
+    "is_elite": false
+  },
+  {
+    "town": "Snowbelle City",
+    "leader": "Wulfric",
+    "pokemon": [
+      {
+        "name": "Abomasnow",
+        "max_health": 46558300,
+        "level": 56
+      },
+      {
+        "name": "Cryogonal",
+        "max_health": 47654830,
+        "level": 55
+      },
+      {
+        "name": "Avalugg",
+        "max_health": 50062000,
+        "level": 59
+      }
+    ],
+    "badge": "Iceberg",
+    "badge_id": 87,
+    "money_reward": 52000,
+    "defeat_message": "Impressive! Your Pokémon fought with great courage. I can tell that you've trained your Pokémon well.",
+    "requirements": [
+      {
+        "type": "ClearDungeonRequirement",
+        "params": {
+          "clears": 1,
+          "dungeon": "Pokémon Village"
+        },
+        "children": []
+      }
+    ],
+    "region": 5,
+    "is_elite": false
+  },
+  {
+    "town": "Elite Malva",
+    "leader": "Malva",
+    "pokemon": [
+      {
+        "name": "Pyroar",
+        "max_health": 46492423,
+        "level": 63
+      },
+      {
+        "name": "Torkoal",
+        "max_health": 46791055,
+        "level": 63
+      },
+      {
+        "name": "Chandelure",
+        "max_health": 46794200,
+        "level": 63
+      },
+      {
+        "name": "Talonflame",
+        "max_health": 47223450,
+        "level": 65
+      }
+    ],
+    "badge": "Elite_Malva",
+    "badge_id": 88,
+    "money_reward": 64000,
+    "defeat_message": "What news... So a new challenger has defeated Malva of the Elite Four!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Iceberg",
+          "badge_id": 87
+        },
+        "children": []
+      }
+    ],
+    "region": 5,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Siebold",
+    "leader": "Siebold",
+    "pokemon": [
+      {
+        "name": "Clawitzer",
+        "max_health": 46492423,
+        "level": 63
+      },
+      {
+        "name": "Gyarados",
+        "max_health": 47094530,
+        "level": 63
+      },
+      {
+        "name": "Starmie",
+        "max_health": 47094530,
+        "level": 63
+      },
+      {
+        "name": "Barbaracle",
+        "max_health": 47223450,
+        "level": 65
+      }
+    ],
+    "badge": "Elite_Siebold",
+    "badge_id": 89,
+    "money_reward": 64000,
+    "defeat_message": "I shall store my memory of you and your Pokémon forever away within my heart.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Iceberg",
+          "badge_id": 87
+        },
+        "children": []
+      }
+    ],
+    "region": 5,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Wikstrom",
+    "leader": "Wikstrom",
+    "pokemon": [
+      {
+        "name": "Klefki",
+        "max_health": 46492423,
+        "level": 63
+      },
+      {
+        "name": "Probopass",
+        "max_health": 47094530,
+        "level": 63
+      },
+      {
+        "name": "Scizor",
+        "max_health": 47094530,
+        "level": 63
+      },
+      {
+        "name": "Aegislash (Shield)",
+        "max_health": 47223450,
+        "level": 65
+      }
+    ],
+    "badge": "Elite_Wikstrom",
+    "badge_id": 90,
+    "money_reward": 64000,
+    "defeat_message": "Glorious! The trust that you share with your honorable Pokémon surpasses even mine!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Iceberg",
+          "badge_id": 87
+        },
+        "children": []
+      }
+    ],
+    "region": 5,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Drasna",
+    "leader": "Drasna",
+    "pokemon": [
+      {
+        "name": "Dragalge",
+        "max_health": 46492423,
+        "level": 63
+      },
+      {
+        "name": "Druddigon",
+        "max_health": 47094530,
+        "level": 63
+      },
+      {
+        "name": "Altaria",
+        "max_health": 47094530,
+        "level": 63
+      },
+      {
+        "name": "Noivern",
+        "max_health": 47223450,
+        "level": 65
+      }
+    ],
+    "badge": "Elite_Drasna",
+    "badge_id": 91,
+    "money_reward": 64000,
+    "defeat_message": "Oh, dear me. That sure was a quick battle... I do hope you'll come back again sometime!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Iceberg",
+          "badge_id": 87
+        },
+        "children": []
+      }
+    ],
+    "region": 5,
+    "is_elite": true
+  },
+  {
+    "town": "Champion Diantha",
+    "leader": "Diantha",
+    "pokemon": [
+      {
+        "name": "Hawlucha",
+        "max_health": 40365050,
+        "level": 64
+      },
+      {
+        "name": "Tyrantrum",
+        "max_health": 41691225,
+        "level": 65
+      },
+      {
+        "name": "Aurorus",
+        "max_health": 41691225,
+        "level": 65
+      },
+      {
+        "name": "Gourgeist (Average)",
+        "max_health": 41767141,
+        "level": 65
+      },
+      {
+        "name": "Goodra",
+        "max_health": 42027136,
+        "level": 66
+      },
+      {
+        "name": "Mega Gardevoir",
+        "max_health": 42371780,
+        "level": 68
+      }
+    ],
+    "badge": "Elite_KalosChampion",
+    "badge_id": 92,
+    "money_reward": 128000,
+    "defeat_message": "Witnessing the noble spirits of you and your Pokémon in battle has really touched my heart...",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Malva",
+          "badge_id": 88
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Siebold",
+          "badge_id": 89
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Wikstrom",
+          "badge_id": 90
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Drasna",
+          "badge_id": 91
+        },
+        "children": []
+      }
+    ],
+    "region": 5,
+    "is_elite": true
+  },
+  {
+    "town": "Iki Town",
+    "leader": "Hala",
+    "pokemon": [
+      {
+        "name": "Machop",
+        "max_health": 62058739,
+        "level": 15
+      },
+      {
+        "name": "Makuhita",
+        "max_health": 62058739,
+        "level": 15
+      },
+      {
+        "name": "Crabrawler",
+        "max_health": 63069612,
+        "level": 16
+      }
+    ],
+    "badge": "Melemele_Stamp",
+    "badge_id": 93,
+    "money_reward": 16000,
+    "defeat_message": "The results come as no surprise to me. What a fine Trainer...and what fine Pokémon, too! Accept this Z-Crystal! It allows Trainers to share their power with their partner Pokémon!</br><img width=\"100\" src=\"assets/images/items/zCrystal/Fightinium Z.svg\"/></br>With this victory... you have cleared all of the trials of Melemele Island, the first of Alola's islands! The Melemele stamp is proof of your accomplishments.",
+    "requirements": [
+      {
+        "type": "MultiRequirement",
+        "params": {},
+        "children": [
+          {
+            "type": "QuestLineStepCompletedRequirement",
+            "params": {
+              "quest": "Welcome to Paradise, Cousin!",
+              "step": 0
+            },
+            "children": []
+          },
+          {
+            "type": "TemporaryBattleRequirement",
+            "params": {
+              "battle": "Hau 3"
+            },
+            "children": []
+          }
+        ]
+      }
+    ],
+    "region": 6,
+    "is_elite": false
+  },
+  {
+    "town": "Konikoni City",
+    "leader": "Olivia",
+    "pokemon": [
+      {
+        "name": "Anorith",
+        "max_health": 81530244,
+        "level": 27
+      },
+      {
+        "name": "Lileep",
+        "max_health": 81530244,
+        "level": 27
+      },
+      {
+        "name": "Lycanroc (Midnight)",
+        "max_health": 83170680,
+        "level": 28
+      }
+    ],
+    "badge": "Akala_Stamp",
+    "badge_id": 94,
+    "money_reward": 30000,
+    "defeat_message": "How lovely. Diamonds only sparkle after coal is pushed to its absolute limit. Here. The Rock-type Z-Crystal... The Rockium Z is all yours!</br><img width=\"100\" src=\"assets/images/items/zCrystal/Rockium Z.svg\"/></br>I think your journey will hold many surprises. And I hope it holds many joys.",
+    "requirements": [
+      {
+        "type": "QuestLineStepCompletedRequirement",
+        "params": {
+          "quest": "Symbiotic Relations",
+          "step": 0
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": false
+  },
+  {
+    "town": "Malie City",
+    "leader": "Nanu",
+    "pokemon": [
+      {
+        "name": "Sableye",
+        "max_health": 101710296,
+        "level": 43
+      },
+      {
+        "name": "Krokorok",
+        "max_health": 101710296,
+        "level": 43
+      },
+      {
+        "name": "Alolan Persian",
+        "max_health": 103271750,
+        "level": 44
+      }
+    ],
+    "badge": "Ula_Ula_Stamp",
+    "badge_id": 95,
+    "money_reward": 52000,
+    "defeat_message": "Hmph... heh. Let me fix your team up for you. Here. This is yours.</br><img width=\"100\" src=\"assets/images/items/zCrystal/Darkinium Z.svg\"/></br>There. Congratulations or whatever. You've officially finished your Ula'ula trials. You've got somewhere else to be, don't you? Try not to destroy the whole place.",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Gladion 2"
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": false
+  },
+  {
+    "town": "Exeggutor Island",
+    "leader": "Hapu",
+    "pokemon": [
+      {
+        "name": "Alolan Dugtrio",
+        "max_health": 85759429,
+        "level": 47
+      },
+      {
+        "name": "Gastrodon (East)",
+        "max_health": 85759429,
+        "level": 47
+      },
+      {
+        "name": "Flygon",
+        "max_health": 85759429,
+        "level": 47
+      },
+      {
+        "name": "Mudsdale",
+        "max_health": 86977838,
+        "level": 48
+      },
+      {
+        "name": "Golurk",
+        "max_health": 91233435,
+        "level": 53
+      },
+      {
+        "name": "Gastrodon (East)",
+        "max_health": 91233435,
+        "level": 53
+      },
+      {
+        "name": "Flygon",
+        "max_health": 91233435,
+        "level": 53
+      },
+      {
+        "name": "Mudsdale",
+        "max_health": 92529615,
+        "level": 54
+      }
+    ],
+    "badge": "Poni_Stamp",
+    "badge_id": 96,
+    "money_reward": 64000,
+    "defeat_message": "You have succeeded in your final grand trial! That was enjoyable. Looks like I cannot beat you even when I am not holding back... Take your Ground-type Z-Crystal then... This Groundium Z is yours!</br><img width=\"100\" src=\"assets/images/items/zCrystal/Groundium Z.svg\"/></br>Then go on with you two! Head straight through here and find the altar!",
+    "requirements": [
+      {
+        "type": "QuestLineCompletedRequirement",
+        "params": {
+          "quest": "Emissary of Light"
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": false
+  },
+  {
+    "town": "Elite Molayne",
+    "leader": "Molayne",
+    "pokemon": [
+      {
+        "name": "Klefki",
+        "max_health": 78883047,
+        "level": 56
+      },
+      {
+        "name": "Bisharp",
+        "max_health": 84369882,
+        "level": 56
+      },
+      {
+        "name": "Magnezone",
+        "max_health": 82982134,
+        "level": 56
+      },
+      {
+        "name": "Metagross",
+        "max_health": 84733765,
+        "level": 56
+      },
+      {
+        "name": "Alolan Dugtrio",
+        "max_health": 95774052,
+        "level": 57
+      }
+    ],
+    "badge": "Elite_Molayne",
+    "badge_id": 99,
+    "money_reward": 100000,
+    "defeat_message": "That Kukui... He certainly found an interesting Trainer for me to face!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Poni_Stamp",
+          "badge_id": 96
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Olivia",
+    "leader": "Olivia",
+    "pokemon": [
+      {
+        "name": "Armaldo",
+        "max_health": 81025320,
+        "level": 56
+      },
+      {
+        "name": "Cradily",
+        "max_health": 74381821,
+        "level": 56
+      },
+      {
+        "name": "Gigalith",
+        "max_health": 140708180,
+        "level": 56
+      },
+      {
+        "name": "Probopass",
+        "max_health": 85174188,
+        "level": 56
+      },
+      {
+        "name": "Lycanroc (Midnight)",
+        "max_health": 150439372,
+        "level": 57
+      }
+    ],
+    "badge": "Elite_Olivia",
+    "badge_id": 97,
+    "money_reward": 100000,
+    "defeat_message": "I don't see the same look in your eyes that I saw when we first met on Akala Island. Have you had some experiences that you'll carry with you in your heart forever? Well, it's time for you to move on.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Poni_Stamp",
+          "badge_id": 96
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Acerola",
+    "leader": "Acerola",
+    "pokemon": [
+      {
+        "name": "Banette",
+        "max_health": 94589428,
+        "level": 56
+      },
+      {
+        "name": "Drifblim",
+        "max_health": 87179189,
+        "level": 56
+      },
+      {
+        "name": "Dhelmise",
+        "max_health": 91179189,
+        "level": 56
+      },
+      {
+        "name": "Froslass",
+        "max_health": 91691988,
+        "level": 56
+      },
+      {
+        "name": "Palossand",
+        "max_health": 103277813,
+        "level": 57
+      }
+    ],
+    "badge": "Elite_Acerola",
+    "badge_id": 98,
+    "money_reward": 100000,
+    "defeat_message": "I'm...I'm speechless! You've done me in!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Poni_Stamp",
+          "badge_id": 96
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Kahili",
+    "leader": "Kahili",
+    "pokemon": [
+      {
+        "name": "Braviary",
+        "max_health": 86420587,
+        "level": 56
+      },
+      {
+        "name": "Hawlucha",
+        "max_health": 109446185,
+        "level": 56
+      },
+      {
+        "name": "Oricorio (Baile)",
+        "max_health": 103127826,
+        "level": 56
+      },
+      {
+        "name": "Mandibuzz",
+        "max_health": 89123587,
+        "level": 56
+      },
+      {
+        "name": "Toucannon",
+        "max_health": 91392090,
+        "level": 57
+      }
+    ],
+    "badge": "Elite_Kahili",
+    "badge_id": 100,
+    "money_reward": 100000,
+    "defeat_message": "It's frustrating to me as a member of the Elite Four, but it seems your strength is the real deal.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Poni_Stamp",
+          "badge_id": 96
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": true
+  },
+  {
+    "town": "Champion Hau",
+    "leader": "Hau",
+    "pokemon": [
+      {
+        "name": "Alolan Raichu",
+        "max_health": 91545555,
+        "level": 59
+      },
+      {
+        "name": "Tauros",
+        "max_health": 89636471,
+        "level": 58
+      },
+      {
+        "name": "Noivern",
+        "max_health": 89636471,
+        "level": 58
+      },
+      {
+        "name": "Crabominable",
+        "max_health": 91545555,
+        "level": 59
+      },
+      {
+        "name": "Flareon",
+        "max_health": 89636471,
+        "level": 58
+      },
+      {
+        "name": "Primarina",
+        "max_health": 96725389,
+        "level": 60
+      },
+      {
+        "name": "Vaporeon",
+        "max_health": 89636471,
+        "level": 58
+      },
+      {
+        "name": "Decidueye",
+        "max_health": 96725389,
+        "level": 60
+      },
+      {
+        "name": "Leafeon",
+        "max_health": 89636471,
+        "level": 58
+      },
+      {
+        "name": "Incineroar",
+        "max_health": 96725389,
+        "level": 60
+      }
+    ],
+    "badge": "Champion_Stamp",
+    "badge_id": 101,
+    "money_reward": 150000,
+    "defeat_message": "We're gonna keep moving forward, by staying at full power all the time!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Molayne",
+          "badge_id": 99
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Olivia",
+          "badge_id": 97
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Acerola",
+          "badge_id": 98
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Kahili",
+          "badge_id": 100
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": true
+  },
+  {
+    "town": "Friend League",
+    "leader": "Karson",
+    "pokemon": [
+      {
+        "name": "Magikarp",
+        "max_health": 472500,
+        "level": 20
+      }
+    ],
+    "badge": "Friend_League",
+    "badge_id": 102,
+    "money_reward": 10000,
+    "defeat_message": "Your Karp is really Magic!",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "alola",
+          "route": 31
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": false
+  },
+  {
+    "town": "Quick League",
+    "leader": "Koichiro",
+    "pokemon": [
+      {
+        "name": "Magikarp Skelly",
+        "max_health": 945000,
+        "level": 20
+      }
+    ],
+    "badge": "Quick_League",
+    "badge_id": 103,
+    "money_reward": 10500,
+    "defeat_message": "Looks like I flailed...",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Magikarp Jump Koylee"
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": false
+  },
+  {
+    "town": "Heavy League",
+    "leader": "Kareign",
+    "pokemon": [
+      {
+        "name": "Magikarp Orange Two-Tone",
+        "max_health": 2362500,
+        "level": 20
+      }
+    ],
+    "badge": "Heavy_League",
+    "badge_id": 104,
+    "money_reward": 11000,
+    "defeat_message": "Karpe Diem",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Magikarp Jump Karpen"
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": false
+  },
+  {
+    "town": "Great League",
+    "leader": "Karbuck",
+    "pokemon": [
+      {
+        "name": "Magikarp",
+        "max_health": 3780000,
+        "level": 20
+      }
+    ],
+    "badge": "Great_League",
+    "badge_id": 105,
+    "money_reward": 11500,
+    "defeat_message": "Guess ya got me. Hook, line and sinker!",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Magikarp Jump Karpress"
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": false
+  },
+  {
+    "town": "Fast League",
+    "leader": "Kareign 2",
+    "pokemon": [
+      {
+        "name": "Magikarp Pink Dapples",
+        "max_health": 7087500,
+        "level": 20
+      }
+    ],
+    "badge": "Fast_League",
+    "badge_id": 106,
+    "money_reward": 12000,
+    "defeat_message": "This life is not for me... I will become a Karpenter now...",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Magikarp Jump Karson"
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": false
+  },
+  {
+    "town": "Luxury League",
+    "leader": "Jump Champ",
+    "pokemon": [
+      {
+        "name": "Magikarp Pink Orca",
+        "max_health": 9450000,
+        "level": 20
+      }
+    ],
+    "badge": "Luxury_League",
+    "badge_id": 107,
+    "money_reward": 12500,
+    "defeat_message": "Just wait 'til my Magikarp evolves and you will all see how great I am! <i>Cries</i>",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Magikarp Jump Karbuck"
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": false
+  },
+  {
+    "town": "Heal League",
+    "leader": "Karami",
+    "pokemon": [
+      {
+        "name": "Magikarp Purple Bubbles",
+        "max_health": 14175000,
+        "level": 20
+      }
+    ],
+    "badge": "Heal_League",
+    "badge_id": 108,
+    "money_reward": 12500,
+    "defeat_message": "I'm getting more old than my rod...",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Magikarp Jump Karpella 2"
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": false
+  },
+  {
+    "town": "Ultra League",
+    "leader": "Jump Champ 2",
+    "pokemon": [
+      {
+        "name": "Magikarp Brown Tiger",
+        "max_health": 18900000,
+        "level": 20
+      }
+    ],
+    "badge": "Ultra_League",
+    "badge_id": 109,
+    "money_reward": 12500,
+    "defeat_message": "I knew I smelled something fishy...",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Magikarp Jump Koylee 2"
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": false
+  },
+  {
+    "town": "E4 League",
+    "leader": "Jump Champ 3",
+    "pokemon": [
+      {
+        "name": "Magikarp Orange Forehead",
+        "max_health": 28350000,
+        "level": 20
+      }
+    ],
+    "badge": "E4_League",
+    "badge_id": 110,
+    "money_reward": 12500,
+    "defeat_message": "That jump really splashed!",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Magikarp Jump Karpella 3"
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": false
+  },
+  {
+    "town": "Master League",
+    "leader": "Magikarp",
+    "pokemon": [
+      {
+        "name": "Magikarp",
+        "max_health": 37800000,
+        "level": 20
+      }
+    ],
+    "badge": "Master_League",
+    "badge_id": 111,
+    "money_reward": 13000,
+    "defeat_message": "Mayor Karp will be proud of you!",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Magikarp Jump Tykarp 2"
+        },
+        "children": []
+      }
+    ],
+    "region": 6,
+    "is_elite": false
+  },
+  {
+    "town": "Turffield",
+    "leader": "Milo",
+    "pokemon": [
+      {
+        "name": "Gossifleur",
+        "max_health": 110892836,
+        "level": 19
+      },
+      {
+        "name": "Eldegoss",
+        "max_health": 123214264,
+        "level": 20
+      }
+    ],
+    "badge": "Galar_Grass",
+    "badge_id": 112,
+    "money_reward": 40000,
+    "defeat_message": "The power of Grass has wilted... What an incredible Gym Challenger!",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "galar",
+          "route": 13
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": false
+  },
+  {
+    "town": "Hulbury",
+    "leader": "Nessa",
+    "pokemon": [
+      {
+        "name": "Goldeen",
+        "max_health": 119044213,
+        "level": 22
+      },
+      {
+        "name": "Arrokuda",
+        "max_health": 119044213,
+        "level": 23
+      },
+      {
+        "name": "Gigantamax Drednaw",
+        "max_health": 122651613,
+        "level": 24
+      }
+    ],
+    "badge": "Galar_Water",
+    "badge_id": 113,
+    "money_reward": 60000,
+    "defeat_message": "I may proudly be the strongest member of this Gym, but I was totally washed away!",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Hop 4"
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": false
+  },
+  {
+    "town": "Motostoke",
+    "leader": "Kabu",
+    "pokemon": [
+      {
+        "name": "Ninetales",
+        "max_health": 125012841,
+        "level": 25
+      },
+      {
+        "name": "Arcanine",
+        "max_health": 125012841,
+        "level": 25
+      },
+      {
+        "name": "Gigantamax Centiskorch",
+        "max_health": 132826144,
+        "level": 27
+      }
+    ],
+    "badge": "Galar_Fire",
+    "badge_id": 114,
+    "money_reward": 60000,
+    "defeat_message": "I'm often regarded as the first real roadblock of the Gym Challenge, and yet you defeated me! Clearly, your talent surpassed my many years of experience. I still have much to learn!",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Marnie 1"
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": false
+  },
+  {
+    "town": "Stow-on-Side1",
+    "leader": "Bea",
+    "pokemon": [
+      {
+        "name": "Hitmontop",
+        "max_health": 131352402,
+        "level": 34
+      },
+      {
+        "name": "Pangoro",
+        "max_health": 131352402,
+        "level": 34
+      },
+      {
+        "name": "Gigantamax Machamp",
+        "max_health": 142075062,
+        "level": 36
+      }
+    ],
+    "badge": "Galar_Fighting",
+    "badge_id": 115,
+    "money_reward": 80000,
+    "defeat_message": "Your strength nearly made me want to turn and run in my bare feet.",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Hop 5"
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": false
+  },
+  {
+    "town": "Stow-on-Side2",
+    "leader": "Allister",
+    "pokemon": [
+      {
+        "name": "Galarian Yamask",
+        "max_health": 131352402,
+        "level": 34
+      },
+      {
+        "name": "Mimikyu",
+        "max_health": 131352402,
+        "level": 34
+      },
+      {
+        "name": "Cursola",
+        "max_health": 131352402,
+        "level": 35
+      },
+      {
+        "name": "Gigantamax Gengar",
+        "max_health": 142075062,
+        "level": 36
+      }
+    ],
+    "badge": "Galar_Ghost",
+    "badge_id": 116,
+    "money_reward": 80000,
+    "defeat_message": "Maybe my mask... kept me from seeing just how strong you really are...",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Hop 5"
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": false
+  },
+  {
+    "town": "Ballonlea",
+    "leader": "Opal",
+    "pokemon": [
+      {
+        "name": "Galarian Weezing",
+        "max_health": 135999999,
+        "level": 36
+      },
+      {
+        "name": "Mawile",
+        "max_health": 135999999,
+        "level": 36
+      },
+      {
+        "name": "Togekiss",
+        "max_health": 135999999,
+        "level": 37
+      },
+      {
+        "name": "Gigantamax Alcremie",
+        "max_health": 147097917,
+        "level": 38
+      }
+    ],
+    "badge": "Galar_Fairy",
+    "badge_id": 117,
+    "money_reward": 80000,
+    "defeat_message": "Your pink is still lacking, but you're an excellent Trainer with some excellent Pokémon.",
+    "requirements": [
+      {
+        "type": "ClearDungeonRequirement",
+        "params": {
+          "clears": 1,
+          "dungeon": "Glimwood Tangle"
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": false
+  },
+  {
+    "town": "Circhester1",
+    "leader": "Gordie",
+    "pokemon": [
+      {
+        "name": "Barbaracle",
+        "max_health": 140246069,
+        "level": 40
+      },
+      {
+        "name": "Shuckle",
+        "max_health": 140246069,
+        "level": 40
+      },
+      {
+        "name": "Stonjourner",
+        "max_health": 140246069,
+        "level": 41
+      },
+      {
+        "name": "Gigantamax Coalossal",
+        "max_health": 151694727,
+        "level": 42
+      }
+    ],
+    "badge": "Galar_Rock",
+    "badge_id": 118,
+    "money_reward": 80000,
+    "defeat_message": "I just want to climb into a hole... Well, I guess it'd be more like falling from here.",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "galar",
+          "route": 26
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": false
+  },
+  {
+    "town": "Circhester2",
+    "leader": "Melony",
+    "pokemon": [
+      {
+        "name": "Frosmoth",
+        "max_health": 140246069,
+        "level": 40
+      },
+      {
+        "name": "Galarian Darmanitan",
+        "max_health": 140246069,
+        "level": 40
+      },
+      {
+        "name": "Eiscue (Ice Face)",
+        "max_health": 140246069,
+        "level": 41
+      },
+      {
+        "name": "Eiscue (Noice Face)",
+        "max_health": 140246069,
+        "level": 41
+      },
+      {
+        "name": "Gigantamax Lapras",
+        "max_health": 151694727,
+        "level": 42
+      }
+    ],
+    "badge": "Galar_Ice",
+    "badge_id": 119,
+    "money_reward": 80000,
+    "defeat_message": "I think you took breaking the ice a little too literally...",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "galar",
+          "route": 26
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": false
+  },
+  {
+    "town": "Spikemuth",
+    "leader": "Piers",
+    "pokemon": [
+      {
+        "name": "Scrafty",
+        "max_health": 145552675,
+        "level": 44
+      },
+      {
+        "name": "Malamar",
+        "max_health": 145552675,
+        "level": 45
+      },
+      {
+        "name": "Skuntank",
+        "max_health": 145552675,
+        "level": 45
+      },
+      {
+        "name": "Obstagoon",
+        "max_health": 157434528,
+        "level": 46
+      }
+    ],
+    "badge": "Galar_Dark",
+    "badge_id": 120,
+    "money_reward": 96000,
+    "defeat_message": "Me an' my team gave it our best. Let's meet up again for a battle some time...",
+    "requirements": [
+      {
+        "type": "TemporaryBattleRequirement",
+        "params": {
+          "battle": "Marnie 2"
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": false
+  },
+  {
+    "town": "Hammerlocke",
+    "leader": "Raihan",
+    "pokemon": [
+      {
+        "name": "Gigalith",
+        "max_health": 151276613,
+        "level": 46
+      },
+      {
+        "name": "Flygon",
+        "max_health": 151276613,
+        "level": 47
+      },
+      {
+        "name": "Sandaconda",
+        "max_health": 151276613,
+        "level": 46
+      },
+      {
+        "name": "Gigantamax Duraludon",
+        "max_health": 163625773,
+        "level": 48
+      }
+    ],
+    "badge": "Galar_Dragon",
+    "badge_id": 121,
+    "money_reward": 128000,
+    "defeat_message": "I might have lost, but I still look good. Maybe I should snap a quick selfie...",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Galar_Dark",
+          "badge_id": 120
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": false
+  },
+  {
+    "town": "Elite Trainer Marnie",
+    "leader": "Marnie",
+    "pokemon": [
+      {
+        "name": "Liepard",
+        "max_health": 160047044,
+        "level": 47
+      },
+      {
+        "name": "Toxicroak",
+        "max_health": 160047044,
+        "level": 47
+      },
+      {
+        "name": "Scrafty",
+        "max_health": 160047044,
+        "level": 47
+      },
+      {
+        "name": "Morpeko",
+        "max_health": 165478757,
+        "level": 48
+      },
+      {
+        "name": "Gigantamax Grimmsnarl",
+        "max_health": 171568449,
+        "level": 49
+      }
+    ],
+    "badge": "Elite_Marnie",
+    "badge_id": 122,
+    "money_reward": 150000,
+    "defeat_message": "OK, so I lost... but I got to see a lot of the good points of you and your Pokémon!",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "galar",
+          "route": 26
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Gym Leader Bede",
+    "leader": "Bede",
+    "pokemon": [
+      {
+        "name": "Mawile",
+        "max_health": 160047044,
+        "level": 51
+      },
+      {
+        "name": "Sylveon",
+        "max_health": 160047044,
+        "level": 51
+      },
+      {
+        "name": "Gardevoir",
+        "max_health": 160047044,
+        "level": 51
+      },
+      {
+        "name": "Galarian Rapidash",
+        "max_health": 165478757,
+        "level": 52
+      },
+      {
+        "name": "Gigantamax Hatterene",
+        "max_health": 171568449,
+        "level": 53
+      }
+    ],
+    "badge": "Elite_Bede",
+    "badge_id": 123,
+    "money_reward": 150000,
+    "defeat_message": "I couldn't win, but at least I was able to show everyone how great Fairy types are.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Marnie",
+          "badge_id": 122
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Trainer Hop",
+    "leader": "Hop",
+    "pokemon": [
+      {
+        "name": "Dubwool",
+        "max_health": 173506298,
+        "level": 59
+      },
+      {
+        "name": "Pincurchin",
+        "max_health": 168817428,
+        "level": 58
+      },
+      {
+        "name": "Snorlax",
+        "max_health": 168817428,
+        "level": 58
+      },
+      {
+        "name": "Corviknight",
+        "max_health": 179511126,
+        "level": 60
+      },
+      {
+        "name": "Gigantamax Inteleon",
+        "max_health": 189335021,
+        "level": 59
+      },
+      {
+        "name": "Gigantamax Rillaboom",
+        "max_health": 189335021,
+        "level": 59
+      },
+      {
+        "name": "Gigantamax Cinderace",
+        "max_health": 189335021,
+        "level": 59
+      }
+    ],
+    "badge": "Elite_Hop",
+    "badge_id": 124,
+    "money_reward": 200000,
+    "defeat_message": "Thanks, mate. I'm really glad you were the one here with me.",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Bede",
+          "badge_id": 123
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": true
+  },
+  {
+    "town": "Champion Leon",
+    "leader": "Leon",
+    "pokemon": [
+      {
+        "name": "Aegislash (Shield)",
+        "max_health": 177587812,
+        "level": 62
+      },
+      {
+        "name": "Dragapult",
+        "max_health": 177587812,
+        "level": 62
+      },
+      {
+        "name": "Haxorus",
+        "max_health": 177587812,
+        "level": 63
+      },
+      {
+        "name": "Seismitoad",
+        "max_health": 181534208,
+        "level": 64
+      },
+      {
+        "name": "Cinderace",
+        "max_health": 187453801,
+        "level": 64
+      },
+      {
+        "name": "Mr. Rime",
+        "max_health": 181534208,
+        "level": 64
+      },
+      {
+        "name": "Inteleon",
+        "max_health": 187453801,
+        "level": 64
+      },
+      {
+        "name": "Rhyperior",
+        "max_health": 181534208,
+        "level": 64
+      },
+      {
+        "name": "Rillaboom",
+        "max_health": 187453801,
+        "level": 64
+      },
+      {
+        "name": "Gigantamax Charizard",
+        "max_health": 197319950,
+        "level": 65
+      }
+    ],
+    "badge": "Elite_GalarChampion",
+    "badge_id": 125,
+    "money_reward": 250000,
+    "defeat_message": "My time as Champion is over... But what a champion time it's been! Thank you for the greatest battle I've ever had!",
+    "requirements": [
+      {
+        "type": "QuestLineStepCompletedRequirement",
+        "params": {
+          "quest": "The Darkest Day",
+          "step": 0
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Gym Leader Klara",
+    "leader": "Klara",
+    "pokemon": [
+      {
+        "name": "Galarian Slowking",
+        "max_health": 281126897,
+        "level": 68
+      },
+      {
+        "name": "Galarian Weezing",
+        "max_health": 281126897,
+        "level": 68
+      },
+      {
+        "name": "Drapion",
+        "max_health": 281126897,
+        "level": 68
+      },
+      {
+        "name": "Scolipede",
+        "max_health": 287045163,
+        "level": 69
+      },
+      {
+        "name": "Galarian Slowbro",
+        "max_health": 295923049,
+        "level": 70
+      }
+    ],
+    "badge": "Elite_ArmorPoison",
+    "badge_id": 126,
+    "money_reward": 150000,
+    "defeat_message": "Aww, come on! What a drag! But...I guess it was also kinda fun!",
+    "requirements": [
+      {
+        "type": "QuestLineCompletedRequirement",
+        "params": {
+          "quest": "The Dojo's Armor"
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Gym Leader Avery",
+    "leader": "Avery",
+    "pokemon": [
+      {
+        "name": "Galarian Slowbro",
+        "max_health": 281126897,
+        "level": 68
+      },
+      {
+        "name": "Swoobat",
+        "max_health": 281126897,
+        "level": 68
+      },
+      {
+        "name": "Galarian Rapidash",
+        "max_health": 281126897,
+        "level": 68
+      },
+      {
+        "name": "Alakazam",
+        "max_health": 287045163,
+        "level": 69
+      },
+      {
+        "name": "Galarian Slowking",
+        "max_health": 295923049,
+        "level": 70
+      }
+    ],
+    "badge": "Elite_ArmorPsychic",
+    "badge_id": 127,
+    "money_reward": 150000,
+    "defeat_message": "More! I require more! Show me your Stored Power!",
+    "requirements": [
+      {
+        "type": "QuestLineCompletedRequirement",
+        "params": {
+          "quest": "The Dojo's Armor"
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Dojo Matron Honey",
+    "leader": "Honey",
+    "pokemon": [
+      {
+        "name": "Galarian Darmanitan",
+        "max_health": 238066328,
+        "level": 73
+      },
+      {
+        "name": "Gallade",
+        "max_health": 238066328,
+        "level": 74
+      },
+      {
+        "name": "Salazzle",
+        "max_health": 243078251,
+        "level": 73
+      },
+      {
+        "name": "Togekiss",
+        "max_health": 243078251,
+        "level": 75
+      },
+      {
+        "name": "Gigantamax Venusaur",
+        "max_health": 250596135,
+        "level": 75
+      },
+      {
+        "name": "Gigantamax Blastoise",
+        "max_health": 250596135,
+        "level": 75
+      }
+    ],
+    "badge": "Elite_ArmorMatron",
+    "badge_id": 128,
+    "money_reward": 250000,
+    "defeat_message": "That was a delight! Nice battling, love!",
+    "requirements": [
+      {
+        "type": "MultiRequirement",
+        "params": {},
+        "children": [
+          {
+            "type": "GymBadgeRequirement",
+            "params": {
+              "badge": "Elite_ArmorPoison",
+              "badge_id": 126
+            },
+            "children": []
+          },
+          {
+            "type": "GymBadgeRequirement",
+            "params": {
+              "badge": "Elite_ArmorPsychic",
+              "badge_id": 127
+            },
+            "children": []
+          }
+        ]
+      }
+    ],
+    "region": 7,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Dojo Master Mustard",
+    "leader": "Mustard",
+    "pokemon": [
+      {
+        "name": "Mienshao",
+        "max_health": 243689942,
+        "level": 73
+      },
+      {
+        "name": "Luxray",
+        "max_health": 243689942,
+        "level": 73
+      },
+      {
+        "name": "Lycanroc (Midday)",
+        "max_health": 248820300,
+        "level": 75
+      },
+      {
+        "name": "Kommo-o",
+        "max_health": 248820300,
+        "level": 75
+      },
+      {
+        "name": "Gigantamax Urshifu (Single Strike)",
+        "max_health": 256515729,
+        "level": 75
+      },
+      {
+        "name": "Gigantamax Urshifu (Rapid Strike)",
+        "max_health": 256515729,
+        "level": 75
+      }
+    ],
+    "badge": "Elite_ArmorChampion",
+    "badge_id": 129,
+    "money_reward": 250000,
+    "defeat_message": "That strength of yours doesn't bend easily!",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_ArmorMatron",
+          "badge_id": 128
+        },
+        "children": []
+      }
+    ],
+    "region": 7,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Trainer Peony",
+    "leader": "Peony",
+    "pokemon": [
+      {
+        "name": "Perrserker",
+        "max_health": 305387462,
+        "level": 74
+      },
+      {
+        "name": "Bronzong",
+        "max_health": 299090814,
+        "level": 73
+      },
+      {
+        "name": "Scizor",
+        "max_health": 299090814,
+        "level": 73
+      },
+      {
+        "name": "Aggron",
+        "max_health": 305387462,
+        "level": 74
+      },
+      {
+        "name": "Copperajah",
+        "max_health": 314832436,
+        "level": 74
+      }
+    ],
+    "badge": "Elite_CrownChampion",
+    "badge_id": 130,
+    "money_reward": 250000,
+    "defeat_message": "Gone and got stronger again, have you? Ah well! Hats off to you-in more ways than one!",
+    "requirements": [
+      {
+        "type": "MultiRequirement",
+        "params": {},
+        "children": [
+          {
+            "type": "QuestLineCompletedRequirement",
+            "params": {
+              "quest": "The Crown of Galar"
+            },
+            "children": []
+          },
+          {
+            "type": "QuestLineCompletedRequirement",
+            "params": {
+              "quest": "The Birds of the Dyna Tree"
+            },
+            "children": []
+          },
+          {
+            "type": "QuestLineCompletedRequirement",
+            "params": {
+              "quest": "The Ancient Golems"
+            },
+            "children": []
+          }
+        ]
+      }
+    ],
+    "region": 7,
+    "is_elite": true
+  },
+  {
+    "town": "Grandtree Arena",
+    "leader": "Lord of the Woods: Kleavor",
+    "pokemon": [
+      {
+        "name": "Noble Kleavor",
+        "max_health": 76658268,
+        "level": 70
+      }
+    ],
+    "badge": "Noble_Kleavor",
+    "badge_id": 131,
+    "money_reward": 128000,
+    "defeat_message": "You defeated Lord Kleavor once again!",
+    "requirements": [
+      {
+        "type": "DevelopmentRequirement",
+        "params": {
+          "raw": ""
+        },
+        "children": []
+      }
+    ],
+    "region": 8,
+    "is_elite": false
+  },
+  {
+    "town": "Brava Arena",
+    "leader": "Lady of the Ridge: Lilligant",
+    "pokemon": [
+      {
+        "name": "Noble Lilligant",
+        "max_health": 76658268,
+        "level": 70
+      }
+    ],
+    "badge": "Noble_Lilligant",
+    "badge_id": 132,
+    "money_reward": 128000,
+    "defeat_message": "You defeated Lady Lilligant once again!",
+    "requirements": [
+      {
+        "type": "DevelopmentRequirement",
+        "params": {
+          "raw": ""
+        },
+        "children": []
+      }
+    ],
+    "region": 8,
+    "is_elite": false
+  },
+  {
+    "town": "Molten Arena",
+    "leader": "Lord of the Isles: Arcanine",
+    "pokemon": [
+      {
+        "name": "Noble Arcanine",
+        "max_health": 76658268,
+        "level": 70
+      }
+    ],
+    "badge": "Noble_Arcanine",
+    "badge_id": 133,
+    "money_reward": 128000,
+    "defeat_message": "You defeated Lord Arcanine once again!",
+    "requirements": [
+      {
+        "type": "DevelopmentRequirement",
+        "params": {
+          "raw": ""
+        },
+        "children": []
+      }
+    ],
+    "region": 8,
+    "is_elite": false
+  },
+  {
+    "town": "Moonview Arena",
+    "leader": "Lord of the Hollow: Electrode",
+    "pokemon": [
+      {
+        "name": "Noble Electrode",
+        "max_health": 76658268,
+        "level": 70
+      }
+    ],
+    "badge": "Noble_Electrode",
+    "badge_id": 134,
+    "money_reward": 128000,
+    "defeat_message": "You defeated Lord Electrode once again!",
+    "requirements": [
+      {
+        "type": "DevelopmentRequirement",
+        "params": {
+          "raw": ""
+        },
+        "children": []
+      }
+    ],
+    "region": 8,
+    "is_elite": false
+  },
+  {
+    "town": "Icepeak Arena",
+    "leader": "Lord of the Tundra: Avalugg",
+    "pokemon": [
+      {
+        "name": "Noble Avalugg",
+        "max_health": 76658268,
+        "level": 70
+      }
+    ],
+    "badge": "Noble_Avalugg",
+    "badge_id": 135,
+    "money_reward": 128000,
+    "defeat_message": "You defeated Lord Avalugg once again!",
+    "requirements": [
+      {
+        "type": "DevelopmentRequirement",
+        "params": {
+          "raw": ""
+        },
+        "children": []
+      }
+    ],
+    "region": 8,
+    "is_elite": false
+  },
+  {
+    "town": "Temple of Sinnoh",
+    "leader": "Volo",
+    "pokemon": [
+      {
+        "name": "Spiritomb",
+        "max_health": 348526193,
+        "level": 68
+      },
+      {
+        "name": "Roserade",
+        "max_health": 348526193,
+        "level": 68
+      },
+      {
+        "name": "Togekiss",
+        "max_health": 348526193,
+        "level": 68
+      },
+      {
+        "name": "Hisuian Arcanine",
+        "max_health": 348526193,
+        "level": 68
+      },
+      {
+        "name": "Lucario",
+        "max_health": 348526193,
+        "level": 68
+      },
+      {
+        "name": "Garchomp",
+        "max_health": 348526193,
+        "level": 68
+      },
+      {
+        "name": "Giratina (Altered)",
+        "max_health": 348526193,
+        "level": 70
+      },
+      {
+        "name": "Giratina (Origin)",
+        "max_health": 348526193,
+        "level": 70
+      }
+    ],
+    "badge": "Azure",
+    "badge_id": 136,
+    "money_reward": 128000,
+    "defeat_message": "Why? Why you?! Why do you have the blessing of Arceus?!",
+    "requirements": [
+      {
+        "type": "DevelopmentRequirement",
+        "params": {
+          "raw": ""
+        },
+        "children": []
+      }
+    ],
+    "region": 8,
+    "is_elite": false
+  },
+  {
+    "town": "Cortondo",
+    "leader": "Katy",
+    "pokemon": [
+      {
+        "name": "Nymble",
+        "max_health": 203123316,
+        "level": 14
+      },
+      {
+        "name": "Tarountula",
+        "max_health": 203123316,
+        "level": 14
+      },
+      {
+        "name": "Teddiursa",
+        "max_health": 203123316,
+        "level": 15
+      }
+    ],
+    "badge": "Bug_Gym",
+    "badge_id": 137,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Artazon",
+    "leader": "Brassius",
+    "pokemon": [
+      {
+        "name": "Petilil",
+        "max_health": 203123316,
+        "level": 16
+      },
+      {
+        "name": "Smoliv",
+        "max_health": 203123316,
+        "level": 14
+      },
+      {
+        "name": "Sudowoodo",
+        "max_health": 203123316,
+        "level": 17
+      }
+    ],
+    "badge": "Grass_Gym",
+    "badge_id": 138,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Levincia",
+    "leader": "Iono",
+    "pokemon": [
+      {
+        "name": "Wattrel",
+        "max_health": 203123316,
+        "level": 23
+      },
+      {
+        "name": "Bellibolt",
+        "max_health": 203123316,
+        "level": 23
+      },
+      {
+        "name": "Luxio",
+        "max_health": 203123316,
+        "level": 23
+      },
+      {
+        "name": "Mismagius",
+        "max_health": 203123316,
+        "level": 24
+      }
+    ],
+    "badge": "Electric_Gym",
+    "badge_id": 139,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Cascarrafa",
+    "leader": "Kofu",
+    "pokemon": [
+      {
+        "name": "Veluza",
+        "max_health": 203123316,
+        "level": 29
+      },
+      {
+        "name": "Wugtrio",
+        "max_health": 203123316,
+        "level": 29
+      },
+      {
+        "name": "Crabominable",
+        "max_health": 203123316,
+        "level": 30
+      }
+    ],
+    "badge": "Water_Gym",
+    "badge_id": 140,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Medali",
+    "leader": "Larry",
+    "pokemon": [
+      {
+        "name": "Komala",
+        "max_health": 203123316,
+        "level": 35
+      },
+      {
+        "name": "Dudunsparce (Two-Segment)",
+        "max_health": 203123316,
+        "level": 35
+      },
+      {
+        "name": "Staraptor",
+        "max_health": 203123316,
+        "level": 36
+      }
+    ],
+    "badge": "Normal_Gym",
+    "badge_id": 141,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Montenevera",
+    "leader": "Ryme",
+    "pokemon": [
+      {
+        "name": "Banette",
+        "max_health": 203123316,
+        "level": 41
+      },
+      {
+        "name": "Mimikyu",
+        "max_health": 203123316,
+        "level": 41
+      },
+      {
+        "name": "Houndstone",
+        "max_health": 203123316,
+        "level": 41
+      },
+      {
+        "name": "Toxtricity (Low Key)",
+        "max_health": 203123316,
+        "level": 42
+      }
+    ],
+    "badge": "Ghost_Gym",
+    "badge_id": 142,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Alfornada",
+    "leader": "Tulip",
+    "pokemon": [
+      {
+        "name": "Farigiraf",
+        "max_health": 203123316,
+        "level": 44
+      },
+      {
+        "name": "Gardevoir",
+        "max_health": 203123316,
+        "level": 44
+      },
+      {
+        "name": "Espathra",
+        "max_health": 203123316,
+        "level": 44
+      },
+      {
+        "name": "Florges (Red)",
+        "max_health": 203123316,
+        "level": 45
+      }
+    ],
+    "badge": "Psychic_Gym",
+    "badge_id": 143,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Glaseado Mountain",
+    "leader": "Grusha",
+    "pokemon": [
+      {
+        "name": "Frosmoth",
+        "max_health": 203123316,
+        "level": 47
+      },
+      {
+        "name": "Beartic",
+        "max_health": 203123316,
+        "level": 47
+      },
+      {
+        "name": "Cetitan",
+        "max_health": 203123316,
+        "level": 47
+      },
+      {
+        "name": "Altaria",
+        "max_health": 203123316,
+        "level": 48
+      }
+    ],
+    "badge": "Ice_Gym",
+    "badge_id": 144,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "ClearDungeonRequirement",
+        "params": {
+          "clears": 1,
+          "dungeon": "Glaseado Mountain"
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Elite Rika",
+    "leader": "Rika",
+    "pokemon": [
+      {
+        "name": "Whiscash",
+        "max_health": 203123316,
+        "level": 57
+      },
+      {
+        "name": "Camerupt",
+        "max_health": 203123316,
+        "level": 57
+      },
+      {
+        "name": "Donphan",
+        "max_health": 203123316,
+        "level": 57
+      },
+      {
+        "name": "Dugtrio",
+        "max_health": 203123316,
+        "level": 57
+      },
+      {
+        "name": "Clodsire",
+        "max_health": 203123316,
+        "level": 58
+      }
+    ],
+    "badge": "Elite_Rika",
+    "badge_id": 145,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Bug_Gym",
+          "badge_id": 137
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Grass_Gym",
+          "badge_id": 138
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Electric_Gym",
+          "badge_id": 139
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Water_Gym",
+          "badge_id": 140
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Normal_Gym",
+          "badge_id": 141
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Ghost_Gym",
+          "badge_id": 142
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Psychic_Gym",
+          "badge_id": 143
+        },
+        "children": []
+      },
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Ice_Gym",
+          "badge_id": 144
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Poppy",
+    "leader": "Poppy",
+    "pokemon": [
+      {
+        "name": "Copperajah",
+        "max_health": 203123316,
+        "level": 58
+      },
+      {
+        "name": "Magnezone",
+        "max_health": 203123316,
+        "level": 58
+      },
+      {
+        "name": "Bronzong",
+        "max_health": 203123316,
+        "level": 58
+      },
+      {
+        "name": "Corviknight",
+        "max_health": 203123316,
+        "level": 58
+      },
+      {
+        "name": "Tinkaton",
+        "max_health": 203123316,
+        "level": 59
+      }
+    ],
+    "badge": "Elite_Poppy",
+    "badge_id": 146,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Rika",
+          "badge_id": 145
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Larry",
+    "leader": "Larry",
+    "pokemon": [
+      {
+        "name": "Tropius",
+        "max_health": 203123316,
+        "level": 59
+      },
+      {
+        "name": "Oricorio (Pom-Pom)",
+        "max_health": 203123316,
+        "level": 59
+      },
+      {
+        "name": "Altaria",
+        "max_health": 203123316,
+        "level": 59
+      },
+      {
+        "name": "Staraptor",
+        "max_health": 203123316,
+        "level": 59
+      },
+      {
+        "name": "Flamigo",
+        "max_health": 203123316,
+        "level": 60
+      }
+    ],
+    "badge": "Elite_Larry",
+    "badge_id": 147,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Poppy",
+          "badge_id": 146
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": true
+  },
+  {
+    "town": "Elite Hassel",
+    "leader": "Hassel",
+    "pokemon": [
+      {
+        "name": "Noivern",
+        "max_health": 203123316,
+        "level": 60
+      },
+      {
+        "name": "Haxorus",
+        "max_health": 203123316,
+        "level": 60
+      },
+      {
+        "name": "Dragalge",
+        "max_health": 203123316,
+        "level": 60
+      },
+      {
+        "name": "Flapple",
+        "max_health": 203123316,
+        "level": 60
+      },
+      {
+        "name": "Baxcalibur",
+        "max_health": 203123316,
+        "level": 61
+      }
+    ],
+    "badge": "Elite_Hassel",
+    "badge_id": 148,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Larry",
+          "badge_id": 147
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": true
+  },
+  {
+    "town": "Top Champion Geeta",
+    "leader": "Geeta",
+    "pokemon": [
+      {
+        "name": "Espathra",
+        "max_health": 203123316,
+        "level": 61
+      },
+      {
+        "name": "Gogoat",
+        "max_health": 203123316,
+        "level": 61
+      },
+      {
+        "name": "Veluza",
+        "max_health": 203123316,
+        "level": 61
+      },
+      {
+        "name": "Avalugg",
+        "max_health": 203123316,
+        "level": 61
+      },
+      {
+        "name": "Kingambit",
+        "max_health": 203123316,
+        "level": 61
+      },
+      {
+        "name": "Glimmora",
+        "max_health": 203123316,
+        "level": 62
+      }
+    ],
+    "badge": "Elite_PaldeaChampion",
+    "badge_id": 149,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Hassel",
+          "badge_id": 148
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": true
+  },
+  {
+    "town": "Champion Nemona",
+    "leader": "Nemona",
+    "pokemon": [
+      {
+        "name": "Lycanroc (Midday)",
+        "max_health": 203123316,
+        "level": 65
+      },
+      {
+        "name": "Goodra",
+        "max_health": 203123316,
+        "level": 65
+      },
+      {
+        "name": "Dudunsparce (Three-Segment)",
+        "max_health": 203123316,
+        "level": 65
+      },
+      {
+        "name": "Orthworm",
+        "max_health": 203123316,
+        "level": 65
+      },
+      {
+        "name": "Pawmot",
+        "max_health": 203123316,
+        "level": 65
+      },
+      {
+        "name": "Quaquaval",
+        "max_health": 203123316,
+        "level": 66
+      },
+      {
+        "name": "Meowscarada",
+        "max_health": 203123316,
+        "level": 66
+      },
+      {
+        "name": "Skeledirge",
+        "max_health": 203123316,
+        "level": 66
+      }
+    ],
+    "badge": "Elite_Nemona",
+    "badge_id": 150,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_PaldeaChampion",
+          "badge_id": 149
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": true
+  },
+  {
+    "town": "Segin Squad\\'s Base",
+    "leader": "Giacomo",
+    "pokemon": [
+      {
+        "name": "Pawniard",
+        "max_health": 203123316,
+        "level": 21
+      },
+      {
+        "name": "Segin Starmobile",
+        "max_health": 203123316,
+        "level": 20
+      }
+    ],
+    "badge": "Dark_Star",
+    "badge_id": 151,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Schedar Squad\\'s Base",
+    "leader": "Mela",
+    "pokemon": [
+      {
+        "name": "Torkoal",
+        "max_health": 203123316,
+        "level": 27
+      },
+      {
+        "name": "Schedar Starmobile",
+        "max_health": 203123316,
+        "level": 26
+      }
+    ],
+    "badge": "Fire_Star",
+    "badge_id": 152,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Navi Squad\\'s Base",
+    "leader": "Atticus",
+    "pokemon": [
+      {
+        "name": "Skuntank",
+        "max_health": 203123316,
+        "level": 32
+      },
+      {
+        "name": "Muk",
+        "max_health": 203123316,
+        "level": 32
+      },
+      {
+        "name": "Revavroom",
+        "max_health": 203123316,
+        "level": 33
+      },
+      {
+        "name": "Navi Starmobile",
+        "max_health": 203123316,
+        "level": 32
+      }
+    ],
+    "badge": "Poison_Star",
+    "badge_id": 153,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Ruchbah Squad\\'s Base",
+    "leader": "Ortega",
+    "pokemon": [
+      {
+        "name": "Azumarill",
+        "max_health": 203123316,
+        "level": 50
+      },
+      {
+        "name": "Wigglytuff",
+        "max_health": 203123316,
+        "level": 50
+      },
+      {
+        "name": "Dachsbun",
+        "max_health": 203123316,
+        "level": 51
+      },
+      {
+        "name": "Ruchbah Starmobile",
+        "max_health": 203123316,
+        "level": 50
+      }
+    ],
+    "badge": "Fairy_Star",
+    "badge_id": 154,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Caph Squad\\'s Base",
+    "leader": "Eri",
+    "pokemon": [
+      {
+        "name": "Toxicroak",
+        "max_health": 203123316,
+        "level": 55
+      },
+      {
+        "name": "Passimian",
+        "max_health": 203123316,
+        "level": 55
+      },
+      {
+        "name": "Lucario",
+        "max_health": 203123316,
+        "level": 55
+      },
+      {
+        "name": "Annihilape",
+        "max_health": 203123316,
+        "level": 56
+      },
+      {
+        "name": "Caph Starmobile",
+        "max_health": 203123316,
+        "level": 56
+      }
+    ],
+    "badge": "Fighting_Star",
+    "badge_id": 155,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Director Clavell",
+    "leader": "Clavell",
+    "pokemon": [
+      {
+        "name": "Oranguru",
+        "max_health": 203123316,
+        "level": 60
+      },
+      {
+        "name": "Abomasnow",
+        "max_health": 203123316,
+        "level": 60
+      },
+      {
+        "name": "Polteageist",
+        "max_health": 203123316,
+        "level": 60
+      },
+      {
+        "name": "Amoonguss",
+        "max_health": 203123316,
+        "level": 60
+      },
+      {
+        "name": "Houndoom",
+        "max_health": 203123316,
+        "level": 60
+      },
+      {
+        "name": "Gyarados",
+        "max_health": 203123316,
+        "level": 60
+      },
+      {
+        "name": "Gyarados",
+        "max_health": 203123316,
+        "level": 60
+      },
+      {
+        "name": "Amoonguss",
+        "max_health": 203123316,
+        "level": 60
+      },
+      {
+        "name": "Houndoom",
+        "max_health": 203123316,
+        "level": 60
+      },
+      {
+        "name": "Skeledirge",
+        "max_health": 203123316,
+        "level": 61
+      },
+      {
+        "name": "Quaquaval",
+        "max_health": 203123316,
+        "level": 61
+      },
+      {
+        "name": "Meowscarada",
+        "max_health": 203123316,
+        "level": 61
+      }
+    ],
+    "badge": "Elite_Clavell",
+    "badge_id": 156,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Penny of Team Star",
+    "leader": "Penny",
+    "pokemon": [
+      {
+        "name": "Umbreon",
+        "max_health": 203123316,
+        "level": 62
+      },
+      {
+        "name": "Vaporeon",
+        "max_health": 203123316,
+        "level": 62
+      },
+      {
+        "name": "Jolteon",
+        "max_health": 203123316,
+        "level": 62
+      },
+      {
+        "name": "Flareon",
+        "max_health": 203123316,
+        "level": 62
+      },
+      {
+        "name": "Leafeon",
+        "max_health": 203123316,
+        "level": 62
+      },
+      {
+        "name": "Sylveon",
+        "max_health": 203123316,
+        "level": 63
+      }
+    ],
+    "badge": "Elite_Penny",
+    "badge_id": 157,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "GymBadgeRequirement",
+        "params": {
+          "badge": "Elite_Clavell",
+          "badge_id": 156
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Stony Cliff Titan",
+    "leader": "Stony Cliff Titan",
+    "pokemon": [
+      {
+        "name": "Titan Klawf",
+        "max_health": 203123316,
+        "level": 16
+      }
+    ],
+    "badge": "Rock_Titan",
+    "badge_id": 158,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Open Sky Titan",
+    "leader": "Open Sky Titan",
+    "pokemon": [
+      {
+        "name": "Titan Bombirdier",
+        "max_health": 203123316,
+        "level": 20
+      }
+    ],
+    "badge": "Flying_Titan",
+    "badge_id": 159,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Lurking Steel Titan",
+    "leader": "Lurking Steel Titan",
+    "pokemon": [
+      {
+        "name": "Titan Orthworm",
+        "max_health": 203123316,
+        "level": 29
+      }
+    ],
+    "badge": "Steel_Titan",
+    "badge_id": 160,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Asado Desert",
+    "leader": "Quaking Earth Titan",
+    "pokemon": [
+      {
+        "name": "Titan Great Tusk",
+        "max_health": 203123316,
+        "level": 45
+      },
+      {
+        "name": "Titan Iron Treads",
+        "max_health": 203123316,
+        "level": 45
+      }
+    ],
+    "badge": "Ground_Titan",
+    "badge_id": 161,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Casseroya Lake",
+    "leader": "False Dragon Titan",
+    "pokemon": [
+      {
+        "name": "Titan Dondozo",
+        "max_health": 203123316,
+        "level": 56
+      },
+      {
+        "name": "Titan Tatsugiri",
+        "max_health": 203123316,
+        "level": 57
+      }
+    ],
+    "badge": "Dragon_Titan",
+    "badge_id": 162,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "Pokémon Trainer Arven",
+    "leader": "Arven",
+    "pokemon": [
+      {
+        "name": "Greedent",
+        "max_health": 203123316,
+        "level": 58
+      },
+      {
+        "name": "Cloyster",
+        "max_health": 203123316,
+        "level": 59
+      },
+      {
+        "name": "Scovillain",
+        "max_health": 203123316,
+        "level": 60
+      },
+      {
+        "name": "Toedscruel",
+        "max_health": 203123316,
+        "level": 61
+      },
+      {
+        "name": "Garganacl",
+        "max_health": 203123316,
+        "level": 62
+      },
+      {
+        "name": "Mabosstiff",
+        "max_health": 203123316,
+        "level": 63
+      }
+    ],
+    "badge": "Elite_Arven",
+    "badge_id": 163,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "AI Sada",
+    "leader": "AI Sada",
+    "pokemon": [
+      {
+        "name": "Slither Wing",
+        "max_health": 203123316,
+        "level": 66
+      },
+      {
+        "name": "Scream Tail",
+        "max_health": 203123316,
+        "level": 66
+      },
+      {
+        "name": "Brute Bonnet",
+        "max_health": 203123316,
+        "level": 66
+      },
+      {
+        "name": "Flutter Mane",
+        "max_health": 203123316,
+        "level": 66
+      },
+      {
+        "name": "Sandy Shocks",
+        "max_health": 203123316,
+        "level": 66
+      },
+      {
+        "name": "Roaring Moon",
+        "max_health": 203123316,
+        "level": 67
+      }
+    ],
+    "badge": "Scarlet",
+    "badge_id": 164,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  },
+  {
+    "town": "AI Turo",
+    "leader": "AI Turo",
+    "pokemon": [
+      {
+        "name": "Iron Moth",
+        "max_health": 203123316,
+        "level": 66
+      },
+      {
+        "name": "Iron Bundle",
+        "max_health": 203123316,
+        "level": 66
+      },
+      {
+        "name": "Iron Hands",
+        "max_health": 203123316,
+        "level": 66
+      },
+      {
+        "name": "Iron Jugulis",
+        "max_health": 203123316,
+        "level": 66
+      },
+      {
+        "name": "Iron Thorns",
+        "max_health": 203123316,
+        "level": 66
+      },
+      {
+        "name": "Iron Valiant",
+        "max_health": 203123316,
+        "level": 67
+      }
+    ],
+    "badge": "Violet",
+    "badge_id": 165,
+    "money_reward": 250000,
+    "defeat_message": "",
+    "requirements": [
+      {
+        "type": "RouteKillRequirement",
+        "params": {
+          "amount": 10,
+          "region": "paldea",
+          "route": 2
+        },
+        "children": []
+      }
+    ],
+    "region": 9,
+    "is_elite": false
+  }
+]

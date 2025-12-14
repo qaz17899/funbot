@@ -29,8 +29,19 @@ ROUTE_MONEY_BASE: int = 3
 # Final catch rate = (pokemon_catch_rate^0.75) + pokeball_bonus
 BASE_CATCH_RATE: float = 0.75
 
-# Shiny chance (1 in N)
-SHINY_CHANCE: int = 8192
+# Shiny chances (1 in N) - context based like Pokeclicker
+SHINY_CHANCE_BATTLE: int = 8192  # Wild route encounters
+SHINY_CHANCE_DUNGEON: int = 4096  # Dungeon encounters
+SHINY_CHANCE_SAFARI: int = 1024  # Safari zone
+SHINY_CHANCE_SHOP: int = 1024  # Shop purchases
+SHINY_CHANCE_BREEDING: int = 1024  # Breeding/eggs
+SHINY_CHANCE_FARM: int = 1024  # Farm wanderers
+SHINY_CHANCE_REWARD: int = 1024  # Quest rewards
+SHINY_CHANCE_STONE: int = 2048  # Evolution stone usage
+SHINY_CHANCE_BATTLEFRONTIER: int = 1024  # Battle frontier
+
+# Default (backwards compat)
+SHINY_CHANCE: int = SHINY_CHANCE_BATTLE
 
 # =============================================================================
 # Experience Constants

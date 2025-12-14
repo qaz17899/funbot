@@ -1,0 +1,103 @@
+{
+    "_comment": "Event Pokemon extracted from RouteData.ts forEach loops (lines 4228-4277)",
+    "_source": "reference/pokeclicker-develop/src/modules/routes/RouteData.ts",
+    "halloween": {
+        "event_name": "Halloween!",
+        "requirement_type": "SpecialEventRandomRequirement",
+        "regions": {
+            "kanto": {
+                "region_id": 0,
+                "pokemon": [
+                    {
+                        "name": "Spooky Bulbasaur"
+                    },
+                    {
+                        "name": "Gastly"
+                    }
+                ]
+            },
+            "johto": {
+                "region_id": 1,
+                "pokemon": [
+                    {
+                        "name": "Spooky Togepi"
+                    },
+                    {
+                        "name": "Misdreavus"
+                    }
+                ]
+            },
+            "hoenn": {
+                "region_id": 2,
+                "pokemon": [
+                    {
+                        "name": "Pikachu (Gengar)"
+                    },
+                    {
+                        "name": "Shuppet"
+                    },
+                    {
+                        "name": "Duskull"
+                    }
+                ]
+            }
+        }
+    },
+    "christmas": {
+        "event_name": "Merry Christmas!",
+        "regions": {
+            "kanto": {
+                "region_id": 0,
+                "pokemon": [
+                    {
+                        "name": "Santa Jynx",
+                        "requirement": {
+                            "type": "MultiRequirement",
+                            "children": [
+                                {
+                                    "type": "SpecialEventRequirement",
+                                    "event": "Merry Christmas!"
+                                },
+                                {
+                                    "type": "CustomRequirement",
+                                    "hint": "Santa Jynx appears after defeating its Band at Bill's House"
+                                }
+                            ]
+                        },
+                        "note": "Complex requirement depends on santaJynxReq variable with multiple ItemOwnedRequirement checks"
+                    }
+                ]
+            }
+        }
+    },
+    "external_variables": {
+        "_comment": "These variables are defined outside Routes.add() and referenced in requirements",
+        "cuteMeowthReq": {
+            "location": "Johto Route 42 - Meowth (Phanpy)",
+            "type": "CustomRequirement",
+            "description": "Defeating Cute Meowth during Easter event"
+        },
+        "santaJynxReq": {
+            "location": "Kanto routes - Santa Jynx",
+            "type": "OneFromManyRequirement",
+            "children": [
+                {
+                    "battle": "Santa Jynx 1",
+                    "presents_required": 11
+                },
+                {
+                    "battle": "Santa Jynx 2",
+                    "presents_required": 27
+                },
+                {
+                    "battle": "Santa Jynx 3",
+                    "presents_required": 49
+                },
+                {
+                    "battle": "Santa Jynx 4",
+                    "presents_required": 150
+                }
+            ]
+        }
+    }
+}
