@@ -101,9 +101,23 @@ class HatcheryService:
         if slot is None:
             return None
 
-        # Calculate steps required
+        # Calculate steps required with Carbos reduction
+        # From PartyPokemon.ts:419-423:
+        # extraCycles = (calcium + protein) / 2
+        # steps = eggCycles * 40
+        # if steps > 300: steps = ((steps/300)^(1 - carbos/70)) * 300
         egg_cycles = pokemon_data.egg_cycles if hasattr(pokemon_data, "egg_cycles") else 20
-        steps_required = egg_cycles * EGG_CYCLE_MULTIPLIER
+        extra_cycles = (pokemon.vitamin_calcium + pokemon.vitamin_protein) / 2
+        base_steps = int((egg_cycles + extra_cycles) * EGG_CYCLE_MULTIPLIER)
+
+        # Apply Carbos reduction (only affects steps > 300)
+        carbos = pokemon.vitamin_carbos
+        div = 300
+        if base_steps <= div or carbos == 0:
+            steps_required = base_steps
+        else:
+            # Carbos reduces steps using exponential formula
+            steps_required = int(((base_steps / div) ** (1 - carbos / 70)) * div)
 
         # Create egg
         egg = await PlayerEgg.create(
@@ -218,10 +232,14 @@ class HatcheryService:
         # Roll for shiny
         shiny = random.randint(1, egg.shiny_chance) == 1
 
-        # Calculate bonuses (from vitamins would be added here)
+        # Calculate bonuses with vitamins (from PartyPokemon.ts:426-428)
+        # attackBonusPercent += (BREEDING_ATTACK_BONUS + calcium)
+        # attackBonusAmount += protein
         shiny_mult = BREEDING_SHINY_ATTACK_MULTIPLIER if shiny else 1
-        bonus_percent = BREEDING_ATTACK_BONUS * shiny_mult
-        bonus_amount = 0  # Protein bonus would go here
+        calcium_bonus = party_pokemon.vitamin_calcium
+        protein_bonus = party_pokemon.vitamin_protein
+        bonus_percent = (BREEDING_ATTACK_BONUS + calcium_bonus) * shiny_mult
+        bonus_amount = protein_bonus * shiny_mult
 
         # Apply bonuses
         party_pokemon.attack_bonus_percent += bonus_percent

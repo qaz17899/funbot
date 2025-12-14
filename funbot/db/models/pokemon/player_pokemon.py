@@ -142,6 +142,18 @@ class PlayerPokemon(BaseModel):
     attack_bonus_amount = fields.IntField(default=0, description="Flat attack bonus from breeding")
 
     # =========================================================================
+    # Pokeclicker: Vitamin System (PartyPokemon.ts:77-78, 421-428)
+    # =========================================================================
+
+    # Vitamins applied to this Pokemon (max = (region + 1) * 5 total)
+    # - Protein: +1 flat attack bonus per hatch
+    # - Calcium: +1% attack bonus per hatch
+    # - Carbos: Reduce egg steps formula
+    vitamin_protein = fields.SmallIntField(default=0, description="Protein uses (+flat ATK/hatch)")
+    vitamin_calcium = fields.SmallIntField(default=0, description="Calcium uses (+% ATK/hatch)")
+    vitamin_carbos = fields.SmallIntField(default=0, description="Carbos uses (reduce steps)")
+
+    # =========================================================================
     # Timestamps
     # =========================================================================
 
@@ -192,8 +204,13 @@ class PlayerPokemon(BaseModel):
 
     @property
     def vitamin_bonus(self) -> int:
-        """Calculate vitamin attack bonus."""
-        return self.vitamins_total
+        """Calculate total vitamins used on this Pokemon."""
+        return self.vitamin_protein + self.vitamin_calcium + self.vitamin_carbos
+
+    @property
+    def total_vitamins_used(self) -> int:
+        """Alias for vitamin_bonus (Pokeclicker compatibility)."""
+        return self.vitamin_bonus
 
     def calculate_attack(self, base_attack: int, ignore_level: bool = False) -> int:
         """Calculate total attack (exact Pokeclicker formula).
