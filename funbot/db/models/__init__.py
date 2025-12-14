@@ -14,6 +14,7 @@ from funbot.db.models.pokemon import (
     KeyItemType,
     PlayerBadge,
     # Player progress
+    PlayerBallInventory,
     PlayerBattleProgress,
     PlayerDungeonProgress,
     PlayerEgg,
@@ -51,6 +52,7 @@ __all__ = (
     "GymPokemon",
     "KeyItemType",
     "PlayerBadge",
+    "PlayerBallInventory",
     "PlayerBattleProgress",
     "PlayerDungeonProgress",
     "PlayerEgg",

@@ -150,3 +150,29 @@ HATCHERY_STEPS_PER_BATTLE: int = 5  # Base steps per battle
 # Egg slot cost (Quest Points) - from Breeding.ts:484-486
 # Cost = 500 * slot_number
 EGG_SLOT_BASE_COST: int = 500
+
+# =============================================================================
+# Pokeball Constants - Exact Pokeclicker values (ItemList.ts:88-103)
+# =============================================================================
+
+# Pokeball prices (currency type, price)
+# Format: {ball_type: (price, currency_type)}
+# Currency: 0=PokéDollar, 3=QuestPoint (from enums.py)
+POKEBALL_PRICES: dict[int, tuple[int, int]] = {
+    1: (100, 0),  # Poké Ball: 100 PokéDollar
+    2: (500, 0),  # Great Ball: 500 PokéDollar
+    3: (2000, 0),  # Ultra Ball: 2000 PokéDollar
+    4: (2500, 3),  # Master Ball: 2500 Quest Points
+}
+
+# Pokeball catch bonuses (from Pokeballs.ts:17-20)
+POKEBALL_CATCH_BONUS: dict[int, int] = {
+    0: 0,  # None
+    1: 0,  # Poké Ball: +0%
+    2: 5,  # Great Ball: +5%
+    3: 10,  # Ultra Ball: +10%
+    4: 100,  # Master Ball: +100% (always catch)
+}
+
+# Starter Pokéballs (from Pokeballs.ts constructor, quantity = 25)
+STARTER_POKEBALL_COUNT: int = 25

@@ -21,6 +21,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from funbot.db.models.pokemon import (
+    PlayerBallInventory,
     PlayerPokeballSettings,
     PlayerPokemon,
     PlayerRouteProgress,
@@ -30,7 +31,7 @@ from funbot.db.models.pokemon import (
 )
 from funbot.db.models.user import User
 from funbot.pokemon.autocomplete import region_autocomplete, route_autocomplete
-from funbot.pokemon.constants.enums import PokemonType
+from funbot.pokemon.constants.enums import Pokeball, PokemonType
 from funbot.pokemon.constants.game_constants import BASE_EP_YIELD
 from funbot.pokemon.services.battle_service import BattleService, ExploreResult
 from funbot.pokemon.services.catch_service import CatchService
@@ -113,6 +114,9 @@ class ExploreCog(commands.Cog):
         # Get wallet
         wallet, _ = await PlayerWallet.get_or_create(user=user)
 
+        # Get ball inventory
+        ball_inventory, _ = await PlayerBallInventory.get_or_create(user=user)
+
         # Get available wild Pokemon for this route from real data
         wild_pokemon = await self._get_route_pokemon(route_data)
         if not wild_pokemon:
@@ -141,6 +145,7 @@ class ExploreCog(commands.Cog):
             party_data=party_pokemon_data,
             settings=settings,
             wallet=wallet,
+            ball_inventory=ball_inventory,
             route_data=route_data,
             wild_pokemon=wild_pokemon,
             count=count,
@@ -179,6 +184,7 @@ class ExploreCog(commands.Cog):
         party_data: list[dict],
         settings: PlayerPokeballSettings,
         wallet: PlayerWallet,
+        ball_inventory: PlayerBallInventory,
         route_data: RouteData,
         wild_pokemon: list[PokemonData],
         count: int,
@@ -190,6 +196,7 @@ class ExploreCog(commands.Cog):
         shiny_count = 0
         total_money = 0
         total_exp = 0
+        balls_used: dict[int, int] = {1: 0, 2: 0, 3: 0, 4: 0}  # Track balls consumed
 
         # Track per-species statistics for batch update
         # Key: pokemon_data_id, Value: {encountered, defeated, captured, shiny variants}
@@ -256,9 +263,26 @@ class ExploreCog(commands.Cog):
 
                 # Attempt catch
                 is_new = wild.id not in owned_ids
-                pokeball = CatchService.get_pokeball_for_pokemon(
+                preferred_ball = CatchService.get_pokeball_for_pokemon(
                     settings.to_dict(), is_new, is_shiny
                 )
+
+                # Check ball availability and fallback (Pokeclicker: Pokeballs.ts:194-207)
+                # If preferred ball unavailable, try lower tier balls
+                pokeball = Pokeball.NONE
+                if preferred_ball != Pokeball.NONE:
+                    # Check from preferred down to Pokeball
+                    for ball_type in range(preferred_ball, 0, -1):
+                        if ball_inventory.get_quantity(ball_type) > 0:
+                            pokeball = Pokeball(ball_type)
+                            break
+
+                # Only attempt catch if we have a ball to use
+                if pokeball == Pokeball.NONE:
+                    continue  # Skip catch attempt, no balls available
+
+                # Consume the ball (track for batch update after loop)
+                balls_used[pokeball] += 1
 
                 catch_result = CatchService.attempt_catch(wild.catch_rate, pokeball)
 
@@ -280,6 +304,12 @@ class ExploreCog(commands.Cog):
                             {"user": user, "pokemon_data": wild, "shiny": is_shiny}
                         )
                         owned_ids.add(wild.id)  # Track to avoid duplicates in same batch
+
+        # Consume balls from inventory (batch update after loop)
+        for ball_type, amount in balls_used.items():
+            if amount > 0:
+                for _ in range(amount):
+                    await ball_inventory.use_ball(ball_type)
 
         # Bulk create new Pokemon outside the loop
         if new_pokemon_to_create:
