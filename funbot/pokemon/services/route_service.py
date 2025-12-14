@@ -12,48 +12,20 @@ Based on PokéClicker's MapHelper.calculateRouteCssClass().
 
 from __future__ import annotations
 
-from enum import IntEnum
 from typing import TYPE_CHECKING
 
 from loguru import logger
 
 from funbot.db.models.pokemon import PlayerPokemon, PlayerRouteProgress, RouteData
+from funbot.pokemon.constants import ROUTE_STATUS_EMOJI, RouteStatus
 from funbot.pokemon.constants.game_constants import ROUTE_KILLS_NEEDED
 from funbot.pokemon.services.requirement_service import get_requirement_service
 
 if TYPE_CHECKING:
     from funbot.db.models.pokemon.route_requirement import RouteRequirement
 
-
-class RouteStatus(IntEnum):
-    """Route status matching PokéClicker's areaStatus.
-
-    Fixed priority order (highest to lowest):
-    1. LOCKED - Can't access yet
-    2. INCOMPLETE - Kills < 10
-    3. QUEST_AT_LOCATION - Has active quest (not implemented yet)
-    4. UNCAUGHT_POKEMON - Has new Pokemon
-    5. UNCAUGHT_SHINY - Missing shiny variants
-    6. COMPLETED - Everything done
-    """
-
-    LOCKED = 0
-    INCOMPLETE = 1
-    QUEST_AT_LOCATION = 2
-    UNCAUGHT_POKEMON = 3
-    UNCAUGHT_SHINY = 4
-    COMPLETED = 5
-
-
-# Emoji mapping for each status
-ROUTE_STATUS_EMOJI: dict[RouteStatus, str] = {
-    RouteStatus.LOCKED: "🔒",
-    RouteStatus.INCOMPLETE: "⚔️",
-    RouteStatus.QUEST_AT_LOCATION: "📋",
-    RouteStatus.UNCAUGHT_POKEMON: "🆕",
-    RouteStatus.UNCAUGHT_SHINY: "✨",
-    RouteStatus.COMPLETED: "🌈",
-}
+# Re-export for backward compatibility
+__all__ = ["ROUTE_STATUS_EMOJI", "RouteStatus", "RouteStatusService", "get_route_status_service"]
 
 
 class RouteStatusService:

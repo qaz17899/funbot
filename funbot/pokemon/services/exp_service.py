@@ -8,18 +8,11 @@ Based on Pokeclicker mechanics:
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 from funbot.pokemon.constants.game_constants import BASE_EXP_MODIFIER, EXP_SCALE_FACTOR, MAX_LEVEL
+from funbot.pokemon.schemas import LevelUpResult
 
-
-@dataclass
-class LevelUpResult:
-    """Result of a level up check."""
-
-    leveled_up: bool
-    new_level: int
-    exp_remaining: int
+# Re-export for backward compatibility
+__all__ = ["ExpService", "LevelUpResult"]
 
 
 class ExpService:

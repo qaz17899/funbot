@@ -7,10 +7,11 @@ from __future__ import annotations
 
 from tortoise import fields
 from tortoise.expressions import F
-from tortoise.models import Model
+
+from funbot.db.models.base import BaseModel
 
 
-class PlayerWallet(Model):
+class PlayerWallet(BaseModel):
     """Pokemon currency wallet for a player.
 
     One wallet per user, created on first Pokemon interaction.

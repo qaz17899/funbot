@@ -6,12 +6,12 @@ Based on Pokeclicker's Pokeball settings UI.
 from __future__ import annotations
 
 from tortoise import fields
-from tortoise.models import Model
 
+from funbot.db.models.base import BaseModel
 from funbot.pokemon.constants.enums import Pokeball
 
 
-class PlayerPokeballSettings(Model):
+class PlayerPokeballSettings(BaseModel):
     """Pokeball auto-catch settings for a player.
 
     Determines which Pokeball to use (or NONE to skip) for each category.

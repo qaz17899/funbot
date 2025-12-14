@@ -12,10 +12,11 @@ This avoids redundancy and ensures catching anywhere updates route status.
 from __future__ import annotations
 
 from tortoise import fields
-from tortoise.models import Model
+
+from funbot.db.models.base import BaseModel
 
 
-class PlayerRouteProgress(Model):
+class PlayerRouteProgress(BaseModel):
     """Player's progress on a specific route."""
 
     id = fields.IntField(pk=True)

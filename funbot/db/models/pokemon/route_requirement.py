@@ -11,36 +11,16 @@ Based on Pokeclicker's requirement system with TREE STRUCTURE for nested logic:
 
 from __future__ import annotations
 
-from enum import IntEnum
-
 from tortoise import fields
-from tortoise.models import Model
+
+from funbot.db.models.base import BaseModel
+from funbot.pokemon.constants import RequirementType
+
+# Re-export for backward compatibility
+__all__ = ["RequirementType", "RouteRequirement", "SpecialRoutePokemon"]
 
 
-class RequirementType(IntEnum):
-    """Types of route unlock requirements."""
-
-    # Leaf nodes (basic conditions)
-    ROUTE_KILL = 1  # RouteKillRequirement(10, Region.kanto, 1)
-    GYM_BADGE = 2  # GymBadgeRequirement(BadgeEnums.Boulder)
-    DUNGEON_CLEAR = 3  # ClearDungeonRequirement(1, getDungeonIndex('Mt. Moon'))
-    TEMP_BATTLE = 4  # TemporaryBattleRequirement('Blue 2')
-    QUEST_LINE_COMPLETED = 5  # QuestLineCompletedRequirement('Celio\'s Errand')
-    QUEST_LINE_STEP = 6  # QuestLineStepCompletedRequirement('Bill\'s Errand', 0)
-    OBTAINED_POKEMON = 7  # ObtainedPokemonRequirement('Sunkern')
-    WEATHER = 8  # WeatherRequirement
-    DAY_OF_WEEK = 9  # DayOfWeekRequirement
-    SPECIAL_EVENT = 10  # SpecialEventRequirement
-    ITEM_OWNED = 11  # ItemOwnedRequirement
-    STATISTIC = 12  # StatisticRequirement
-    POKEMON_LEVEL = 13  # PokemonLevelRequirement
-
-    # Branch nodes (logical operators)
-    ONE_FROM_MANY = 100  # OR - at least one child must pass
-    MULTI = 101  # AND - all children must pass
-
-
-class RouteRequirement(Model):
+class RouteRequirement(BaseModel):
     """Unlock requirement for a route.
 
     Uses TREE STRUCTURE with self-referencing parent for nested AND/OR logic.
@@ -84,7 +64,7 @@ class RouteRequirement(Model):
         table = "pokemon_route_requirement"
 
 
-class SpecialRoutePokemon(Model):
+class SpecialRoutePokemon(BaseModel):
     """Pokemon that appear on routes under special conditions.
 
     Links to a RouteRequirement tree for its unlock condition.

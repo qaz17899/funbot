@@ -9,10 +9,11 @@ Based on Pokeclicker's roaming system:
 from __future__ import annotations
 
 from tortoise import fields
-from tortoise.models import Model
+
+from funbot.db.models.base import BaseModel
 
 
-class RoamingPokemon(Model):
+class RoamingPokemon(BaseModel):
     """Roaming legendary Pokemon that appear randomly on routes."""
 
     id = fields.IntField(pk=True)

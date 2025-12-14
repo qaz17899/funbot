@@ -9,7 +9,6 @@ Based on Pokeclicker mechanics:
 from __future__ import annotations
 
 import random
-from dataclasses import dataclass
 
 from funbot.pokemon.constants.enums import PokemonType
 from funbot.pokemon.constants.game_constants import (
@@ -18,35 +17,10 @@ from funbot.pokemon.constants.game_constants import (
     ROUTE_MONEY_BASE,
 )
 from funbot.pokemon.constants.type_chart import get_attack_modifier
+from funbot.pokemon.schemas import BattleResult, ExploreResult
 
-
-@dataclass
-class BattleResult:
-    """Result of a single battle encounter."""
-
-    pokemon_name: str
-    pokemon_id: int
-    defeated: bool
-    damage_dealt: int
-    ticks_to_defeat: int
-    money_earned: int
-    exp_earned: int
-    is_shiny: bool
-
-
-@dataclass
-class ExploreResult:
-    """Result of exploring a route (multiple encounters)."""
-
-    route: int
-    region: int
-    encounter_count: int
-    pokemon_defeated: int
-    pokemon_caught: int
-    shiny_count: int
-    total_money: int
-    total_exp: int
-    caught_pokemon: list[tuple[str, int, bool]]  # (name, id, is_shiny)
+# Re-export for backward compatibility during transition
+__all__ = ["BattleResult", "BattleService", "ExploreResult"]
 
 
 class BattleService:

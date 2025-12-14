@@ -7,10 +7,11 @@ Data is read-only after initial import.
 from __future__ import annotations
 
 from tortoise import fields
-from tortoise.models import Model
+
+from funbot.db.models.base import BaseModel
 
 
-class PokemonData(Model):
+class PokemonData(BaseModel):
     """Static Pokemon data imported from PokeAPI.
 
     Contains base stats and info for all 1025+ Pokemon.

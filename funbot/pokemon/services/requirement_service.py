@@ -148,7 +148,7 @@ class RequirementService:
             return True
 
         # Check if player has this badge
-        return await PlayerBadge.filter(player_id=player_id, badge=badge_name).exists()
+        return await PlayerBadge.filter(user_id=player_id, badge=badge_name).exists()
 
     async def _check_dungeon_clear(self, player_id: int, params: dict) -> bool:
         """Check if player has cleared a dungeon enough times.
@@ -171,7 +171,7 @@ class RequirementService:
 
         # Get player progress
         progress = await PlayerDungeonProgress.filter(
-            player_id=player_id, dungeon_id=dungeon.id
+            user_id=player_id, dungeon_id=dungeon.id
         ).first()
 
         player_clears = progress.clears if progress else 0
@@ -200,9 +200,7 @@ class RequirementService:
             return True  # Permissive if battle not found
 
         # Get player progress
-        progress = await PlayerBattleProgress.filter(
-            player_id=player_id, battle_id=battle.id
-        ).first()
+        progress = await PlayerBattleProgress.filter(user_id=player_id, battle_id=battle.id).first()
 
         player_defeats = progress.defeats if progress else 0
         return player_defeats >= defeats_required
@@ -226,7 +224,7 @@ class RequirementService:
             return True
 
         progress = await PlayerQuestProgress.filter(
-            player__id=player_id, quest_line__name=quest_name
+            user__id=player_id, quest_line__name=quest_name
         ).first()
 
         if not progress:
@@ -254,7 +252,7 @@ class RequirementService:
             return True
 
         progress = await PlayerQuestProgress.filter(
-            player__id=player_id, quest_line__name=quest_name
+            user__id=player_id, quest_line__name=quest_name
         ).first()
 
         # If no progress, treat as step -1 (not started)
@@ -283,7 +281,9 @@ class RequirementService:
         if not pokemon_name:
             return True
 
-        return await PlayerPokemon.filter(player_id=player_id, pokemon__name=pokemon_name).exists()
+        return await PlayerPokemon.filter(
+            user_id=player_id, pokemon_data__name=pokemon_name
+        ).exists()
 
     # =========================================================================
     # CONDITIONAL REQUIREMENTS (Real-time checks)

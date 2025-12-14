@@ -9,19 +9,13 @@ Based on Pokeclicker mechanics:
 from __future__ import annotations
 
 import random
-from dataclasses import dataclass
 
 from funbot.pokemon.constants.enums import POKEBALL_BONUS, Pokeball
 from funbot.pokemon.constants.game_constants import BASE_CATCH_RATE, SHINY_CHANCE
+from funbot.pokemon.schemas import CatchAttemptResult
 
-
-@dataclass
-class CatchAttemptResult:
-    """Result of a catch attempt."""
-
-    success: bool
-    pokeball_used: Pokeball
-    catch_rate: float
+# Re-export for backward compatibility
+__all__ = ["CatchAttemptResult", "CatchService"]
 
 
 class CatchService:

@@ -6,10 +6,11 @@ Each row represents a Pokemon owned by a player.
 from __future__ import annotations
 
 from tortoise import fields
-from tortoise.models import Model
+
+from funbot.db.models.base import BaseModel
 
 
-class PlayerPokemon(Model):
+class PlayerPokemon(BaseModel):
     """A Pokemon owned by a player.
 
     Created when catching a new Pokemon.

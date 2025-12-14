@@ -11,13 +11,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from tortoise import fields
-from tortoise.models import Model
+
+from funbot.db.models.base import BaseModel
 
 if TYPE_CHECKING:
     from funbot.db.models.pokemon.route_requirement import RouteRequirement
 
 
-class RouteData(Model):
+class RouteData(BaseModel):
     """Pokemon route data from Pokeclicker."""
 
     id = fields.IntField(pk=True)

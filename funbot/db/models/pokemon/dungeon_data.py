@@ -71,10 +71,10 @@ class PlayerDungeonProgress(BaseModel):
 
     class Meta:
         table = "pokemon_player_dungeon_progress"
-        unique_together = (("player", "dungeon"),)
+        unique_together = (("user", "dungeon"),)
 
     id = fields.IntField(primary_key=True)
-    player = fields.ForeignKeyField(
+    user = fields.ForeignKeyField(
         "models.User", related_name="dungeon_progress", on_delete=fields.CASCADE
     )
     dungeon = fields.ForeignKeyField(

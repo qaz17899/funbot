@@ -5,27 +5,13 @@ Tracks player's progress through quest lines matching Pokeclicker's QuestLine st
 
 from __future__ import annotations
 
-from enum import IntEnum
-
 from tortoise import fields
 
 from funbot.db.models.base import BaseModel
+from funbot.pokemon.constants import QuestLineState
 
-
-class QuestLineState(IntEnum):
-    """Quest line state matching Pokeclicker's QuestLineState.ts.
-
-    Pokeclicker source:
-        enum QuestLineState {
-            inactive = 0,
-            started = 1,
-            ended = 2,
-        }
-    """
-
-    INACTIVE = 0  # Not started
-    STARTED = 1  # In progress
-    ENDED = 2  # Completed
+# Re-export for backward compatibility
+__all__ = ["PlayerQuestProgress", "QuestLineState"]
 
 
 class PlayerQuestProgress(BaseModel):
@@ -39,10 +25,10 @@ class PlayerQuestProgress(BaseModel):
 
     class Meta:
         table = "pokemon_player_quest_progress"
-        unique_together = (("player", "quest_line"),)
+        unique_together = (("user", "quest_line"),)
 
     id = fields.IntField(primary_key=True)
-    player = fields.ForeignKeyField(
+    user = fields.ForeignKeyField(
         "models.User", related_name="quest_progress", on_delete=fields.CASCADE
     )
     quest_line = fields.ForeignKeyField(
