@@ -24,9 +24,6 @@ from funbot.pokemon.services.requirement_service import get_requirement_service
 if TYPE_CHECKING:
     from funbot.db.models.pokemon.route_requirement import RouteRequirement
 
-# Re-export for backward compatibility
-__all__ = ["ROUTE_STATUS_EMOJI", "RouteStatus", "RouteStatusService", "get_route_status_service"]
-
 
 class RouteStatusService:
     """Service for computing route status and progress.

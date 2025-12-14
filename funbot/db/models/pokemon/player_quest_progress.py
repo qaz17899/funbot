@@ -10,9 +10,6 @@ from tortoise import fields
 from funbot.db.models.base import BaseModel
 from funbot.pokemon.constants import QuestLineState
 
-# Re-export for backward compatibility
-__all__ = ["PlayerQuestProgress", "QuestLineState"]
-
 
 class PlayerQuestProgress(BaseModel):
     """Track player's progress through quest lines.

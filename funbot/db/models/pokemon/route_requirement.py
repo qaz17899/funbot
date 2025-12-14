@@ -14,10 +14,7 @@ from __future__ import annotations
 from tortoise import fields
 
 from funbot.db.models.base import BaseModel
-from funbot.pokemon.constants import RequirementType
-
-# Re-export for backward compatibility
-__all__ = ["RequirementType", "RouteRequirement", "SpecialRoutePokemon"]
+from funbot.pokemon.constants import RequirementType  # noqa: F401
 
 
 class RouteRequirement(BaseModel):

@@ -11,9 +11,6 @@ from __future__ import annotations
 from funbot.pokemon.constants.game_constants import BASE_EXP_MODIFIER, EXP_SCALE_FACTOR, MAX_LEVEL
 from funbot.pokemon.schemas import LevelUpResult
 
-# Re-export for backward compatibility
-__all__ = ["ExpService", "LevelUpResult"]
-
 
 class ExpService:
     """Service for experience calculations."""

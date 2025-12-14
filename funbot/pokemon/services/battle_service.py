@@ -17,10 +17,7 @@ from funbot.pokemon.constants.game_constants import (
     ROUTE_MONEY_BASE,
 )
 from funbot.pokemon.constants.type_chart import get_attack_modifier
-from funbot.pokemon.schemas import BattleResult, ExploreResult
-
-# Re-export for backward compatibility during transition
-__all__ = ["BattleResult", "BattleService", "ExploreResult"]
+from funbot.pokemon.schemas import BattleResult, ExploreResult  # noqa: F401
 
 
 class BattleService:

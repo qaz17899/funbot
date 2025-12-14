@@ -13,9 +13,6 @@ from tortoise import fields
 from funbot.db.models.base import BaseModel
 from funbot.pokemon.constants import KeyItemType
 
-# Re-export for backward compatibility
-__all__ = ["KeyItemType", "PlayerKeyItem"]
-
 
 class PlayerKeyItem(BaseModel):
     """Key items owned by a player."""

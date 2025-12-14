@@ -14,9 +14,6 @@ from funbot.pokemon.constants.enums import POKEBALL_BONUS, Pokeball
 from funbot.pokemon.constants.game_constants import BASE_CATCH_RATE, SHINY_CHANCE
 from funbot.pokemon.schemas import CatchAttemptResult
 
-# Re-export for backward compatibility
-__all__ = ["CatchAttemptResult", "CatchService"]
-
 
 class CatchService:
     """Service for catch calculations."""
