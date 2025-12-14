@@ -108,16 +108,13 @@ class PartyPaginatorView(PaginatorView):
 
     def _build_layout(self) -> None:
         """Override to build custom layout with Sections."""
-        self._rebuild_content()
-
-        # Separator before buttons
-        self.add_item(Separator(divider=False, spacing=discord.SeparatorSpacing.small))
-
-        # Navigation buttons
+        # Initialize nav_row first
         from funbot.ui.components_v2.paginator import NavigationRow
 
         self.nav_row = NavigationRow(self)
-        self.add_item(self.nav_row)
+
+        # Build content (including nav at bottom)
+        self._rebuild_content()
 
     def _rebuild_content(self) -> None:
         """Build content container for current page."""
@@ -198,19 +195,20 @@ class PartyPaginatorView(PaginatorView):
         stats = f"-# 📊 總計: {len(self._all_pokemon)} 隻 | 總攻擊力: {self.total_attack:,}"
         self.content_container.add_item(TextDisplay(stats))
 
-        # Add to view (at position 0)
+        # Add navigation buttons at bottom of container
+        self.content_container.add_item(
+            Separator(divider=False, spacing=discord.SeparatorSpacing.small)
+        )
+        self.nav_row.update_states(self._current_page, self.max_page)
+        self.content_container.add_item(self.nav_row)
+
+        # Add to view
         self.clear_items()
         self.add_item(self.content_container)
 
     async def update_page(self, interaction: Interaction) -> None:
         """Override to rebuild content on page change."""
         self._rebuild_content()
-
-        # Re-add navigation
-        self.add_item(Separator(divider=False, spacing=discord.SeparatorSpacing.small))
-        self.nav_row.update_states(self._current_page, self.max_page)
-        self.add_item(self.nav_row)
-
         await self.absolute_edit(interaction, view=self)
 
 
