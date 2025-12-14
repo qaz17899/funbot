@@ -14,6 +14,7 @@ from discord.ext import commands
 
 from funbot.db.models.pokemon import PlayerPokemon, PlayerWallet, PokemonData
 from funbot.db.models.user import User
+from funbot.pokemon.constants import PokerusState
 from funbot.pokemon.constants.game_constants import DEFAULT_STARTER_REGION, STARTERS
 from funbot.pokemon.ui_utils import get_type_emoji
 from funbot.types import Interaction
@@ -93,8 +94,15 @@ class StarterSelect(ui.Select["StarterSelectLayout"]):
         pokemon_id = int(self.values[0])
         pokemon_data = await PokemonData.get(id=pokemon_id)
 
-        # Create the starter Pokemon
-        await PlayerPokemon.create(user=self.user, pokemon_data=pokemon_data, level=5, shiny=False)
+        # Create the starter Pokemon with Pokerus (like Pokeclicker's "A New World" quest)
+        # Starter gets CONTAGIOUS status so they can immediately gain EVs
+        await PlayerPokemon.create(
+            user=self.user,
+            pokemon_data=pokemon_data,
+            level=5,
+            shiny=False,
+            pokerus=PokerusState.CONTAGIOUS,
+        )
 
         # Create wallet for user
         await PlayerWallet.get_or_create(user=self.user)

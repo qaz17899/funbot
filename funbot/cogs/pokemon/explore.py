@@ -31,6 +31,7 @@ from funbot.db.models.pokemon import (
 from funbot.db.models.user import User
 from funbot.pokemon.autocomplete import region_autocomplete, route_autocomplete
 from funbot.pokemon.constants.enums import PokemonType
+from funbot.pokemon.constants.game_constants import BASE_EP_YIELD
 from funbot.pokemon.services.battle_service import BattleService, ExploreResult
 from funbot.pokemon.services.catch_service import CatchService
 from funbot.pokemon.services.exp_service import ExpService
@@ -186,7 +187,13 @@ class ExploreCog(commands.Cog):
         total_money = 0
         total_exp = 0
 
-        owned_ids = {p.pokemon_data.id for p in party}
+        # Track per-species statistics for batch update
+        # Key: pokemon_data_id, Value: {encountered, defeated, captured, shiny variants}
+        species_stats: dict[int, dict[str, int]] = {}
+
+        # Map owned Pokemon for EP gain
+        owned_pokemon_map: dict[int, PlayerPokemon] = {p.pokemon_data.id: p for p in party}  # type: ignore
+        owned_ids = set(owned_pokemon_map.keys())
 
         # Get route parameters
         route_number = route_data.number
@@ -206,6 +213,20 @@ class ExploreCog(commands.Cog):
             wild = random.choice(wild_pokemon)
             is_shiny = CatchService.roll_shiny()
 
+            # Track encounter statistic
+            if wild.id not in species_stats:
+                species_stats[wild.id] = {
+                    "encountered": 0,
+                    "defeated": 0,
+                    "captured": 0,
+                    "shiny_encountered": 0,
+                    "shiny_defeated": 0,
+                    "shiny_captured": 0,
+                }
+            species_stats[wild.id]["encountered"] += 1
+            if is_shiny:
+                species_stats[wild.id]["shiny_encountered"] += 1
+
             # Calculate enemy HP and damage
             enemy_type1 = PokemonType(wild.type1)
             enemy_type2 = PokemonType(wild.type2) if wild.type2 else PokemonType.NONE
@@ -219,6 +240,9 @@ class ExploreCog(commands.Cog):
 
             if can_defeat:
                 pokemon_defeated += 1
+                species_stats[wild.id]["defeated"] += 1
+                if is_shiny:
+                    species_stats[wild.id]["shiny_defeated"] += 1
 
                 # Money and exp
                 money = BattleService.calculate_route_money(route_number, region)
@@ -236,8 +260,15 @@ class ExploreCog(commands.Cog):
 
                 if catch_result.success:
                     caught_pokemon.append((wild.name, wild.id, is_shiny))
+                    species_stats[wild.id]["captured"] += 1
                     if is_shiny:
                         shiny_count += 1
+                        species_stats[wild.id]["shiny_captured"] += 1
+
+                    # Add EP if re-catching existing Pokemon
+                    if not is_new and wild.id in owned_pokemon_map:
+                        existing_pokemon = owned_pokemon_map[wild.id]
+                        existing_pokemon.gain_effort_points(BASE_EP_YIELD, shiny=is_shiny)
 
                     # Collect new Pokemon for bulk create later (avoid DB call in loop)
                     if is_new:
@@ -250,6 +281,34 @@ class ExploreCog(commands.Cog):
         if new_pokemon_to_create:
             await PlayerPokemon.bulk_create(
                 [PlayerPokemon(**data) for data in new_pokemon_to_create], ignore_conflicts=True
+            )
+
+        # Update per-species statistics for owned Pokemon
+        pokemon_to_update_stats: list[PlayerPokemon] = []
+        for pokemon_id, stats in species_stats.items():
+            if pokemon_id in owned_pokemon_map:
+                poke = owned_pokemon_map[pokemon_id]
+                poke.stat_encountered += stats["encountered"]
+                poke.stat_defeated += stats["defeated"]
+                poke.stat_captured += stats["captured"]
+                poke.stat_shiny_encountered += stats["shiny_encountered"]
+                poke.stat_shiny_defeated += stats["shiny_defeated"]
+                poke.stat_shiny_captured += stats["shiny_captured"]
+                pokemon_to_update_stats.append(poke)
+
+        if pokemon_to_update_stats:
+            await PlayerPokemon.bulk_update(
+                pokemon_to_update_stats,
+                fields=[
+                    "effort_points",
+                    "pokerus",  # EP and Pokerus from gain_effort_points()
+                    "stat_encountered",
+                    "stat_defeated",
+                    "stat_captured",
+                    "stat_shiny_encountered",
+                    "stat_shiny_defeated",
+                    "stat_shiny_captured",
+                ],
             )
 
         # Update wallet
