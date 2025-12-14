@@ -13,6 +13,7 @@ from funbot.db.models.pokemon.player_ball_inventory import PlayerBallInventory
 from funbot.db.models.pokemon.player_wallet import PlayerWallet
 from funbot.pokemon.constants.enums import Currency, Pokeball
 from funbot.pokemon.constants.game_constants import POKEBALL_PRICES
+from funbot.pokemon.ui_utils import get_currency_emoji
 
 if TYPE_CHECKING:
     from funbot.db.models.user import User
@@ -120,10 +121,17 @@ class ShopService:
 
         if not can_afford:
             _price, currency_type = ShopService.get_ball_price(ball_type)
-            currency_name = Currency(currency_type).name.replace("_", " ").title()
+            # Get currency emoji based on type
+            currency_emoji_map = {
+                Currency.POKEDOLLAR: get_currency_emoji("money"),
+                Currency.QUEST_POINT: get_currency_emoji("questPoint"),
+                Currency.DUNGEON_TOKEN: get_currency_emoji("dungeonToken"),
+                Currency.BATTLE_POINT: get_currency_emoji("battlePoint"),
+            }
+            currency_emoji = currency_emoji_map.get(Currency(currency_type), "💰")
             return PurchaseResult(
                 success=False,
-                message=f"資金不足！需要 {total_cost:,} {currency_name}，你只有 {balance:,}",
+                message=f"資金不足！需要 {currency_emoji} {total_cost:,}，你只有 {currency_emoji} {balance:,}",
             )
 
         # Deduct currency
