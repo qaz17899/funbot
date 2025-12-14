@@ -124,3 +124,29 @@ REPEATBALL_EP_MODIFIER: int = 5  # Repeat Ball = 5x EP
 DUNGEON_EP_MODIFIER: int = 3  # Dungeon multiplier
 DUNGEON_BOSS_EP_MODIFIER: int = 10  # Dungeon boss multiplier
 ROAMER_EP_MODIFIER: int = 50  # Roaming multiplier
+
+# =============================================================================
+# Hatchery/Breeding Constants - Pokeclicker exact values
+# =============================================================================
+
+# Egg step calculation (from Breeding.ts:463-468)
+# Steps = eggCycles * EGG_CYCLE_MULTIPLIER
+EGG_CYCLE_MULTIPLIER: int = 40
+
+# Max hatchery slots (start with 1, can buy up to 4)
+MAX_EGG_SLOTS: int = 4
+DEFAULT_EGG_SLOTS: int = 1
+
+# Attack bonus from hatching (from Egg.hatch() lines 134-136)
+# Each hatch: attackBonusPercent += BREEDING_ATTACK_BONUS + calcium
+BREEDING_ATTACK_BONUS: int = 25  # Base % attack increase per hatch
+BREEDING_SHINY_ATTACK_MULTIPLIER: int = 2  # Shiny hatch = 2x bonus
+
+# Steps per battle (from Breeding.ts:208-210)
+# progressEggsBattle: sqrt(route) steps per defeat
+# Simplified for Discord: use fixed amounts
+HATCHERY_STEPS_PER_BATTLE: int = 5  # Base steps per battle
+
+# Egg slot cost (Quest Points) - from Breeding.ts:484-486
+# Cost = 500 * slot_number
+EGG_SLOT_BASE_COST: int = 500

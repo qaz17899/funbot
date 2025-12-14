@@ -129,6 +129,19 @@ class PlayerPokemon(BaseModel):
     stat_shiny_hatched = fields.IntField(default=0, description="Shiny hatches")
 
     # =========================================================================
+    # Pokeclicker: Breeding System
+    # =========================================================================
+
+    # Whether this Pokemon is currently in the hatchery
+    breeding = fields.BooleanField(default=False, description="In hatchery")
+
+    # Attack bonuses from hatching (from Egg.hatch() lines 134-136)
+    # attackBonusPercent += BREEDING_ATTACK_BONUS + calcium
+    # attackBonusAmount += protein
+    attack_bonus_percent = fields.IntField(default=0, description="% attack bonus from breeding")
+    attack_bonus_amount = fields.IntField(default=0, description="Flat attack bonus from breeding")
+
+    # =========================================================================
     # Timestamps
     # =========================================================================
 

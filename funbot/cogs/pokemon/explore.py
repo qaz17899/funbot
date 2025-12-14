@@ -35,6 +35,7 @@ from funbot.pokemon.constants.game_constants import BASE_EP_YIELD
 from funbot.pokemon.services.battle_service import BattleService, ExploreResult
 from funbot.pokemon.services.catch_service import CatchService
 from funbot.pokemon.services.exp_service import ExpService
+from funbot.pokemon.services.hatchery_service import HatcheryService
 from funbot.pokemon.services.route_service import get_route_status_service
 from funbot.types import Interaction
 from funbot.ui.components_v2 import Container, LayoutView, TextDisplay
@@ -333,6 +334,12 @@ class ExploreCog(commands.Cog):
             progress, _ = await PlayerRouteProgress.get_or_create(user_id=user.id, route=route_data)
             progress.kills += pokemon_defeated
             await progress.save()
+
+            # Progress hatchery eggs (steps = sqrt(route) per defeat)
+            hatchery_steps = (
+                HatcheryService.calculate_steps_from_route(route_number) * pokemon_defeated
+            )
+            await HatcheryService.progress_eggs(user, hatchery_steps)
 
         return ExploreResult(
             route=route_number,
