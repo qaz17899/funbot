@@ -138,24 +138,35 @@ class PartyPaginatorView(PaginatorView):
         for poke in page_pokemon:
             data: PokemonData = poke.pokemon_data  # type: ignore
 
-            # Calculate attack
-            attack = ExpService.calculate_attack_from_level(data.base_attack, poke.level)
+            # Calculate attack with EV bonus
+            base_attack = ExpService.calculate_attack_from_level(data.base_attack, poke.level)
+            ev_multiplier = poke.ev_bonus  # 1.0 + (evs / 1000)
+            total_attack = int(base_attack * ev_multiplier) + poke.vitamin_bonus
 
             # Format text
             shiny_mark = "✨" if poke.shiny else ""
+            pokerus_mark = "🦠" if poke.has_pokerus else ""
+            gender_mark = poke.gender_symbol
             name = poke.nickname or data.name
             type_emoji = get_type_emoji(data.type1)
             type2_emoji = get_type_emoji(data.type2) if data.type2 else ""
 
-            # Line 1: Name, Level, Attack
-            line1 = f"**{shiny_mark}{name}** Lv.{poke.level} | ATK: {attack:,}"
-            # Line 2: Type(s)
-            line2 = f"-# {type_emoji}{type2_emoji}"
+            # Line 1: Name with marks, Level, Attack
+            line1 = f"**{shiny_mark}{name}** {gender_mark}{pokerus_mark} Lv.{poke.level} | ATK: {total_attack:,}"
+
+            # Line 2: Types and EV info (if any EVs)
+            ev_info = f" | EVs: {poke.evs:.1f} (×{ev_multiplier:.2f})" if poke.evs > 0 else ""
+            line2 = f"-# {type_emoji}{type2_emoji}{ev_info}"
 
             # Create section with thumbnail if sprite available
-            if data.sprite_url:
+            sprite_url = (
+                data.sprite_shiny_url
+                if (poke.shiny and not poke.hide_shiny_sprite)
+                else data.sprite_url
+            )
+            if sprite_url:
                 section = Section(
-                    TextDisplay(line1), TextDisplay(line2), accessory=Thumbnail(data.sprite_url)
+                    TextDisplay(line1), TextDisplay(line2), accessory=Thumbnail(sprite_url)
                 )
                 self.content_container.add_item(section)
             else:

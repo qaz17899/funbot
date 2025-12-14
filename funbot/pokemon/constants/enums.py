@@ -1,8 +1,15 @@
-"""Pokemon system enums."""
+"""Pokemon system enums.
+
+Centralized location for all Pokemon-related enumerations.
+"""
 
 from __future__ import annotations
 
 from enum import IntEnum, auto
+
+# =============================================================================
+# Pokemon Types and Regions
+# =============================================================================
 
 
 class PokemonType(IntEnum):
@@ -44,6 +51,11 @@ class Region(IntEnum):
     PALDEA = 8  # Gen 9
 
 
+# =============================================================================
+# Items and Currency
+# =============================================================================
+
+
 class Currency(IntEnum):
     """Pokemon currency types."""
 
@@ -71,3 +83,24 @@ POKEBALL_BONUS: dict[Pokeball, float] = {
     Pokeball.ULTRABALL: 10.0,
     Pokeball.MASTERBALL: 100.0,  # Always catch
 }
+
+
+# =============================================================================
+# Pokemon Attributes
+# =============================================================================
+
+
+class Gender(IntEnum):
+    """Pokemon gender."""
+
+    GENDERLESS = 0
+    MALE = 1
+    FEMALE = 2
+
+
+class PokerusState(IntEnum):
+    """Pokerus infection state."""
+
+    NONE = 0  # Never infected
+    INFECTED = 1  # Currently infected (spreads, doubles EV gain)
+    CURED = 2  # Was infected, now cured (permanent EVs boost remains)

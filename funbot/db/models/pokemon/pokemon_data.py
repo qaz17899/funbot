@@ -7,10 +7,11 @@ Data is read-only after initial import.
 from __future__ import annotations
 
 from tortoise import fields
-from tortoise.models import Model
+
+from funbot.db.models.base import BaseModel
 
 
-class PokemonData(Model):
+class PokemonData(BaseModel):
     """Static Pokemon data imported from PokeAPI.
 
     Contains base stats and info for all 1025+ Pokemon.
@@ -43,6 +44,13 @@ class PokemonData(Model):
     base_exp = fields.SmallIntField(description="Base experience yield")
     egg_cycles = fields.SmallIntField(default=20, description="Egg hatch cycles")
 
+    # Gender info (Pokeclicker feature)
+    # -1 = genderless, 0-8 = female ratio (0=always male, 8=always female)
+    # e.g., 4 = 50% male/50% female
+    gender_ratio = fields.SmallIntField(
+        default=4, description="Gender ratio: -1=genderless, 0-8 female proportion (4=50%)"
+    )
+
     # Visual
     sprite_url = fields.CharField(max_length=200, null=True, description="Sprite image URL")
     sprite_shiny_url = fields.CharField(max_length=200, null=True, description="Shiny sprite URL")
@@ -71,3 +79,22 @@ class PokemonData(Model):
             + self.base_sp_defense
             + self.base_speed
         )
+
+    @property
+    def male_ratio(self) -> float:
+        """Get male percentage (0.0-1.0). Returns 0 for genderless."""
+        if self.gender_ratio < 0:
+            return 0.0
+        return 1.0 - (self.gender_ratio / 8.0)
+
+    @property
+    def female_ratio(self) -> float:
+        """Get female percentage (0.0-1.0). Returns 0 for genderless."""
+        if self.gender_ratio < 0:
+            return 0.0
+        return self.gender_ratio / 8.0
+
+    @property
+    def is_genderless(self) -> bool:
+        """Check if Pokemon is genderless."""
+        return self.gender_ratio < 0
