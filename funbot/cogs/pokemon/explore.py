@@ -335,9 +335,11 @@ class ExploreCog(commands.Cog):
             progress.kills += pokemon_defeated
             await progress.save()
 
-            # Progress hatchery eggs (steps = sqrt(route) per defeat)
+            # Progress hatchery eggs (steps = sqrt(normalized_route) per defeat)
+            # normalized_route = order_number, not route number (per Pokeclicker Routes.normalizedNumber)
             hatchery_steps = (
-                HatcheryService.calculate_steps_from_route(route_number) * pokemon_defeated
+                HatcheryService.calculate_steps_from_route(route_data.order_number)
+                * pokemon_defeated
             )
             await HatcheryService.progress_eggs(user, hatchery_steps)
 

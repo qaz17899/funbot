@@ -271,9 +271,17 @@ class HatcheryService:
         return results
 
     @staticmethod
-    def calculate_steps_from_route(route: int) -> int:
+    def calculate_steps_from_route(normalized_route: float) -> int:
         """Calculate steps from route battle.
 
-        From Breeding.progressEggsBattle(): sqrt(route)
+        From Breeding.progressEggsBattle() + Routes.normalizedNumber():
+        - normalizedRoute = route's order index (1, 2, 3...) not route number
+        - steps = sqrt(normalizedRoute)
+
+        Args:
+            normalized_route: RouteData.order_number (e.g., 1.0, 2.0, 3.5)
+
+        Returns:
+            Steps per battle on this route
         """
-        return max(1, int(math.sqrt(route)))
+        return max(1, int(math.sqrt(normalized_route)))
