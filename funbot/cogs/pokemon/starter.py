@@ -94,14 +94,18 @@ class StarterSelect(ui.Select["StarterSelectLayout"]):
         pokemon_id = int(self.values[0])
         pokemon_data = await PokemonData.get(id=pokemon_id)
 
-        # Create the starter Pokemon with Pokerus (like Pokeclicker's "A New World" quest)
-        # Starter gets CONTAGIOUS status so they can immediately gain EVs
+        # TODO: Correct Pokerus trigger per Pokeclicker (KeyItems.ts:57-79)
+        # - Original trigger: After clearing "Distortion World" dungeon (Sinnoh "A New World" quest)
+        # - Original target: Kanto starter OR lowest ID Pokemon (fallback)
+        # - Should also unlock "Contagious" Pokeball filter option
+        # Current simplification: Starter gets CONTAGIOUS immediately since we lack dungeon system
+        # Migrate when dungeon/quest system is implemented
         await PlayerPokemon.create(
             user=self.user,
             pokemon_data=pokemon_data,
             level=5,
             shiny=False,
-            pokerus=PokerusState.CONTAGIOUS,
+            pokerus=PokerusState.CONTAGIOUS,  # TEMPORARY: Should be UNINFECTED until quest
         )
 
         # Create wallet for user
