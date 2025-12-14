@@ -232,14 +232,21 @@ class HatcheryService:
         # Roll for shiny
         shiny = random.randint(1, egg.shiny_chance) == 1
 
-        # Calculate bonuses with vitamins (from PartyPokemon.ts:426-428)
-        # attackBonusPercent += (BREEDING_ATTACK_BONUS + calcium)
-        # attackBonusAmount += protein
+        # Calculate bonuses with vitamins (EXACT match: Egg.ts:134-136)
+        # partyPokemon.attackBonusPercent += Math.max(1, Math.round(
+        #     (BREEDING_ATTACK_BONUS + calcium) * (efficiency/100)) * shinyMultiplier);
+        # partyPokemon.attackBonusAmount += Math.max(0, Math.round(
+        #     protein * (efficiency/100)) * shinyMultiplier);
         shiny_mult = BREEDING_SHINY_ATTACK_MULTIPLIER if shiny else 1
+        efficiency = 100  # TODO: Support hatchery helpers with efficiency < 100
         calcium_bonus = party_pokemon.vitamin_calcium
         protein_bonus = party_pokemon.vitamin_protein
-        bonus_percent = (BREEDING_ATTACK_BONUS + calcium_bonus) * shiny_mult
-        bonus_amount = protein_bonus * shiny_mult
+
+        # max(1, ...) ensures at least 1% per hatch, round() for exact match
+        bonus_percent = (
+            max(1, round((BREEDING_ATTACK_BONUS + calcium_bonus) * (efficiency / 100))) * shiny_mult
+        )
+        bonus_amount = max(0, round(protein_bonus * (efficiency / 100))) * shiny_mult
 
         # Apply bonuses
         party_pokemon.attack_bonus_percent += bonus_percent
