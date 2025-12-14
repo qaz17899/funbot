@@ -6,6 +6,8 @@ Matches Pokeclicker's Poké Mart system.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import discord
 from discord import app_commands, ui
 from discord.ext import commands
@@ -17,8 +19,11 @@ from funbot.pokemon.constants.enums import Currency, Pokeball
 from funbot.pokemon.constants.game_constants import POKEBALL_PRICES
 from funbot.pokemon.services.shop_service import ShopService
 from funbot.pokemon.ui_utils import Emoji, get_currency_emoji
-from funbot.types import FunBot, Interaction
+from funbot.types import Interaction
 from funbot.ui.components_v2 import Container, Separator, TextDisplay
+
+if TYPE_CHECKING:
+    from funbot.bot import FunBot
 
 
 class BuyBallModal(ui.Modal, title="購買寶貝球"):
