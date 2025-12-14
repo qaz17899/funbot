@@ -16,6 +16,7 @@ from funbot.db.models.pokemon import (
     # Player progress
     PlayerBattleProgress,
     PlayerDungeonProgress,
+    PlayerEgg,
     PlayerKeyItem,
     PlayerPokeballSettings,
     PlayerPokemon,
@@ -52,6 +53,7 @@ __all__ = (
     "PlayerBadge",
     "PlayerBattleProgress",
     "PlayerDungeonProgress",
+    "PlayerEgg",
     "PlayerKeyItem",
     # Pokemon models
     "PlayerPokeballSettings",
