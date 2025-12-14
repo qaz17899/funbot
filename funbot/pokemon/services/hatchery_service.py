@@ -16,7 +16,6 @@ from funbot.pokemon.constants import PokerusState
 from funbot.pokemon.constants.game_constants import (
     BREEDING_ATTACK_BONUS,
     BREEDING_SHINY_ATTACK_MULTIPLIER,
-    DEFAULT_EGG_SLOTS,
     EGG_CYCLE_MULTIPLIER,
     MAX_EGG_SLOTS,
     SHINY_CHANCE_BREEDING,
@@ -49,12 +48,13 @@ class HatcheryService:
 
     @staticmethod
     async def get_egg_slots(user: User) -> int:
-        """Get number of egg slots for user.
+        """Get number of egg slots for user."""
+        return user.hatchery_egg_slots
 
-        TODO: Track in user preferences/progress model.
-        For now, return default.
-        """
-        return DEFAULT_EGG_SLOTS
+    @staticmethod
+    async def get_queue_slots(user: User) -> int:
+        """Get number of queue slots for user."""
+        return user.hatchery_queue_slots
 
     @staticmethod
     async def get_eggs(user: User) -> list[PlayerEgg]:

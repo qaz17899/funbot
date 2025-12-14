@@ -10,6 +10,7 @@ from funbot.db.models.pokemon.dungeon_data import (
     PlayerDungeonProgress,
 )
 from funbot.db.models.pokemon.gym_data import GymData, GymPokemon, PlayerBadge
+from funbot.db.models.pokemon.hatchery_queue import HatcheryQueue
 from funbot.db.models.pokemon.key_item import KeyItemType, PlayerKeyItem
 from funbot.db.models.pokemon.player_egg import PlayerEgg
 from funbot.db.models.pokemon.player_pokeball_settings import PlayerPokeballSettings
@@ -41,6 +42,7 @@ __all__ = [
     "GymData",
     "GymPokemon",
     # Core
+    "HatcheryQueue",
     "KeyItemType",
     "PlayerBadge",
     "PlayerBattleProgress",
