@@ -33,6 +33,13 @@ class PlayerPokemon(BaseModel):
     EV Bonus Formula:
     - EVs < 50: bonus = 1 + 0.01 * evs (linear)
     - EVs >= 50: bonus = evs^(log(1.5)/log(50)) (diminishing returns)
+
+    TODO: Pokerus Spreading (requires Hatchery system)
+    - Per PartyPokemon.ts:160-192:
+    - Spreads only in Hatchery between manually-bred eggs
+    - Contagious/Resistant Pokemon can spread to same-type Pokemon
+    - INFECTED->CONTAGIOUS upgrade happens when egg hatches
+    - Current simplification: Starter gets CONTAGIOUS immediately
     """
 
     class Meta:

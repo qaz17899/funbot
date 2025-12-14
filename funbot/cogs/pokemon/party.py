@@ -140,7 +140,7 @@ class PartyPaginatorView(PaginatorView):
 
             # Calculate attack with EV bonus
             base_attack = ExpService.calculate_attack_from_level(data.base_attack, poke.level)
-            ev_multiplier = poke.ev_bonus  # 1.0 + (evs / 1000)
+            ev_multiplier = poke.ev_bonus  # Pokeclicker formula
             total_attack = int(base_attack * ev_multiplier) + poke.vitamin_bonus
 
             # Format text
@@ -154,9 +154,20 @@ class PartyPaginatorView(PaginatorView):
             # Line 1: Name with marks, Level, Attack
             line1 = f"**{shiny_mark}{name}** {gender_mark}{pokerus_mark} Lv.{poke.level} | ATK: {total_attack:,}"
 
-            # Line 2: Types and EV info (if any EVs)
-            ev_info = f" | EVs: {poke.evs:.1f} (×{ev_multiplier:.2f})" if poke.evs > 0 else ""
+            # Line 2: Types and EV info
+            ev_info = f" | EVs: {poke.evs:.1f}" if poke.evs > 0 else ""
             line2 = f"-# {type_emoji}{type2_emoji}{ev_info}"
+
+            # Line 3: Statistics (if any captures)
+            stats_parts = []
+            if poke.stat_captured > 0:
+                stats_parts.append(f"捕捉: {poke.stat_captured}")
+            if poke.stat_defeated > 0:
+                stats_parts.append(f"擊敗: {poke.stat_defeated}")
+            if poke.caught_at:
+                caught_str = poke.caught_at.strftime("%Y/%m/%d")
+                stats_parts.append(f"首捕: {caught_str}")
+            line3 = f"-# 📊 {' | '.join(stats_parts)}" if stats_parts else ""
 
             # Create section with thumbnail if sprite available
             sprite_url = (
@@ -165,14 +176,17 @@ class PartyPaginatorView(PaginatorView):
                 else data.sprite_url
             )
             if sprite_url:
-                section = Section(
-                    TextDisplay(line1), TextDisplay(line2), accessory=Thumbnail(sprite_url)
-                )
+                items = [TextDisplay(line1), TextDisplay(line2)]
+                if line3:
+                    items.append(TextDisplay(line3))
+                section = Section(*items, accessory=Thumbnail(sprite_url))
                 self.content_container.add_item(section)
             else:
                 # No sprite - just text
                 self.content_container.add_item(TextDisplay(line1))
                 self.content_container.add_item(TextDisplay(line2))
+                if line3:
+                    self.content_container.add_item(TextDisplay(line3))
 
         # Footer with stats (on last page or all pages)
         self.content_container.add_item(Separator(spacing=discord.SeparatorSpacing.large))
