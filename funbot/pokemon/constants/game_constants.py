@@ -180,3 +180,10 @@ POKEBALL_CATCH_BONUS: dict[int, int] = {
 
 # Starter Pokéballs (from Pokeballs.ts constructor, quantity = 25)
 STARTER_POKEBALL_COUNT: int = 25
+
+# =============================================================================
+# Gym Constants
+# =============================================================================
+
+# Time limit for gym battles in seconds
+GYM_TIME_LIMIT: int = 30

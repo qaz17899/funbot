@@ -14,10 +14,8 @@ from datetime import UTC, datetime
 from enum import Enum
 
 from funbot.db.models.pokemon.gym_data import GymData, GymPokemon, PlayerBadge
+from funbot.pokemon.constants.game_constants import GYM_TIME_LIMIT
 from funbot.pokemon.services.battle_service import BattleService
-
-# Constants
-GYM_TIME_LIMIT = 30  # seconds
 
 
 class GymBattleStatus(Enum):

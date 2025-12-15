@@ -11,7 +11,12 @@ import discord
 from discord import ui
 
 from funbot.pokemon.constants.enums import Pokeball
-from funbot.pokemon.ui_utils import POKEBALL_EMOJI_IDS, Emoji, get_ball_emoji, get_pokeball_name
+from funbot.pokemon.ui_utils import (
+    Emoji,
+    get_ball_emoji,
+    get_ball_partial_emoji,
+    get_pokeball_name,
+)
 
 if TYPE_CHECKING:
     from funbot.db.models.pokemon import PlayerPokeballSettings
@@ -38,39 +43,31 @@ class PokeballSelect(ui.Select["PokeballSettingsLayout"]):
             discord.SelectOption(
                 label="不捕捉",
                 value=str(Pokeball.NONE),
-                emoji=discord.PartialEmoji(name="None", id=POKEBALL_EMOJI_IDS["None"]),
+                emoji=get_ball_partial_emoji(Pokeball.NONE),
                 default=current_value == Pokeball.NONE,
             ),
             discord.SelectOption(
                 label="Poké Ball",
                 value=str(Pokeball.POKEBALL),
-                emoji=discord.PartialEmoji(
-                    name="Pokeball", id=POKEBALL_EMOJI_IDS["Pokeball"]
-                ),
+                emoji=get_ball_partial_emoji(Pokeball.POKEBALL),
                 default=current_value == Pokeball.POKEBALL,
             ),
             discord.SelectOption(
                 label="Great Ball",
                 value=str(Pokeball.GREATBALL),
-                emoji=discord.PartialEmoji(
-                    name="Greatball", id=POKEBALL_EMOJI_IDS["Greatball"]
-                ),
+                emoji=get_ball_partial_emoji(Pokeball.GREATBALL),
                 default=current_value == Pokeball.GREATBALL,
             ),
             discord.SelectOption(
                 label="Ultra Ball",
                 value=str(Pokeball.ULTRABALL),
-                emoji=discord.PartialEmoji(
-                    name="Ultraball", id=POKEBALL_EMOJI_IDS["Ultraball"]
-                ),
+                emoji=get_ball_partial_emoji(Pokeball.ULTRABALL),
                 default=current_value == Pokeball.ULTRABALL,
             ),
             discord.SelectOption(
                 label="Master Ball",
                 value=str(Pokeball.MASTERBALL),
-                emoji=discord.PartialEmoji(
-                    name="Masterball", id=POKEBALL_EMOJI_IDS["Masterball"]
-                ),
+                emoji=get_ball_partial_emoji(Pokeball.MASTERBALL),
                 default=current_value == Pokeball.MASTERBALL,
             ),
         ]

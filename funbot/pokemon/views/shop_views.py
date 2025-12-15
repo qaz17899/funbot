@@ -16,7 +16,6 @@ import discord
 from discord import ui
 
 from funbot.pokemon.constants.enums import Currency, Pokeball
-from funbot.pokemon.constants.game_constants import POKEBALL_CATCH_BONUS, POKEBALL_PRICES
 from funbot.pokemon.services.shop_service import ShopService
 from funbot.pokemon.ui_utils import Emoji, get_ball_emoji, get_currency_emoji, get_pokeball_name
 from funbot.ui.components_v2 import Button, Container, LayoutView, Section, Separator, TextDisplay
@@ -165,8 +164,8 @@ class ShopView(LayoutView):
             ball_emoji = get_ball_emoji(ball_type)
             name = get_pokeball_name(ball_type)
             qty = self.inventory.get_quantity(ball_type)
-            price, currency_type = POKEBALL_PRICES.get(ball_type, (0, 0))
-            catch_bonus = POKEBALL_CATCH_BONUS.get(ball_type, 0)
+            price, currency_type = ShopService.get_ball_price(ball_type)
+            catch_bonus = ShopService.get_ball_catch_bonus(ball_type)
 
             # Currency display
             if currency_type == Currency.POKEDOLLAR:

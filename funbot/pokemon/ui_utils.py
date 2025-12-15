@@ -13,6 +13,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from urllib.parse import quote
 
+import discord
+
 from funbot.pokemon.constants.enums import Currency, LootTier, Pokeball, Region
 from funbot.pokemon.constants.game_constants import ROUTE_KILLS_NEEDED
 
@@ -45,6 +47,7 @@ __all__ = (
     "get_badge_emoji",
     "get_badge_image_url",
     "get_ball_emoji",
+    "get_ball_partial_emoji",
     "get_currency_emoji",
     "get_gem_emoji",
     "get_leader_image_url",
@@ -302,6 +305,23 @@ def get_ball_emoji(ball: int | Pokeball) -> str:
     name = BALL_ENUM_TO_NAME.get(ball_val, "Pokeball")
     emoji_id = POKEBALL_EMOJI_IDS.get(name, POKEBALL_EMOJI_IDS["Pokeball"])
     return f"<:{name}:{emoji_id}>"
+
+
+def get_ball_partial_emoji(ball: int | Pokeball) -> discord.PartialEmoji:
+    """Get Discord PartialEmoji for Pokeball type.
+
+    Encapsulates emoji ID lookup - View layer doesn't need to know about IDs.
+
+    Args:
+        ball: Pokeball enum or integer value
+
+    Returns:
+        discord.PartialEmoji object for use in SelectOption, etc.
+    """
+    ball_val = int(ball)
+    name = BALL_ENUM_TO_NAME.get(ball_val, "Pokeball")
+    emoji_id = POKEBALL_EMOJI_IDS.get(name, POKEBALL_EMOJI_IDS["Pokeball"])
+    return discord.PartialEmoji(name=name, id=emoji_id)
 
 
 # Discord custom emoji IDs for currencies

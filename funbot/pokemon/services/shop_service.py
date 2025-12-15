@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from funbot.db.models.pokemon.player_ball_inventory import PlayerBallInventory
 from funbot.db.models.pokemon.player_wallet import PlayerWallet
 from funbot.pokemon.constants.enums import Currency
-from funbot.pokemon.constants.game_constants import POKEBALL_PRICES
+from funbot.pokemon.constants.game_constants import POKEBALL_CATCH_BONUS, POKEBALL_PRICES
 
 
 @dataclass
@@ -52,6 +52,18 @@ class ShopService:
             (price, currency_type) tuple
         """
         return POKEBALL_PRICES.get(ball_type, (0, 0))
+
+    @staticmethod
+    def get_ball_catch_bonus(ball_type: int) -> int:
+        """Get catch bonus percentage for a ball type.
+
+        Args:
+            ball_type: Pokeball enum value
+
+        Returns:
+            Bonus percentage (e.g., 5 for 5%)
+        """
+        return POKEBALL_CATCH_BONUS.get(ball_type, 0)
 
     @staticmethod
     async def can_afford(
