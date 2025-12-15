@@ -114,28 +114,44 @@ class GymBattleView(LayoutView):
         # Time bar
         time_bar = self._build_time_bar(self.state.time_remaining)
         container.add_item(
-            TextDisplay(f"🕐 **剩餘時間**: {self.state.time_remaining:.1f}s\n`{time_bar}`")
+            TextDisplay(
+                f"🕐 **剩餘時間**: {self.state.time_remaining:.1f}s\n`{time_bar}`"
+            )
         )
 
         container.add_item(discord.ui.Separator(spacing=discord.SeparatorSpacing.small))
 
-        # Current opponent
+        # Current opponent with sprite
         current = self.state.current_pokemon
         if current:
             hp_bar = self._build_health_bar(current.current_hp, current.max_hp)
-            container.add_item(
-                TextDisplay(f"### 🎯 對手: {current.name} Lv.{current.level}\nHP: `{hp_bar}`")
+            opponent_text = (
+                f"### 🎯 對手: {current.name} Lv.{current.level}\nHP: `{hp_bar}`"
             )
+
+            # Use Section with Thumbnail if sprite available
+            if current.sprite_url:
+                container.add_item(
+                    Section(
+                        TextDisplay(opponent_text),
+                        accessory=Thumbnail(current.sprite_url),
+                    )
+                )
+            else:
+                container.add_item(TextDisplay(opponent_text))
         else:
             container.add_item(TextDisplay("### ✅ 所有寶可夢已擊敗！"))
 
         container.add_item(discord.ui.Separator(spacing=discord.SeparatorSpacing.small))
 
-        # Battle stats
+        # Battle stats - show actual damage per tick (with multiplier)
+        from funbot.pokemon.services.gym_service import GYM_DAMAGE_MULTIPLIER
+
+        actual_damage_per_tick = self.state.player_attack * GYM_DAMAGE_MULTIPLIER
         progress = f"{self.state.defeated_count}/{self.state.total_pokemon}"
         container.add_item(
             TextDisplay(
-                f"⚔️ **你的攻擊力**: {self.state.player_attack:,}/tick\n"
+                f"⚔️ **每秒傷害**: {actual_damage_per_tick:,}\n"
                 f"📊 **進度**: {progress} 寶可夢"
             )
         )
@@ -165,7 +181,9 @@ class GymBattleView(LayoutView):
         # Defeat message
         if self.gym.defeat_message:
             container.add_item(TextDisplay(f'-# *"{self.gym.defeat_message}"*'))
-            container.add_item(discord.ui.Separator(spacing=discord.SeparatorSpacing.small))
+            container.add_item(
+                discord.ui.Separator(spacing=discord.SeparatorSpacing.small)
+            )
 
         # Rewards
         if self.result:
@@ -177,7 +195,7 @@ class GymBattleView(LayoutView):
 
             rewards.extend(
                 (
-                    f"{money_emoji} **獎金**: ${self.result.money_earned:,}",
+                    f"**獎金**: {self.result.money_earned:,} {money_emoji}",
                     f"⏱️ **用時**: {self.result.time_used:.1f}秒",
                 )
             )
@@ -284,7 +302,9 @@ class GymBattleView(LayoutView):
 class GymListView(LayoutView):
     """View for displaying available gyms."""
 
-    def __init__(self, gyms: list[GymData], player_badges: list[str], region_name: str) -> None:
+    def __init__(
+        self, gyms: list[GymData], player_badges: list[str], region_name: str
+    ) -> None:
         super().__init__(timeout=60)
 
         container = Container(accent_color=discord.Color.blue())

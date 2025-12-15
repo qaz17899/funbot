@@ -253,7 +253,6 @@ class HatcheryService:
         #     protein * (efficiency/100)) * shinyMultiplier);
         shiny_mult = BREEDING_SHINY_ATTACK_MULTIPLIER if shiny else 1
         efficiency = 100  # TODO: Support hatchery helpers with efficiency < 100
-                          # Issue URL: https://github.com/qaz17899/funbot/issues/27
         calcium_bonus = party_pokemon.vitamin_calcium
         protein_bonus = party_pokemon.vitamin_protein
 

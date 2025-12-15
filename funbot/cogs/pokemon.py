@@ -74,7 +74,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
     # ═══════════════════════════════════════════════════════════════════════
 
     pokemon = app_commands.Group(name="pokemon", description="寶可夢指令")
-    hatchery = app_commands.Group(name="hatchery", parent=pokemon, description="孵化場指令")
+    hatchery = app_commands.Group(
+        name="hatchery", parent=pokemon, description="孵化場指令"
+    )
 
     # ═══════════════════════════════════════════════════════════════════════
     # /pokemon start
@@ -103,7 +105,8 @@ class PokemonCog(commands.Cog, name="Pokemon"):
 
         if not starters:
             await interaction.followup.send(
-                f"{Emoji.CROSS} 寶可夢資料尚未匯入，請先執行資料匯入腳本。", ephemeral=True
+                f"{Emoji.CROSS} 寶可夢資料尚未匯入，請先執行資料匯入腳本。",
+                ephemeral=True,
             )
             return
 
@@ -133,7 +136,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             return
 
         # Get all Pokemon
-        pokemon_list = await PlayerPokemon.filter(user=user).prefetch_related("pokemon_data")
+        pokemon_list = await PlayerPokemon.filter(user=user).prefetch_related(
+            "pokemon_data"
+        )
 
         if not pokemon_list:
             await interaction.followup.send(
@@ -146,7 +151,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         sorted_pokemon = sorted(pokemon_list, key=lambda p: p.pokemon_data.id)
 
         # Calculate total attack (includes EVs, breeding bonuses, etc.)
-        total_attack = sum(p.calculate_attack(p.pokemon_data.base_attack) for p in sorted_pokemon)
+        total_attack = sum(
+            p.calculate_attack(p.pokemon_data.base_attack) for p in sorted_pokemon
+        )
 
         # Build the paginator view
         view = PartyPaginatorView(
@@ -216,7 +223,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
     # ═══════════════════════════════════════════════════════════════════════
 
     @pokemon.command(name="explore", description="探索路線並捕捉野生寶可夢")
-    @app_commands.describe(region="地區編號 (0=關都)", route="路線編號", count="探索次數 (1-100)")
+    @app_commands.describe(
+        region="地區編號 (0=關都)", route="路線編號", count="探索次數 (1-100)"
+    )
     @app_commands.autocomplete(region=region_autocomplete, route=route_autocomplete)
     async def explore(
         self, interaction: Interaction, region: int = 0, route: int = 0, count: int = 1
@@ -257,13 +266,17 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         # Get player's party
         party = await PlayerPokemon.filter(user=user).prefetch_related("pokemon_data")
         if not party:
-            await interaction.followup.send(f"{Emoji.CROSS} 你沒有任何寶可夢！", ephemeral=True)
+            await interaction.followup.send(
+                f"{Emoji.CROSS} 你沒有任何寶可夢！", ephemeral=True
+            )
             return
 
         # Get route Pokemon
         wild_pokemon = await self._get_route_pokemon(route_data)
         if not wild_pokemon:
-            await interaction.followup.send(f"{Emoji.CROSS} 此路線沒有野生寶可夢。", ephemeral=True)
+            await interaction.followup.send(
+                f"{Emoji.CROSS} 此路線沒有野生寶可夢。", ephemeral=True
+            )
             return
 
         # Get settings and resources
@@ -293,19 +306,38 @@ class PokemonCog(commands.Cog, name="Pokemon"):
 
     async def _get_route_pokemon(self, route_data: RouteData) -> list[PokemonData]:
         """Get Pokemon available on a route."""
-        pokemon_ids = set()
+        # RouteData stores Pokemon NAMES (strings), not IDs
+        pokemon_names: set[str] = set()
 
         if route_data.land_pokemon:
-            pokemon_ids.update(route_data.land_pokemon)
+            pokemon_names.update(route_data.land_pokemon)
         if route_data.water_pokemon:
-            pokemon_ids.update(route_data.water_pokemon)
+            pokemon_names.update(route_data.water_pokemon)
         if route_data.headbutt_pokemon:
-            pokemon_ids.update(route_data.headbutt_pokemon)
+            pokemon_names.update(route_data.headbutt_pokemon)
 
-        if not pokemon_ids:
+        if not pokemon_names:
             return []
 
-        return list(await PokemonData.filter(id__in=pokemon_ids))
+        return list(await PokemonData.filter(name__in=pokemon_names))
+
+    def _calculate_route_level(self, route: int, region: int) -> int:
+        """Calculate enemy Pokemon level for a route (Pokeclicker exact formula).
+
+        From PokemonFactory.ts:78:
+        return Math.floor(20 * Math.pow(normalizedRoute, 1/2.25))
+
+        Args:
+            route: Route number
+            region: Region index
+
+        Returns:
+            Enemy level for this route
+        """
+        # For now, use route number directly (TODO: normalize by region)
+        normalized_route = route
+        level = int(20 * pow(normalized_route, 1 / 2.25))
+        return max(1, level)
 
     async def _simulate_encounters(
         self,
@@ -323,6 +355,7 @@ class PokemonCog(commands.Cog, name="Pokemon"):
 
         total_exp = 0
         total_money = 0
+        total_dungeon_tokens = 0  # Pokeclicker: gained on catch
         pokedex_new: list[str] = []
         shiny_caught: list[str] = []
         already_caught = 0
@@ -336,13 +369,19 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         new_pokemon_to_create: list[dict] = []
         ball_usage: dict[int, int] = {}  # ball_type -> count
 
+        # Calculate route level for EXP (Pokeclicker formula)
+        route_level = self._calculate_route_level(route_data.number, route_data.region)
+
         for _ in range(count):
             # Pick random wild Pokemon
             wild = random.choice(wild_pokemon)
 
-            # Calculate battle rewards
-            money_earned = BattleService.calculate_route_money(route_data.number, route_data.region)
-            exp_earned = wild.base_hp // 10  # Simplified EXP
+            # Calculate battle rewards (Pokeclicker exact formulas)
+            money_earned = BattleService.calculate_route_money(
+                route_data.number, route_data.region
+            )
+            # Use Pokemon's base_exp and route level (from Party.ts:138-143)
+            exp_earned = ExpService.calculate_battle_exp(wild.base_exp, route_level)
 
             # Add rewards
             total_exp += exp_earned
@@ -391,12 +430,23 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             catch_result = CatchService.attempt_catch(wild.catch_rate, actual_ball)
 
             if catch_result.success:
+                # Pokeclicker: Dungeon Tokens gained on EVERY successful catch
+                # From Battle.ts:188 - gainTokens() called in catchPokemon()
+                tokens_earned = BattleService.calculate_dungeon_tokens(
+                    route_data.number, route_data.region
+                )
+                total_dungeon_tokens += tokens_earned
+
                 if is_new:
                     pokedex_new.append(wild.name)
                     owned_ids.add(wild.id)
                     # Queue for batch creation
                     new_pokemon_to_create.append(
-                        {"user_id": user.id, "pokemon_data_id": wild.id, "shiny": is_shiny}
+                        {
+                            "user_id": user.id,
+                            "pokemon_data_id": wild.id,
+                            "shiny": is_shiny,
+                        }
                     )
                 else:
                     already_caught += 1
@@ -419,21 +469,26 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             for _ in range(used_count):
                 await ball_inventory.use_ball(ball_type)
 
-        # 3. Update wallet
+        # 3. Update wallet (money + dungeon tokens)
         wallet.pokedollar += total_money
-        await wallet.save(update_fields=["pokedollar"])
+        wallet.dungeon_token += total_dungeon_tokens
+        await wallet.save(update_fields=["pokedollar", "dungeon_token"])
 
-        # 4. Update party EXP in batch
-        exp_per_pokemon = total_exp // len(party) if party else 0
+        # 4. Update party EXP in batch (Pokeclicker: ALL Pokemon get FULL exp)
+        # From Party.ts:145: for (const pokemon of this.caughtPokemon) { pokemon.gainExp(expTotal) }
+        # Each Pokemon receives the full total_exp, not divided!
         updated_party: list[PlayerPokemon] = []
         for poke in party:
-            level_result = ExpService.add_exp_and_level_up(poke.level, 0, exp_per_pokemon)
+            level_result = ExpService.add_exp_and_level_up(
+                poke.level, poke.exp, total_exp  # Full exp to each Pokemon
+            )
             if level_result.leveled_up:
                 poke.level = level_result.new_level
-                updated_party.append(poke)
+            poke.exp = level_result.exp_remaining
+            updated_party.append(poke)
 
         if updated_party:
-            await PlayerPokemon.bulk_update(updated_party, fields=["level"])
+            await PlayerPokemon.bulk_update(updated_party, fields=["level", "exp"])
 
         return ExploreResult(
             total_exp=total_exp,
@@ -445,6 +500,7 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             total_encounters=count,
             total_battles=count,
             balls_used=balls_used,
+            total_dungeon_tokens=total_dungeon_tokens,
         )
 
     # ═══════════════════════════════════════════════════════════════════════
@@ -453,9 +509,14 @@ class PokemonCog(commands.Cog, name="Pokemon"):
 
     @pokemon.command(name="gym", description="挑戰道館")
     @app_commands.describe(
-        region="地區", gym_name="道館名稱 (留空顯示列表)", animated="是否顯示即時戰鬥動畫"
+        region="地區",
+        gym_name="道館名稱 (留空顯示列表)",
+        animated="是否顯示即時戰鬥動畫",
     )
-    @app_commands.autocomplete(region=region_autocomplete, gym_name=gym_autocomplete)  # pyright: ignore[reportArgumentType]
+    @app_commands.autocomplete(
+        region=region_autocomplete,
+        gym_name=gym_autocomplete,  # pyright: ignore[reportArgumentType]
+    )
     async def gym(
         self,
         interaction: Interaction,
@@ -485,7 +546,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         # Find the gym
         gym = await GymService.get_gym_by_name(gym_name)
         if not gym:
-            await interaction.followup.send(f"{Emoji.CROSS} 找不到道館: {gym_name}", ephemeral=True)
+            await interaction.followup.send(
+                f"{Emoji.CROSS} 找不到道館: {gym_name}", ephemeral=True
+            )
             return
 
         # Start battle
@@ -536,7 +599,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             return
 
         # Check if user owns this Pokemon
-        player_pokemon = await PlayerPokemon.filter(user=user, pokemon_data=pokemon_data).first()
+        player_pokemon = await PlayerPokemon.filter(
+            user=user, pokemon_data=pokemon_data
+        ).first()
         if not player_pokemon:
             await interaction.followup.send(
                 f"{Emoji.CROSS} 你沒有 **{pokemon_data.name}**！", ephemeral=True
@@ -546,7 +611,8 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         # Check if already breeding
         if player_pokemon.breeding:
             await interaction.followup.send(
-                f"{Emoji.CROSS} **{pokemon_data.name}** 已經在孵化場中！", ephemeral=True
+                f"{Emoji.CROSS} **{pokemon_data.name}** 已經在孵化場中！",
+                ephemeral=True,
             )
             return
 
@@ -577,14 +643,20 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         results = await HatcheryService.hatch_all_ready(user)
 
         if not results:
-            await interaction.followup.send(f"{Emoji.CROSS} 沒有已準備好孵化的蛋！", ephemeral=True)
+            await interaction.followup.send(
+                f"{Emoji.CROSS} 沒有已準備好孵化的蛋！", ephemeral=True
+            )
             return
 
         # Build result message
         lines = [f"# {Emoji.EGG} 孵化結果"]
         for result in results:
             shiny_mark = Emoji.SHINY if result.shiny else ""
-            pokerus_mark = f" {Emoji.POKERUS} **Pokerus 升級！**" if result.pokerus_upgraded else ""
+            pokerus_mark = (
+                f" {Emoji.POKERUS} **Pokerus 升級！**"
+                if result.pokerus_upgraded
+                else ""
+            )
             lines.append(
                 f"- {shiny_mark}**{result.pokemon_name}** +{result.attack_bonus_percent}% ATK{pokerus_mark}"
             )

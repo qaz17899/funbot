@@ -32,7 +32,6 @@ class PlayerPokemon(BaseModel):
     - EVs >= 50: bonus = evs^(log(1.5)/log(50)) (diminishing returns)
 
     TODO: Pokerus Spreading (requires Hatchery system)
-    Issue URL: https://github.com/qaz17899/funbot/issues/26
     - Per PartyPokemon.ts:160-192:
     - Spreads only in Hatchery between manually-bred eggs
     - Contagious/Resistant Pokemon can spread to same-type Pokemon
@@ -223,7 +222,6 @@ class PlayerPokemon(BaseModel):
         ev_multiplier = self.ev_bonus
 
         # TODO: held_item_multiplier and shadow_multiplier when implemented
-        # Issue URL: https://github.com/qaz17899/funbot/issues/25
         held_item_multiplier = 1.0
         shadow_multiplier = 1.0
 

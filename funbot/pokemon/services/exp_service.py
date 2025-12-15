@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from funbot.pokemon.constants.game_constants import BASE_EXP_MODIFIER, EXP_SCALE_FACTOR, MAX_LEVEL
+from funbot.pokemon.constants.game_constants import EXP_SCALE_FACTOR, MAX_LEVEL
 
 
 @dataclass
@@ -58,23 +58,29 @@ class ExpService:
         ) - ExpService.calculate_exp_to_level(current_level)
 
     @staticmethod
-    def calculate_battle_exp(base_exp: int, enemy_level: int, party_size: int = 1) -> int:
-        """Calculate EXP earned from defeating an enemy.
+    def calculate_battle_exp(
+        base_exp: int, enemy_level: int, trainer: bool = False
+    ) -> int:
+        """Calculate EXP earned from defeating an enemy (Pokeclicker exact formula).
 
-        Formula: base_exp * enemy_level * modifier / party_size
+        From Party.ts:138-143:
+        expTotal = Math.floor(exp * level * trainerBonus * multBonus / 9)
+
+        In Pokeclicker, ALL party Pokemon receive the FULL exp amount.
+        This is different from mainline Pokemon games where exp is split.
 
         Args:
-            base_exp: Enemy Pokemon's base exp yield
+            base_exp: Enemy Pokemon's base exp yield (from PokemonData.base_exp)
             enemy_level: Enemy Pokemon's level
-            party_size: Number of Pokemon in party (for splitting)
+            trainer: If True, apply 1.5x trainer bonus
 
         Returns:
-            EXP earned per Pokemon
+            EXP earned (each party Pokemon gets this full amount)
         """
-        if party_size <= 0:
-            party_size = 1
+        trainer_bonus = 1.5 if trainer else 1.0
+        mult_bonus = 1.0  # TODO: Add multiplier system if needed
 
-        exp = int(base_exp * enemy_level * BASE_EXP_MODIFIER / party_size)
+        exp = int(base_exp * enemy_level * trainer_bonus * mult_bonus / 9)
         return max(1, exp)
 
     @staticmethod
@@ -113,7 +119,9 @@ class ExpService:
             new_level = MAX_LEVEL
             new_exp = 0
 
-        return LevelUpResult(leveled_up=leveled_up, new_level=new_level, exp_remaining=new_exp)
+        return LevelUpResult(
+            leveled_up=leveled_up, new_level=new_level, exp_remaining=new_exp
+        )
 
     @staticmethod
     def calculate_attack_from_level(base_attack: int, level: int) -> int:
