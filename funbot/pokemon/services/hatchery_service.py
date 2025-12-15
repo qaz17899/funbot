@@ -280,7 +280,7 @@ class HatcheryService:
 
         # Get party Pokemon (use prefetched pokemon_data)
         party_pokemon = await PlayerPokemon.filter(
-            user_id=egg.user_id, pokemon_data=egg.pokemon_data
+            user=egg.user, pokemon_data=egg.pokemon_data
         ).first()
 
         if not party_pokemon:

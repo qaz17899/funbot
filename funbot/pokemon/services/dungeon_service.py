@@ -288,12 +288,16 @@ class DungeonService:
 
         # Get player progress for these dungeons
         dungeon_ids = [d.id for d in dungeons]
-        progress_list = await PlayerDungeonProgress.filter(
-            player_id=player_id,
-            dungeon_id__in=dungeon_ids,
-        ).all()
+        progress_list = (
+            await PlayerDungeonProgress.filter(
+                player_id=player_id,
+                dungeon_id__in=dungeon_ids,
+            )
+            .prefetch_related("dungeon")
+            .all()
+        )
 
-        progress_map = {p.dungeon_id: p.clears for p in progress_list}
+        progress_map = {p.dungeon.id: p.clears for p in progress_list}  # type: ignore[union-attr]
 
         return [(dungeon, progress_map.get(dungeon.id, 0)) for dungeon in dungeons]
 

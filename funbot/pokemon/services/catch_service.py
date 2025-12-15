@@ -12,6 +12,7 @@ from __future__ import annotations
 import random
 from dataclasses import dataclass, field
 from enum import IntEnum
+from typing import TYPE_CHECKING
 
 from loguru import logger
 
@@ -23,6 +24,9 @@ from funbot.pokemon.constants.game_constants import (
     SHINY_CHANCE,
     SHINY_EP_MODIFIER,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class CatchContext(IntEnum):
@@ -159,7 +163,7 @@ class CatchService:
     @staticmethod
     def find_available_ball(
         preferred_ball: Pokeball,
-        get_quantity_fn: callable,
+        get_quantity_fn: Callable[[Pokeball], int],
     ) -> Pokeball | None:
         """Find available ball with fallback to lower tiers.
 
@@ -329,7 +333,7 @@ class CatchService:
 
         # 9. Handle NEW Pokemon
         if is_new:
-            new_pokemon = await PlayerPokemon.create(
+            await PlayerPokemon.create(
                 user_id=player_id,
                 pokemon_data_id=pokemon_data.id,
                 shiny=is_shiny,
@@ -434,9 +438,13 @@ class CatchService:
         wallet, _ = await PlayerWallet.get_or_create(user_id=player_id)
 
         # 2. Get all owned Pokemon IDs (single query)
-        owned_pokemon = await PlayerPokemon.filter(user_id=player_id).all()
+        owned_pokemon = (
+            await PlayerPokemon.filter(user_id=player_id)
+            .prefetch_related("pokemon_data")
+            .all()
+        )
         owned_map: dict[int, PlayerPokemon] = {
-            p.pokemon_data_id: p for p in owned_pokemon
+            p.pokemon_data.id: p for p in owned_pokemon  # type: ignore[union-attr]
         }
 
         # 3. Track local state for batch operations

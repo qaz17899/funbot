@@ -78,8 +78,9 @@ class ExpService:
             EXP earned (each party Pokemon gets this full amount)
         """
         trainer_bonus = 1.5 if trainer else 1.0
-        mult_bonus = 1.0  # TODO: Add multiplier system if needed
-                          # Issue URL: https://github.com/qaz17899/funbot/issues/29
+        # TODO: Add multiplier system if needed
+        # Issue URL: https://github.com/qaz17899/funbot/issues/29
+        mult_bonus = 1.0
 
         exp = int(base_exp * enemy_level * trainer_bonus * mult_bonus / 9)
         return max(1, exp)

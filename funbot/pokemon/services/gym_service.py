@@ -12,6 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
+from typing import cast
 
 from funbot.db.models.pokemon.gym_data import GymData, GymPokemon, PlayerBadge
 from funbot.pokemon.constants.game_constants import GYM_TIME_LIMIT
@@ -142,10 +143,11 @@ class GymService:
             return []
 
         # Get player badges (badge count is low, so fetching all is fine)
+        # Tortoise values_list(flat=True) returns list[str] at runtime
         player_badges = await PlayerBadge.filter(user_id=player_id).values_list(
             "badge", flat=True
         )
-        player_badge_set = set(player_badges)
+        player_badge_set = cast("set[str]", set(player_badges))
 
         return [(gym, gym.badge in player_badge_set) for gym in gyms]
 

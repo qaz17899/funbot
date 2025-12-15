@@ -208,7 +208,8 @@ def get_loot_tier_emoji(tier: str | LootTier) -> str:
     Returns:
         Emoji string
     """
-    if isinstance(tier, str):
+    # LootTier is a StrEnum, so we need to convert string to enum
+    if not isinstance(tier, LootTier):
         try:
             tier = LootTier(tier.lower())
         except ValueError:
