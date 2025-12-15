@@ -2,6 +2,8 @@
 
 Based on Pokeclicker Breeding.ts and Egg.ts.
 Handles egg slots, steps progress, hatching, and Pokerus spreading.
+
+Note: All methods use player_id: int for consistency with other services.
 """
 
 from __future__ import annotations
@@ -9,9 +11,9 @@ from __future__ import annotations
 import math
 import random
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 
 from funbot.db.models.pokemon import PlayerEgg, PlayerPokemon, PokemonData
+from funbot.db.models.user import User
 from funbot.pokemon.constants import PokerusState
 from funbot.pokemon.constants.game_constants import (
     BREEDING_ATTACK_BONUS,
@@ -20,9 +22,6 @@ from funbot.pokemon.constants.game_constants import (
     MAX_EGG_SLOTS,
     SHINY_CHANCE_BREEDING,
 )
-
-if TYPE_CHECKING:
-    from funbot.db.models.user import User
 
 
 @dataclass
@@ -44,38 +43,74 @@ class HatcheryService:
     - Steps-based progress (from battles)
     - Pokerus spreading (same type matching)
     - Attack bonus on hatch
+
+    Note: All methods use player_id: int for consistency with other services.
     """
 
     @staticmethod
-    async def get_egg_slots(user: User) -> int:
-        """Get number of egg slots for user."""
-        return user.hatchery_egg_slots
+    async def get_egg_slots(player_id: int) -> int:
+        """Get number of egg slots for player.
+
+        Args:
+            player_id: The player's user ID
+
+        Returns:
+            Number of unlocked egg slots (1-4)
+        """
+        user = await User.get_or_none(id=player_id)
+        return user.hatchery_egg_slots if user else 1
 
     @staticmethod
-    async def get_queue_slots(user: User) -> int:
-        """Get number of queue slots for user."""
-        return user.hatchery_queue_slots
+    async def get_queue_slots(player_id: int) -> int:
+        """Get number of queue slots for player.
+
+        Args:
+            player_id: The player's user ID
+
+        Returns:
+            Number of unlocked queue slots
+        """
+        user = await User.get_or_none(id=player_id)
+        return user.hatchery_queue_slots if user else 0
 
     @staticmethod
-    async def get_eggs(user: User) -> list[PlayerEgg]:
-        """Get all eggs in user's hatchery."""
-        return await PlayerEgg.filter(user=user).prefetch_related("pokemon_data").all()
+    async def get_eggs(player_id: int) -> list[PlayerEgg]:
+        """Get all eggs in player's hatchery.
+
+        Args:
+            player_id: The player's user ID
+
+        Returns:
+            List of PlayerEgg in hatchery
+        """
+        return (
+            await PlayerEgg.filter(user_id=player_id)
+            .prefetch_related("pokemon_data")
+            .all()
+        )
 
     @staticmethod
-    async def has_free_slot(user: User) -> bool:
-        """Check if user has a free egg slot."""
-        current_eggs = await PlayerEgg.filter(user=user).count()
-        slots = await HatcheryService.get_egg_slots(user)
+    async def has_free_slot(player_id: int) -> bool:
+        """Check if player has a free egg slot.
+
+        Args:
+            player_id: The player's user ID
+
+        Returns:
+            True if there's a free slot
+        """
+        current_eggs = await PlayerEgg.filter(user_id=player_id).count()
+        slots = await HatcheryService.get_egg_slots(player_id)
         return current_eggs < slots
 
     @staticmethod
     async def add_to_hatchery(
-        user: User, pokemon: PlayerPokemon, pokemon_data: PokemonData
+        player_id: int, pokemon: PlayerPokemon, pokemon_data: PokemonData
     ) -> PlayerEgg | None:
         """Add a Pokemon to the hatchery.
 
         Args:
-            user: The user
+            player_id: The player's user ID
             pokemon: The PlayerPokemon to breed
             pokemon_data: The PokemonData for egg cycles
 
@@ -85,11 +120,11 @@ class HatcheryService:
         if pokemon.breeding:
             return None
 
-        if not await HatcheryService.has_free_slot(user):
+        if not await HatcheryService.has_free_slot(player_id):
             return None
 
         # Find next available slot
-        current_eggs = await PlayerEgg.filter(user=user).all()
+        current_eggs = await PlayerEgg.filter(user_id=player_id).all()
         used_slots = {egg.slot for egg in current_eggs}
 
         slot = None
@@ -121,7 +156,7 @@ class HatcheryService:
 
         # Create egg
         egg = await PlayerEgg.create(
-            user=user,
+            user_id=player_id,
             pokemon_data=pokemon_data,
             slot=slot,
             steps=0,
@@ -136,23 +171,23 @@ class HatcheryService:
         return egg
 
     @staticmethod
-    async def progress_eggs(user: User, steps: int) -> list[PlayerEgg]:
+    async def progress_eggs(player_id: int, steps: int) -> list[PlayerEgg]:
         """Progress all eggs by given steps.
 
         Also handles Pokerus spreading.
 
         Args:
-            user: The user
+            player_id: The player's user ID
             steps: Number of steps to add
 
         Returns:
             List of eggs that are now ready to hatch
         """
-        eggs = await HatcheryService.get_eggs(user)
+        eggs = await HatcheryService.get_eggs(player_id)
         ready_eggs: list[PlayerEgg] = []
 
         # Spread Pokerus first (before adding steps)
-        await HatcheryService._spread_pokerus(user, eggs)
+        await HatcheryService._spread_pokerus(player_id, eggs)
 
         # Add steps to each egg
         for egg in eggs:
@@ -166,12 +201,16 @@ class HatcheryService:
         return ready_eggs
 
     @staticmethod
-    async def _spread_pokerus(user: User, eggs: list[PlayerEgg]) -> None:
+    async def _spread_pokerus(player_id: int, eggs: list[PlayerEgg]) -> None:
         """Spread Pokerus between eggs of same type.
 
         From PartyPokemon.calculatePokerus() lines 181-192:
         - Find types of all CONTAGIOUS+ eggs
         - Infect UNINFECTED eggs that share a type
+
+        Args:
+            player_id: The player's user ID
+            eggs: List of eggs to check for Pokerus spreading
         """
         if not eggs:
             return
@@ -180,15 +219,16 @@ class HatcheryService:
         # Use pokemon_data.id since eggs are prefetched with pokemon_data
         pokemon_data_ids = [egg.pokemon_data.id for egg in eggs]
         party_pokemon_list = (
-            await PlayerPokemon.filter(user=user, pokemon_data_id__in=pokemon_data_ids)
+            await PlayerPokemon.filter(
+                user_id=player_id, pokemon_data_id__in=pokemon_data_ids
+            )
             .prefetch_related("pokemon_data")
             .all()
         )
 
         # Build lookup dict: pokemon_data.id -> PlayerPokemon
         pokemon_lookup: dict[int, PlayerPokemon] = {
-            p.pokemon_data.id: p
-            for p in party_pokemon_list  # type: ignore[union-attr]
+            p.pokemon_data.id: p for p in party_pokemon_list  # type: ignore[union-attr]
         }
 
         # Get all contagious Pokemon types from eggs
@@ -228,13 +268,19 @@ class HatcheryService:
         - Add attack bonuses
         - Upgrade Pokerus INFECTED -> CONTAGIOUS
         - Update statistics
+
+        Args:
+            egg: The PlayerEgg to hatch
+
+        Returns:
+            HatchResult or None if egg cannot hatch
         """
         if not egg.can_hatch:
             return None
 
         # Get party Pokemon (use prefetched pokemon_data)
         party_pokemon = await PlayerPokemon.filter(
-            user=egg.user, pokemon_data=egg.pokemon_data
+            user_id=egg.user_id, pokemon_data=egg.pokemon_data
         ).first()
 
         if not party_pokemon:
@@ -258,7 +304,8 @@ class HatcheryService:
 
         # max(1, ...) ensures at least 1% per hatch, round() for exact match
         bonus_percent = (
-            max(1, round((BREEDING_ATTACK_BONUS + calcium_bonus) * (efficiency / 100))) * shiny_mult
+            max(1, round((BREEDING_ATTACK_BONUS + calcium_bonus) * (efficiency / 100)))
+            * shiny_mult
         )
         bonus_amount = max(0, round(protein_bonus * (efficiency / 100))) * shiny_mult
 
@@ -296,9 +343,16 @@ class HatcheryService:
         )
 
     @staticmethod
-    async def hatch_all_ready(user: User) -> list[HatchResult]:
-        """Hatch all ready eggs for a user."""
-        eggs = await HatcheryService.get_eggs(user)
+    async def hatch_all_ready(player_id: int) -> list[HatchResult]:
+        """Hatch all ready eggs for a player.
+
+        Args:
+            player_id: The player's user ID
+
+        Returns:
+            List of HatchResult for each hatched egg
+        """
+        eggs = await HatcheryService.get_eggs(player_id)
         results: list[HatchResult] = []
 
         for egg in eggs:

@@ -305,9 +305,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             count=count,
         )
 
-        # Progress eggs
+        # Progress eggs (use player_id for consistency)
         steps = HatcheryService.calculate_steps_from_route(route_data.order_number)
-        await HatcheryService.progress_eggs(user, int(steps * count))
+        await HatcheryService.progress_eggs(user.id, int(steps * count))
 
         # Create result view
         view = ExploreResultView(interaction.user.display_name, route_data, results)
@@ -536,9 +536,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         """View all eggs in hatchery."""
         await interaction.response.defer()
 
-        user, _ = await User.get_or_create(id=interaction.user.id)
-        eggs = await HatcheryService.get_eggs(user)
-        slots = await HatcheryService.get_egg_slots(user)
+        player_id = interaction.user.id
+        eggs = await HatcheryService.get_eggs(player_id)
+        slots = await HatcheryService.get_egg_slots(player_id)
 
         view = HatcheryListView(eggs, slots, interaction.user.display_name)
         await interaction.followup.send(view=view)
@@ -553,7 +553,7 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         """Add a Pokemon to the hatchery."""
         await interaction.response.defer()
 
-        user, _ = await User.get_or_create(id=interaction.user.id)
+        player_id = interaction.user.id
 
         # Find Pokemon by name
         pokemon_data = await PokemonData.filter(name__icontains=pokemon_name).first()
@@ -565,7 +565,7 @@ class PokemonCog(commands.Cog, name="Pokemon"):
 
         # Check if user owns this Pokemon
         player_pokemon = await PlayerPokemon.filter(
-            user=user, pokemon_data=pokemon_data
+            user_id=player_id, pokemon_data=pokemon_data
         ).first()
         if not player_pokemon:
             await interaction.followup.send(
@@ -581,8 +581,10 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             )
             return
 
-        # Try to add to hatchery
-        egg = await HatcheryService.add_to_hatchery(user, player_pokemon, pokemon_data)
+        # Try to add to hatchery (use player_id for consistency)
+        egg = await HatcheryService.add_to_hatchery(
+            player_id, player_pokemon, pokemon_data
+        )
         if not egg:
             await interaction.followup.send(
                 f"{Emoji.CROSS} 孵化場已滿！請先孵化現有的蛋。", ephemeral=True
@@ -604,8 +606,8 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         """Hatch all ready eggs."""
         await interaction.response.defer()
 
-        user, _ = await User.get_or_create(id=interaction.user.id)
-        results = await HatcheryService.hatch_all_ready(user)
+        player_id = interaction.user.id
+        results = await HatcheryService.hatch_all_ready(player_id)
 
         if not results:
             await interaction.followup.send(

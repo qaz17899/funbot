@@ -49,17 +49,20 @@ async def region_autocomplete(
     return choices[:25]  # Discord limits to 25 choices
 
 
-async def route_autocomplete(
-    interaction: Interaction, current: str
+async def _route_autocomplete_impl(
+    interaction: Interaction, current: str, *, include_locked: bool = True
 ) -> list[app_commands.Choice[int]]:
-    """Autocomplete for route selection with status indicators.
+    """Internal implementation for route autocomplete.
 
-    Shows routes in the selected region with:
-    - Status emoji (🔒/⚔️/🆕/✨/🌈)
-    - Kill count (X/10)
-    - Extra info (新/閃/✓)
+    Shared logic for route_autocomplete and unlocked_route_autocomplete.
 
-    Requires 'region' parameter to be filled first.
+    Args:
+        interaction: Discord interaction
+        current: Current input string
+        include_locked: If False, filters out locked routes
+
+    Returns:
+        List of route choices
     """
     # Get the region from namespace (filled by user)
     namespace = interaction.namespace
@@ -77,6 +80,10 @@ async def route_autocomplete(
     choices = []
 
     for route, status, kills in routes_with_status:
+        # Skip locked routes if not included
+        if not include_locked and status == RouteStatus.LOCKED:
+            continue
+
         # Use centralized format_route_choice from ui_utils
         display_name, route_id = format_route_choice(route, status, kills)
 
@@ -87,6 +94,21 @@ async def route_autocomplete(
     return choices[:25]  # Discord limits to 25 choices
 
 
+async def route_autocomplete(
+    interaction: Interaction, current: str
+) -> list[app_commands.Choice[int]]:
+    """Autocomplete for route selection with status indicators.
+
+    Shows routes in the selected region with:
+    - Status emoji (🔒/⚔️/🆕/✨/🌈)
+    - Kill count (X/10)
+    - Extra info (新/閃/✓)
+
+    Requires 'region' parameter to be filled first.
+    """
+    return await _route_autocomplete_impl(interaction, current, include_locked=True)
+
+
 async def unlocked_route_autocomplete(
     interaction: Interaction, current: str
 ) -> list[app_commands.Choice[int]]:
@@ -95,31 +117,7 @@ async def unlocked_route_autocomplete(
     Same as route_autocomplete but filters out locked routes.
     Useful for commands that require an accessible route.
     """
-    namespace = interaction.namespace
-    region = getattr(namespace, "region", 0)
-
-    player_id = interaction.user.id
-    service = get_route_status_service()
-
-    routes_with_status = await service.get_available_routes_for_region(
-        player_id, region
-    )
-
-    current_lower = current.lower()
-    choices = []
-
-    for route, status, kills in routes_with_status:
-        # Skip locked routes
-        if status == RouteStatus.LOCKED:
-            continue
-
-        # Use centralized format_route_choice from ui_utils
-        display_name, route_id = format_route_choice(route, status, kills)
-
-        if current_lower in display_name.lower() or current_lower in route.name.lower():
-            choices.append(app_commands.Choice(name=display_name, value=route_id))
-
-    return choices[:25]
+    return await _route_autocomplete_impl(interaction, current, include_locked=False)
 
 
 async def gym_autocomplete(
