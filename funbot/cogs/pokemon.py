@@ -118,9 +118,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             )
             return
 
-        # Create V2 layout with starter selection
+        # Create V2 layout with starter selection (use player_id for consistency)
         view = StarterSelectLayout(
-            starters=list(starters), user=user, discord_user_id=interaction.user.id
+            starters=list(starters), player_id=interaction.user.id
         )
 
         await interaction.followup.send(view=view)
