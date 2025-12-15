@@ -2,20 +2,18 @@
 
 Handles Pokeball purchases and other shop transactions.
 Matches Pokeclicker's Shop.ts and PokeballItem.ts mechanics.
+
+Note: All methods use user_id: int for consistency with other services.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 
 from funbot.db.models.pokemon.player_ball_inventory import PlayerBallInventory
 from funbot.db.models.pokemon.player_wallet import PlayerWallet
-from funbot.pokemon.constants.enums import Currency, Pokeball
+from funbot.pokemon.constants.enums import Currency
 from funbot.pokemon.constants.game_constants import POKEBALL_PRICES
-
-if TYPE_CHECKING:
-    from funbot.db.models.user import User
 
 
 @dataclass
@@ -57,12 +55,12 @@ class ShopService:
 
     @staticmethod
     async def can_afford(
-        user: User, ball_type: int, amount: int
+        user_id: int, ball_type: int, amount: int
     ) -> tuple[bool, int, int]:
         """Check if user can afford a purchase.
 
         Args:
-            user: The user
+            user_id: The player's user ID
             ball_type: Pokeball enum value
             amount: Number to purchase
 
@@ -72,7 +70,7 @@ class ShopService:
         price, currency_type = ShopService.get_ball_price(ball_type)
         total_cost = price * amount
 
-        wallet, _ = await PlayerWallet.get_or_create(user=user)
+        wallet, _ = await PlayerWallet.get_or_create(user_id=user_id)
 
         # Get current balance based on currency type
         if currency_type == Currency.POKEDOLLAR:
@@ -89,7 +87,9 @@ class ShopService:
         return balance >= total_cost, total_cost, balance
 
     @staticmethod
-    async def buy_pokeballs(user: User, ball_type: int, amount: int) -> PurchaseResult:
+    async def buy_pokeballs(
+        user_id: int, ball_type: int, amount: int
+    ) -> PurchaseResult:
         """Purchase Pokeballs.
 
         Matches Pokeclicker mechanics:
@@ -98,7 +98,7 @@ class ShopService:
         - Purchase statistics tracking
 
         Args:
-            user: The user making the purchase
+            user_id: The player's user ID
             ball_type: Pokeball enum value (1-4)
             amount: Number of balls to buy
 
@@ -113,7 +113,7 @@ class ShopService:
 
         # Check affordability
         can_afford, total_cost, balance = await ShopService.can_afford(
-            user, ball_type, amount
+            user_id, ball_type, amount
         )
 
         if not can_afford:
@@ -130,7 +130,7 @@ class ShopService:
 
         # Deduct currency
         _, currency_type = ShopService.get_ball_price(ball_type)
-        wallet, _ = await PlayerWallet.get_or_create(user=user)
+        wallet, _ = await PlayerWallet.get_or_create(user_id=user_id)
 
         if currency_type == Currency.POKEDOLLAR:
             new_balance = await wallet.add_pokedollar(-total_cost)
@@ -140,7 +140,7 @@ class ShopService:
             new_balance = 0
 
         # Add balls to inventory
-        inventory, _ = await PlayerBallInventory.get_or_create(user=user)
+        inventory, _ = await PlayerBallInventory.get_or_create(user_id=user_id)
         await inventory.gain_balls(ball_type, amount, purchased=True)
 
         # Return pure data - View layer handles formatting
@@ -155,14 +155,17 @@ class ShopService:
         )
 
     @staticmethod
-    async def get_shop_inventory(user: User) -> dict:
+    async def get_shop_inventory(user_id: int) -> dict:
         """Get shop inventory with prices and user's current quantities.
+
+        Args:
+            user_id: The player's user ID
 
         Returns:
             Dict with ball info for shop display
         """
-        wallet, _ = await PlayerWallet.get_or_create(user=user)
-        inventory, _ = await PlayerBallInventory.get_or_create(user=user)
+        wallet, _ = await PlayerWallet.get_or_create(user_id=user_id)
+        inventory, _ = await PlayerBallInventory.get_or_create(user_id=user_id)
 
         shop_items = []
         for ball_type, (price, currency_type) in POKEBALL_PRICES.items():

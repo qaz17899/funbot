@@ -191,12 +191,13 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             )
             return
 
-        # Get shop data
-        shop_data = await ShopService.get_shop_inventory(user)
+        # Get shop data using user_id (Service layer uses int, not User object)
+        user_id = interaction.user.id
+        shop_data = await ShopService.get_shop_inventory(user_id)
         inventory, _ = await PlayerBallInventory.get_or_create(user=user)
 
-        # Create beautiful V2 shop view
-        view = ShopView(user, shop_data["wallet"], inventory)
+        # Create beautiful V2 shop view (uses user_id for consistency)
+        view = ShopView(user_id, shop_data["wallet"], inventory)
 
         await interaction.followup.send(view=view)
 

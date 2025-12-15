@@ -10,6 +10,11 @@ import math
 from dataclasses import dataclass, field
 from enum import Enum
 
+from funbot.pokemon.constants.game_constants import (
+    BASE_EP_YIELD,
+    DUNGEON_BOSS_EP_MODIFIER,
+    DUNGEON_EP_MODIFIER,
+)
 from funbot.pokemon.services.battle_service import BattleService
 
 
@@ -69,12 +74,6 @@ class DungeonRewards:
     dungeon_tokens: int = 0
     first_clear_bonus: dict | None = None
     pokemon_caught: list[str] = field(default_factory=list)
-
-
-# EP modifiers from GameConstants.ts
-DUNGEON_EP_MODIFIER = 3
-DUNGEON_BOSS_EP_MODIFIER = 10
-BASE_EP_YIELD = 100
 
 
 class DungeonBattleService:
