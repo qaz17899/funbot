@@ -299,13 +299,14 @@ POKEBALL_EMOJI_IDS: dict[str, int] = {
     "Rocketball": 1449471365659885679,
 }
 
-# Pokeball enum value to emoji name mapping (Maps Enum to POKEBALL_EMOJI_IDS keys)
+# Pokeball enum value to emoji name mapping (Maps int to POKEBALL_EMOJI_IDS keys)
+# Keys must be int because get_ball_emoji/get_ball_partial_emoji use int(ball) for lookup
 BALL_ENUM_TO_NAME: dict[int, str] = {
-    Pokeball.NONE: "None",
-    Pokeball.POKEBALL: "Pokeball",
-    Pokeball.GREATBALL: "Greatball",
-    Pokeball.ULTRABALL: "Ultraball",
-    Pokeball.MASTERBALL: "Masterball",
+    int(Pokeball.NONE): "None",
+    int(Pokeball.POKEBALL): "Pokeball",
+    int(Pokeball.GREATBALL): "Greatball",
+    int(Pokeball.ULTRABALL): "Ultraball",
+    int(Pokeball.MASTERBALL): "Masterball",
 }
 
 
