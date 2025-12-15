@@ -14,7 +14,7 @@ from discord import app_commands
 
 from funbot.pokemon.constants.enums import Region
 from funbot.pokemon.services.route_service import RouteStatus, get_route_status_service
-from funbot.pokemon.ui_utils import REGION_DISPLAY_NAMES
+from funbot.pokemon.ui_utils import REGION_DISPLAY_NAMES, format_route_choice
 
 if TYPE_CHECKING:
     from funbot.types import Interaction
@@ -72,7 +72,8 @@ async def route_autocomplete(
     choices = []
 
     for route, status, kills in routes_with_status:
-        display_name, route_id = service.format_route_choice(route, status, kills)
+        # Use centralized format_route_choice from ui_utils
+        display_name, route_id = format_route_choice(route, status, kills)
 
         # Filter by current input
         if current_lower in display_name.lower() or current_lower in route.name.lower():
@@ -107,7 +108,8 @@ async def unlocked_route_autocomplete(
         if status == RouteStatus.LOCKED:
             continue
 
-        display_name, route_id = service.format_route_choice(route, status, kills)
+        # Use centralized format_route_choice from ui_utils
+        display_name, route_id = format_route_choice(route, status, kills)
 
         if current_lower in display_name.lower() or current_lower in route.name.lower():
             choices.append(app_commands.Choice(name=display_name, value=route_id))

@@ -10,7 +10,14 @@ Key naming conventions:
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+from urllib.parse import quote
+
 from funbot.pokemon.constants.enums import Currency, LootTier, Pokeball, Region
+from funbot.pokemon.constants.game_constants import ROUTE_KILLS_NEEDED
+
+if TYPE_CHECKING:
+    from funbot.db.models.pokemon.route_data import RouteData
 
 __all__ = (
     # Constants (alphabetical)
@@ -21,6 +28,8 @@ __all__ = (
     "LOOT_TIER_EMOJIS",
     "POKEBALL_DISPLAY_NAMES",
     "POKEBALL_EMOJI_IDS",
+    "POKECLICKER_BADGE_BASE_URL",
+    "POKECLICKER_NPC_BASE_URL",
     "REGION_DISPLAY_NAMES",
     "ROUTE_STATUS_EMOJI",
     "TYPE_EMOJIS",
@@ -28,14 +37,21 @@ __all__ = (
     "Emoji",
     # Functions (alphabetical)
     "build_progress_bar",
+    "format_route_choice",
     "get_badge_emoji",
+    "get_badge_image_url",
     "get_ball_emoji",
     "get_currency_emoji",
     "get_gem_emoji",
+    "get_leader_image_url",
     "get_loot_tier_emoji",
     "get_pokeball_name",
     "get_type_emoji",
 )
+
+# Pokeclicker asset URLs (moved from GymService)
+POKECLICKER_NPC_BASE_URL = "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/npcs"
+POKECLICKER_BADGE_BASE_URL = "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/badges"
 
 
 class Emoji:
@@ -504,3 +520,71 @@ def get_badge_emoji(badge_name: str) -> str:
     """Get Discord custom emoji for gym badge."""
     emoji_id = BADGE_EMOJI_IDS.get(badge_name, BADGE_EMOJI_IDS["Boulder"])
     return f"<:{badge_name}:{emoji_id}>"
+
+
+# =============================================================================
+# UI Formatting Functions (moved from Service layer for separation of concerns)
+# =============================================================================
+
+
+def get_leader_image_url(leader_name: str) -> str:
+    """Get the URL for a gym leader's image.
+
+    Moved from GymService to decouple Service from UI assets.
+
+    Args:
+        leader_name: Name of the gym leader (e.g., "Brock")
+
+    Returns:
+        URL to the leader's image on Pokeclicker GitHub
+    """
+    encoded_name = quote(leader_name)
+    return f"{POKECLICKER_NPC_BASE_URL}/{encoded_name}.png"
+
+
+def get_badge_image_url(badge_name: str) -> str:
+    """Get the URL for a badge's image.
+
+    Moved from GymService to decouple Service from UI assets.
+
+    Args:
+        badge_name: Name of the badge (e.g., "Boulder")
+
+    Returns:
+        URL to the badge's image on Pokeclicker GitHub
+    """
+    return f"{POKECLICKER_BADGE_BASE_URL}/{badge_name}.svg"
+
+
+def format_route_choice(route: RouteData, status: int, kills: int) -> tuple[str, int]:
+    """Format a route for autocomplete display.
+
+    Moved from RouteStatusService to decouple Service from UI.
+
+    Args:
+        route: The route data
+        status: RouteStatus integer value (0-5)
+        kills: Kill count on this route
+
+    Returns:
+        Tuple of (display_name, route_number) for app_commands.Choice
+    """
+    emoji = ROUTE_STATUS_EMOJI.get(status, "❓")
+    kills_display = f"({kills}/{ROUTE_KILLS_NEEDED})"
+
+    # Add status-specific suffix
+    # RouteStatus: 5=COMPLETED, 3=UNCAUGHT_POKEMON, 4=UNCAUGHT_SHINY
+    suffix = ""
+    if status == 5:  # COMPLETED
+        suffix = " ✓"
+    elif status == 3:  # UNCAUGHT_POKEMON
+        suffix = " | 新"
+    elif status == 4:  # UNCAUGHT_SHINY
+        suffix = " | 閃"
+
+    # Discord autocomplete has 100 char limit for name
+    display = f"{emoji} {route.name} {kills_display}{suffix}"
+    if len(display) > 100:
+        display = display[:97] + "..."
+
+    return display, route.number

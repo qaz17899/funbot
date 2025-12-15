@@ -60,11 +60,19 @@ class BuyBallModal(ui.Modal, title="購買寶貝球"):
         result = await ShopService.buy_pokeballs(self.user, self.ball_type, amount)
 
         if result.success:
-            # Refresh the shop view
-            await self.refresh_callback(interaction, result.message)
+            # Format success message in View layer (Service returns pure data)
+            ball_name = get_pokeball_name(result.ball_type)
+            message = f"成功購買 {result.quantity} 個 {ball_name}！"
+            await self.refresh_callback(interaction, message)
         else:
+            # Format error message in View layer
+            currency_emoji = get_currency_emoji(Currency(result.currency_type))
+            error_msg = (
+                f"資金不足！需要 {result.total_cost:,} {currency_emoji}，"
+                f"你只有 {result.new_balance:,} {currency_emoji}"
+            )
             await interaction.response.send_message(
-                f"{Emoji.CROSS} {result.message}", ephemeral=True
+                f"{Emoji.CROSS} {error_msg}", ephemeral=True
             )
 
 

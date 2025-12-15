@@ -13,7 +13,6 @@ from funbot.db.models.pokemon.player_ball_inventory import PlayerBallInventory
 from funbot.db.models.pokemon.player_wallet import PlayerWallet
 from funbot.pokemon.constants.enums import Currency, Pokeball
 from funbot.pokemon.constants.game_constants import POKEBALL_PRICES
-from funbot.pokemon.ui_utils import get_currency_emoji, get_pokeball_name
 
 if TYPE_CHECKING:
     from funbot.db.models.user import User
@@ -21,13 +20,18 @@ if TYPE_CHECKING:
 
 @dataclass
 class PurchaseResult:
-    """Result of a purchase attempt."""
+    """Result of a purchase attempt.
+
+    Contains pure data - View layer handles formatting with emojis.
+    """
 
     success: bool
     message: str
     quantity: int = 0
     total_cost: int = 0
     new_balance: int = 0
+    ball_type: int = 0  # For View to format ball name
+    currency_type: int = 0  # For View to format currency emoji
 
 
 class ShopService:
@@ -113,12 +117,15 @@ class ShopService:
         )
 
         if not can_afford:
-            _price, currency_type = ShopService.get_ball_price(ball_type)
-            # Get currency emoji based on type (using Currency enum directly)
-            currency_emoji = get_currency_emoji(Currency(currency_type))
+            _, currency_type = ShopService.get_ball_price(ball_type)
+            # Return pure data - View layer handles formatting with emojis
             return PurchaseResult(
                 success=False,
-                message=f"資金不足！需要 {total_cost:,} {currency_emoji}，你只有 {balance:,} {currency_emoji}",
+                message="資金不足",
+                quantity=0,
+                total_cost=total_cost,
+                new_balance=balance,
+                currency_type=currency_type,
             )
 
         # Deduct currency
@@ -136,14 +143,15 @@ class ShopService:
         inventory, _ = await PlayerBallInventory.get_or_create(user=user)
         await inventory.gain_balls(ball_type, amount, purchased=True)
 
-        ball_name = get_pokeball_name(ball_type)
-
+        # Return pure data - View layer handles formatting
         return PurchaseResult(
             success=True,
-            message=f"成功購買 {amount} 個 {ball_name}！",
+            message="購買成功",
             quantity=amount,
             total_cost=total_cost,
             new_balance=new_balance,
+            ball_type=ball_type,
+            currency_type=currency_type,
         )
 
     @staticmethod
@@ -161,9 +169,9 @@ class ShopService:
             shop_items.append(
                 {
                     "ball_type": ball_type,
-                    "name": get_pokeball_name(ball_type),
+                    # name removed - View layer uses get_pokeball_name()
                     "price": price,
-                    "currency": Currency(currency_type).name,
+                    "currency_type": currency_type,
                     "owned": inventory.get_quantity(ball_type),
                 }
             )

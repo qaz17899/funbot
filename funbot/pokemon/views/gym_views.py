@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 import discord
 
 from funbot.pokemon.services.battle_service import BattleService
+from funbot.pokemon.constants.enums import Currency
 from funbot.pokemon.services.gym_service import (
     GYM_TIME_LIMIT,
     GymBattleResult,
@@ -19,8 +20,12 @@ from funbot.pokemon.services.gym_service import (
     GymBattleStatus,
     GymService,
 )
-from funbot.pokemon.constants.enums import Currency
-from funbot.pokemon.ui_utils import Emoji, build_progress_bar, get_currency_emoji
+from funbot.pokemon.ui_utils import (
+    Emoji,
+    build_progress_bar,
+    get_currency_emoji,
+    get_leader_image_url,
+)
 from funbot.ui.components_v2 import (
     Container,
     LayoutView,
@@ -87,8 +92,8 @@ class GymBattleView(LayoutView):
 
         container = Container(accent_color=color)
 
-        # Header with gym info and leader image
-        leader_image_url = GymService.get_leader_image_url(self.gym.leader)
+        # Header with gym info and leader image (using centralized ui_utils)
+        leader_image_url = get_leader_image_url(self.gym.leader)
         container.add_item(
             Section(
                 TextDisplay(f"# ⚡ {self.gym.name}"),
@@ -154,8 +159,8 @@ class GymBattleView(LayoutView):
         """
         container = Container(accent_color=discord.Color.gold())
 
-        # Victory header
-        leader_image_url = GymService.get_leader_image_url(self.gym.leader)
+        # Victory header (using centralized ui_utils)
+        leader_image_url = get_leader_image_url(self.gym.leader)
         container.add_item(
             Section(
                 TextDisplay("# 🎉 勝利！"),
@@ -200,8 +205,8 @@ class GymBattleView(LayoutView):
         """
         container = Container(accent_color=discord.Color.red())
 
-        # Defeat header
-        leader_image_url = GymService.get_leader_image_url(self.gym.leader)
+        # Defeat header (using centralized ui_utils)
+        leader_image_url = get_leader_image_url(self.gym.leader)
         container.add_item(
             Section(
                 TextDisplay(f"# {Emoji.CROSS} 失敗..."),

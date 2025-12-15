@@ -20,7 +20,6 @@ from loguru import logger
 from funbot.db.models.pokemon import PlayerPokemon, PlayerRouteProgress, RouteData
 from funbot.pokemon.constants.game_constants import ROUTE_KILLS_NEEDED
 from funbot.pokemon.services.requirement_service import get_requirement_service
-from funbot.pokemon.ui_utils import ROUTE_STATUS_EMOJI
 
 if TYPE_CHECKING:
     from funbot.db.models.pokemon.route_requirement import RouteRequirement
@@ -262,39 +261,6 @@ class RouteStatusService:
             results.append((route, status, kills))
 
         return results
-
-    def format_route_choice(
-        self, route: RouteData, status: RouteStatus, kills: int
-    ) -> tuple[str, int]:
-        """Format a route for autocomplete display.
-
-        Args:
-            route: The route data
-            status: Current status for the player
-            kills: Kill count on this route
-
-        Returns:
-            Tuple of (display_name, route_number) for app_commands.Choice
-        """
-        emoji = ROUTE_STATUS_EMOJI[status]
-        kills_display = f"({kills}/{ROUTE_KILLS_NEEDED})"
-
-        # Add status-specific suffix
-        suffix = ""
-        if status == RouteStatus.COMPLETED:
-            suffix = " ✓"
-        elif status == RouteStatus.UNCAUGHT_POKEMON:
-            suffix = " | 新"
-        elif status == RouteStatus.UNCAUGHT_SHINY:
-            suffix = " | 閃"
-
-        # Discord autocomplete has 100 char limit for name
-        display = f"{emoji} {route.name} {kills_display}{suffix}"
-        if len(display) > 100:
-            display = display[:97] + "..."
-
-        # Return route.number (not route.id) to match explore command's filter
-        return display, route.number
 
 
 # Singleton instance

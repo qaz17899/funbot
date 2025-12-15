@@ -12,15 +12,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
-from urllib.parse import quote
 
 from funbot.db.models.pokemon.gym_data import GymData, GymPokemon, PlayerBadge
 from funbot.pokemon.services.battle_service import BattleService
 
 # Constants
 GYM_TIME_LIMIT = 30  # seconds
-POKECLICKER_NPC_BASE_URL = "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/npcs"
-POKECLICKER_BADGE_BASE_URL = "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/badges"
 
 
 class GymBattleStatus(Enum):
@@ -91,33 +88,11 @@ class GymBattleResult:
 
 
 class GymService:
-    """Service for gym battle operations."""
+    """Service for gym battle operations.
 
-    @staticmethod
-    def get_leader_image_url(leader_name: str) -> str:
-        """Get the URL for a gym leader's image.
-
-        Args:
-            leader_name: Name of the gym leader (e.g., "Brock")
-
-        Returns:
-            URL to the leader's image on Pokeclicker GitHub
-        """
-        # URL encode the name for special characters
-        encoded_name = quote(leader_name)
-        return f"{POKECLICKER_NPC_BASE_URL}/{encoded_name}.png"
-
-    @staticmethod
-    def get_badge_image_url(badge_name: str) -> str:
-        """Get the URL for a badge's image.
-
-        Args:
-            badge_name: Name of the badge (e.g., "Boulder")
-
-        Returns:
-            URL to the badge's image on Pokeclicker GitHub
-        """
-        return f"{POKECLICKER_BADGE_BASE_URL}/{badge_name}.svg"
+    Note: Image URL functions (get_leader_image_url, get_badge_image_url)
+    have been moved to ui_utils.py to maintain separation of concerns.
+    """
 
     @staticmethod
     async def get_gym_by_name(name: str) -> GymData | None:
