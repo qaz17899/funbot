@@ -306,9 +306,9 @@ class DungeonExploreView(LayoutView):
             TileEventType,
         )
         from funbot.pokemon.services.dungeon_map import DungeonMap
-        from funbot.pokemon.services.dungeon_service import DungeonService
+        from funbot.pokemon.services.dungeon_service import get_dungeon_service
 
-        service = DungeonService()
+        service = get_dungeon_service()
 
         # Get initial run state
         run = await service.get_run_by_id(self.run_id)

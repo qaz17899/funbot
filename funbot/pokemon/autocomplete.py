@@ -166,7 +166,7 @@ async def dungeon_autocomplete(
     Uses DungeonService for data and format_dungeon_choice for display.
     Requires 'region' parameter to be filled first (defaults to Kanto).
     """
-    from funbot.pokemon.services.dungeon_service import DungeonService
+    from funbot.pokemon.services.dungeon_service import get_dungeon_service
 
     # Yield control for async
     await asyncio.sleep(0)
@@ -176,8 +176,8 @@ async def dungeon_autocomplete(
     region = getattr(namespace, "region", 0)
     user_id = interaction.user.id
 
-    # Use Service to get data (proper layering)
-    service = DungeonService()
+    # Use singleton Service (proper layering)
+    service = get_dungeon_service()
     dungeons_with_status = await service.search_dungeons_for_autocomplete(
         user_id, region, current
     )

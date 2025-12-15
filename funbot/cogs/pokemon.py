@@ -191,13 +191,13 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             )
             return
 
-        # Get shop data using user_id (Service layer uses int, not User object)
-        user_id = interaction.user.id
-        shop_data = await ShopService.get_shop_inventory(user_id)
+        # Get shop data using player_id (Service layer uses int, not User object)
+        player_id = interaction.user.id
+        shop_data = await ShopService.get_shop_inventory(player_id)
         inventory, _ = await PlayerBallInventory.get_or_create(user=user)
 
-        # Create beautiful V2 shop view (uses user_id for consistency)
-        view = ShopView(user_id, shop_data["wallet"], inventory)
+        # Create beautiful V2 shop view (uses player_id for consistency)
+        view = ShopView(player_id, shop_data["wallet"], inventory)
 
         await interaction.followup.send(view=view)
 
@@ -638,13 +638,13 @@ class PokemonCog(commands.Cog, name="Pokemon"):
     @app_commands.autocomplete(region=region_autocomplete)
     async def dungeon_list(self, interaction: Interaction, region: int = 0) -> None:
         """List available dungeons in a region."""
-        from funbot.pokemon.services.dungeon_service import DungeonService
+        from funbot.pokemon.services.dungeon_service import get_dungeon_service
         from funbot.pokemon.views.dungeon_views import DungeonListView
 
         await interaction.response.defer()
 
         user_id = interaction.user.id
-        service = DungeonService()
+        service = get_dungeon_service()
 
         dungeons = await service.get_available_dungeons(user_id, region)
 
@@ -666,13 +666,13 @@ class PokemonCog(commands.Cog, name="Pokemon"):
     ) -> None:
         """Enter a dungeon and start auto-exploration."""
         from funbot.db.models.pokemon.dungeon_data import DungeonData
-        from funbot.pokemon.services.dungeon_service import DungeonService
+        from funbot.pokemon.services.dungeon_service import get_dungeon_service
         from funbot.pokemon.views.dungeon_views import DungeonExploreView
 
         await interaction.response.defer()
 
         user_id = interaction.user.id
-        service = DungeonService()
+        service = get_dungeon_service()
 
         # Find dungeon by name
         dungeon = await DungeonData.filter(name__icontains=name).first()
@@ -725,13 +725,13 @@ class PokemonCog(commands.Cog, name="Pokemon"):
     @dungeon.command(name="status", description="查看當前地下城狀態")
     async def dungeon_status(self, interaction: Interaction) -> None:
         """Show current dungeon run status and resume exploration."""
-        from funbot.pokemon.services.dungeon_service import DungeonService
+        from funbot.pokemon.services.dungeon_service import get_dungeon_service
         from funbot.pokemon.views.dungeon_views import DungeonExploreView
 
         await interaction.response.defer()
 
         user_id = interaction.user.id
-        service = DungeonService()
+        service = get_dungeon_service()
 
         # Get active run
         run = await service.get_active_run(user_id)

@@ -1086,3 +1086,21 @@ class DungeonService:
         )
 
         return True
+
+
+# =============================================================================
+# Singleton Instance
+# =============================================================================
+
+_dungeon_service: DungeonService | None = None
+
+
+def get_dungeon_service() -> DungeonService:
+    """Get the singleton DungeonService instance.
+
+    Matches the pattern used by RouteStatusService and RequirementService.
+    """
+    global _dungeon_service
+    if _dungeon_service is None:
+        _dungeon_service = DungeonService()
+    return _dungeon_service

@@ -2,9 +2,9 @@
 
 UI components for the /pokemon shop command.
 
-Note: Views store user_id (int) instead of User objects to:
+Note: Views store player_id (int) instead of User objects to:
 1. Avoid detached instance issues in async context
-2. Match Service layer interface (user_id: int)
+2. Match Service layer interface (player_id: int)
 3. Ensure fresh data is fetched when needed
 """
 
@@ -40,10 +40,10 @@ class BuyBallModal(ui.Modal, title="購買寶貝球"):
     )
 
     def __init__(
-        self, user_id: int, ball_type: int, refresh_callback: Callable
+        self, player_id: int, ball_type: int, refresh_callback: Callable
     ) -> None:
         super().__init__()
-        self.user_id = user_id
+        self.player_id = player_id
         self.ball_type = ball_type
         self.refresh_callback = refresh_callback
 
@@ -63,7 +63,7 @@ class BuyBallModal(ui.Modal, title="購買寶貝球"):
             )
             return
 
-        result = await ShopService.buy_pokeballs(self.user_id, self.ball_type, amount)
+        result = await ShopService.buy_pokeballs(self.player_id, self.ball_type, amount)
 
         if result.success:
             # Format success message in View layer (Service returns pure data)
@@ -85,7 +85,7 @@ class BuyBallModal(ui.Modal, title="購買寶貝球"):
 class BuyBallButton(Button["ShopView"]):
     """Button to buy a specific ball type."""
 
-    def __init__(self, ball_type: int, user_id: int) -> None:
+    def __init__(self, ball_type: int, player_id: int) -> None:
         # Style based on ball tier
         styles = {
             Pokeball.POKEBALL: discord.ButtonStyle.secondary,
@@ -99,17 +99,17 @@ class BuyBallButton(Button["ShopView"]):
             style=styles.get(Pokeball(ball_type), discord.ButtonStyle.secondary),
         )
         self.ball_type = ball_type
-        self.user_id = user_id
+        self.player_id = player_id
 
     async def callback(self, interaction: Interaction) -> None:
         """Show purchase modal."""
-        if interaction.user.id != self.user_id:
+        if interaction.user.id != self.player_id:
             await interaction.response.send_message(
                 f"{Emoji.CROSS} 這不是你的商店！", ephemeral=True
             )
             return
 
-        modal = BuyBallModal(self.user_id, self.ball_type, self.view.refresh_shop)
+        modal = BuyBallModal(self.player_id, self.ball_type, self.view.refresh_shop)
         await interaction.response.send_modal(modal)
 
 
@@ -117,10 +117,10 @@ class ShopView(LayoutView):
     """Shop view with V2 components."""
 
     def __init__(
-        self, user_id: int, wallet: dict, inventory: PlayerBallInventory
+        self, player_id: int, wallet: dict, inventory: PlayerBallInventory
     ) -> None:
         super().__init__(timeout=300)
-        self.user_id = user_id
+        self.player_id = player_id
         self.wallet = wallet
         self.inventory = inventory
 
@@ -189,7 +189,7 @@ class ShopView(LayoutView):
             section = Section(
                 ball_title,
                 ball_details,
-                accessory=BuyBallButton(ball_type, self.user_id),
+                accessory=BuyBallButton(ball_type, self.player_id),
             )
             container.add_item(section)
 
@@ -204,8 +204,8 @@ class ShopView(LayoutView):
         self, interaction: Interaction, success_message: str = ""
     ) -> None:
         """Refresh the shop UI after a purchase."""
-        # Re-fetch data using user_id
-        self.wallet = (await ShopService.get_shop_inventory(self.user_id))["wallet"]
+        # Re-fetch data using player_id
+        self.wallet = (await ShopService.get_shop_inventory(self.player_id))["wallet"]
         await self.inventory.refresh_from_db()
 
         # Rebuild UI
