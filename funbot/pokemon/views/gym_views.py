@@ -19,6 +19,7 @@ from funbot.pokemon.services.gym_service import (
     GymBattleStatus,
     GymService,
 )
+from funbot.pokemon.constants.enums import Currency
 from funbot.pokemon.ui_utils import Emoji, get_currency_emoji
 from funbot.ui.components_v2 import (
     Container,
@@ -194,7 +195,7 @@ class GymBattleView(LayoutView):
 
         # Rewards
         if self.result:
-            money_emoji = get_currency_emoji("money")
+            money_emoji = get_currency_emoji(Currency.POKEDOLLAR)
             rewards = []
 
             if self.result.is_first_win:

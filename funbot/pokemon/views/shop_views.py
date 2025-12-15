@@ -11,10 +11,20 @@ import discord
 from discord import ui
 
 from funbot.pokemon.constants.enums import Currency, Pokeball
-from funbot.pokemon.constants.game_constants import POKEBALL_CATCH_BONUS, POKEBALL_PRICES
+from funbot.pokemon.constants.game_constants import (
+    POKEBALL_CATCH_BONUS,
+    POKEBALL_PRICES,
+)
 from funbot.pokemon.services.shop_service import ShopService
 from funbot.pokemon.ui_utils import Emoji, get_ball_emoji, get_currency_emoji
-from funbot.ui.components_v2 import Button, Container, LayoutView, Section, Separator, TextDisplay
+from funbot.ui.components_v2 import (
+    Button,
+    Container,
+    LayoutView,
+    Section,
+    Separator,
+    TextDisplay,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -118,8 +128,8 @@ class ShopView(LayoutView):
         self.clear_items()
 
         # Get emojis
-        money_emoji = get_currency_emoji("money")
-        quest_emoji = get_currency_emoji("questPoint")
+        money_emoji = get_currency_emoji(Currency.POKEDOLLAR)
+        quest_emoji = get_currency_emoji(Currency.QUEST_POINT)
 
         # Main container with gradient blue
         container = Container(accent_color=discord.Color.from_rgb(66, 133, 244))

@@ -318,13 +318,10 @@ class GymService:
         # Calculate total gym HP
         total_gym_hp = sum(gp.max_hp for gp in state.gym_pokemon)
 
-        # Calculate ticks needed using centralized BattleService
-        effective_attack = BattleService.calculate_damage_per_tick(state.player_attack)
-        if effective_attack <= 0:
-            state.status = GymBattleStatus.LOST
-            return state
-
-        ticks_needed = (total_gym_hp + effective_attack - 1) // effective_attack
+        # Calculate ticks needed using centralized BattleService (SSOT)
+        ticks_needed = BattleService.calculate_ticks_to_defeat(
+            total_gym_hp, state.player_attack
+        )
 
         if ticks_needed <= GYM_TIME_LIMIT:
             # Win!
@@ -341,7 +338,10 @@ class GymService:
             state.time_remaining = 0
 
             # Calculate damage dealt and update HP sequentially (with multiplier)
-            damage_dealt = effective_attack * GYM_TIME_LIMIT
+            damage_per_tick = BattleService.calculate_damage_per_tick(
+                state.player_attack
+            )
+            damage_dealt = damage_per_tick * GYM_TIME_LIMIT
             for i, gp in enumerate(state.gym_pokemon):
                 if damage_dealt >= gp.max_hp:
                     damage_dealt -= gp.max_hp

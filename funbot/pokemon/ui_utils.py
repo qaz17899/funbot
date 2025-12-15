@@ -2,9 +2,15 @@
 
 Contains emoji mappings and other UI helpers used across multiple cogs.
 Discord custom emoji IDs are used for pokeballs, currencies, and items.
+
+Key naming conventions:
+- Currency keys use snake_case to match Python conventions and Enum names
+- Pokeball keys use PascalCase to match Discord emoji names
 """
 
 from __future__ import annotations
+
+from funbot.pokemon.constants.enums import Currency, Pokeball
 
 __all__ = (
     # Badges
@@ -139,32 +145,44 @@ POKEBALL_EMOJI_IDS: dict[str, int] = {
     "Rocketball": 1449471365659885679,
 }
 
-# Pokeball enum value to emoji name mapping
+# Pokeball enum value to emoji name mapping (Maps Enum to POKEBALL_EMOJI_IDS keys)
 BALL_ENUM_TO_NAME: dict[int, str] = {
-    0: "None",
-    1: "Pokeball",
-    2: "Greatball",
-    3: "Ultraball",
-    4: "Masterball",
+    Pokeball.NONE: "None",
+    Pokeball.POKEBALL: "Pokeball",
+    Pokeball.GREATBALL: "Greatball",
+    Pokeball.ULTRABALL: "Ultraball",
+    Pokeball.MASTERBALL: "Masterball",
 }
 
 
-def get_ball_emoji(ball_id: int) -> str:
-    """Get Discord custom emoji for Pokeball type."""
-    name = BALL_ENUM_TO_NAME.get(ball_id, "Pokeball")
-    emoji_id = POKEBALL_EMOJI_IDS[name]
+def get_ball_emoji(ball: int | Pokeball) -> str:
+    """Get Discord custom emoji for Pokeball type.
+
+    Args:
+        ball: Pokeball enum or integer value
+
+    Returns:
+        Discord custom emoji string
+    """
+    ball_val = int(ball)
+    name = BALL_ENUM_TO_NAME.get(ball_val, "Pokeball")
+    emoji_id = POKEBALL_EMOJI_IDS.get(name, POKEBALL_EMOJI_IDS["Pokeball"])
     return f"<:{name}:{emoji_id}>"
 
 
 # Discord custom emoji IDs for currencies
+# Keys normalized to snake_case to match Enum names and Python conventions
 CURRENCY_EMOJI_IDS: dict[str, int] = {
+    # Primary currencies (match Currency enum)
     "money": 1449471872482672830,
-    "battlePoint": 1449471848046788639,
-    "dungeonToken": 1449471868103819446,
-    "questPoint": 1449471874902921267,
-    "farmPoint": 1449471869454385235,
-    "contestToken": 1449471864672878682,
+    "pokedollar": 1449471872482672830,  # Alias for money
+    "dungeon_token": 1449471868103819446,
+    "battle_point": 1449471848046788639,
+    "quest_point": 1449471874902921267,
+    "farm_point": 1449471869454385235,
+    "contest_token": 1449471864672878682,
     "diamond": 1449471866220581084,
+    # Coin variants
     "coinyellow": 1449471860738887752,
     "coinwhite": 1449471859123945584,
     "coinred": 1449471857395896463,
@@ -175,11 +193,31 @@ CURRENCY_EMOJI_IDS: dict[str, int] = {
     "coinblue": 1449471849770520647,
 }
 
+# Currency enum to emoji key mapping
+_CURRENCY_ENUM_TO_KEY: dict[Currency, str] = {
+    Currency.POKEDOLLAR: "money",
+    Currency.DUNGEON_TOKEN: "dungeon_token",
+    Currency.BATTLE_POINT: "battle_point",
+    Currency.QUEST_POINT: "quest_point",
+}
 
-def get_currency_emoji(currency: str) -> str:
-    """Get Discord custom emoji for currency type."""
-    emoji_id = CURRENCY_EMOJI_IDS.get(currency, CURRENCY_EMOJI_IDS["money"])
-    return f"<:{currency}:{emoji_id}>"
+
+def get_currency_emoji(currency: str | Currency) -> str:
+    """Get Discord custom emoji for currency type.
+
+    Args:
+        currency: Currency enum or string key (snake_case)
+
+    Returns:
+        Discord custom emoji string
+    """
+    if isinstance(currency, Currency):
+        key = _CURRENCY_ENUM_TO_KEY.get(currency, "money")
+    else:
+        key = currency
+
+    emoji_id = CURRENCY_EMOJI_IDS.get(key, CURRENCY_EMOJI_IDS["money"])
+    return f"<:{key}:{emoji_id}>"
 
 
 # Discord custom emoji IDs for type gems (18 types)

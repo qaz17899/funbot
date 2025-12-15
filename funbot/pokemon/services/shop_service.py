@@ -125,14 +125,8 @@ class ShopService:
 
         if not can_afford:
             _price, currency_type = ShopService.get_ball_price(ball_type)
-            # Get currency emoji based on type
-            currency_emoji_map = {
-                Currency.POKEDOLLAR: get_currency_emoji("money"),
-                Currency.QUEST_POINT: get_currency_emoji("questPoint"),
-                Currency.DUNGEON_TOKEN: get_currency_emoji("dungeonToken"),
-                Currency.BATTLE_POINT: get_currency_emoji("battlePoint"),
-            }
-            currency_emoji = currency_emoji_map.get(Currency(currency_type), "💰")
+            # Get currency emoji based on type (using Currency enum directly)
+            currency_emoji = get_currency_emoji(Currency(currency_type))
             return PurchaseResult(
                 success=False,
                 message=f"資金不足！需要 {total_cost:,} {currency_emoji}，你只有 {balance:,} {currency_emoji}",

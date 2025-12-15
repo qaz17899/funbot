@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 
 import discord
 
+from funbot.pokemon.constants.enums import Currency
 from funbot.pokemon.ui_utils import DUNGEON_TILE_EMOJI, get_currency_emoji
 from funbot.ui.components_v2 import Container, LayoutView, TextDisplay
 
@@ -62,7 +63,7 @@ class DungeonListView(LayoutView):
         super().__init__(author=author, timeout=120)
 
         region_name = REGION_NAMES.get(region, f"Region {region}")
-        token_emoji = get_currency_emoji("dungeon_token")
+        token_emoji = get_currency_emoji(Currency.DUNGEON_TOKEN)
 
         container = Container(accent_color=discord.Color.dark_purple())
 
@@ -249,8 +250,8 @@ class DungeonExploreView(LayoutView):
         container.add_item(discord.ui.Separator(spacing=discord.SeparatorSpacing.small))
 
         # Rewards
-        money_emoji = get_currency_emoji("money")
-        token_emoji = get_currency_emoji("dungeon_token")
+        money_emoji = get_currency_emoji(Currency.POKEDOLLAR)
+        token_emoji = get_currency_emoji(Currency.DUNGEON_TOKEN)
 
         money = self.rewards.get("money", 0)
         exp = self.rewards.get("exp", 0)
@@ -719,8 +720,8 @@ class DungeonResultView(LayoutView):
         container.add_item(discord.ui.Separator(spacing=discord.SeparatorSpacing.small))
 
         # Rewards
-        money_emoji = get_currency_emoji("money")
-        token_emoji = get_currency_emoji("dungeon_token")
+        money_emoji = get_currency_emoji(Currency.POKEDOLLAR)
+        token_emoji = get_currency_emoji(Currency.DUNGEON_TOKEN)
 
         rewards = [
             f"💰 **金錢**: {money_earned:,} {money_emoji}",

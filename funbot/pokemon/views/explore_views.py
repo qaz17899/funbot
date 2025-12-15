@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 
 import discord
 
+from funbot.pokemon.constants.enums import Currency
 from funbot.pokemon.ui_utils import Emoji, get_currency_emoji
 from funbot.ui.components_v2 import Container, LayoutView, TextDisplay
 
@@ -50,8 +51,8 @@ class ExploreResultView(LayoutView):
         container.add_item(discord.ui.Separator(spacing=discord.SeparatorSpacing.small))
 
         # Battle stats
-        money_emoji = get_currency_emoji("money")
-        token_emoji = get_currency_emoji("dungeonToken")
+        money_emoji = get_currency_emoji(Currency.POKEDOLLAR)
+        token_emoji = get_currency_emoji(Currency.DUNGEON_TOKEN)
         battle_summary = (
             f"{Emoji.BATTLE} 戰鬥: {results.total_battles} 場\n"
             f"{Emoji.EXP} 經驗: +{results.total_exp:,}\n"
