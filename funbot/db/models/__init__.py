@@ -8,6 +8,8 @@ from funbot.db.models.pokemon import (
     DungeonData,
     DungeonLoot,
     DungeonPokemon,
+    DungeonTrainer,
+    DungeonTrainerPokemon,
     # Gym system
     GymData,
     GymPokemon,
@@ -17,6 +19,7 @@ from funbot.db.models.pokemon import (
     PlayerBallInventory,
     PlayerBattleProgress,
     PlayerDungeonProgress,
+    PlayerDungeonRun,
     PlayerEgg,
     PlayerKeyItem,
     PlayerPokeballSettings,
@@ -47,6 +50,8 @@ __all__ = (
     "DungeonData",
     "DungeonLoot",
     "DungeonPokemon",
+    "DungeonTrainer",
+    "DungeonTrainerPokemon",
     # Gym system models
     "GymData",
     "GymPokemon",
@@ -55,6 +60,7 @@ __all__ = (
     "PlayerBallInventory",
     "PlayerBattleProgress",
     "PlayerDungeonProgress",
+    "PlayerDungeonRun",
     "PlayerEgg",
     "PlayerKeyItem",
     # Pokemon models

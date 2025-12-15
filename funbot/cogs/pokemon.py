@@ -27,7 +27,12 @@ from funbot.db.models.pokemon import (
 from funbot.db.models.pokemon.player_ball_inventory import PlayerBallInventory
 from funbot.db.models.pokemon.route_data import RouteData
 from funbot.db.models.user import User
-from funbot.pokemon.autocomplete import gym_autocomplete, region_autocomplete, route_autocomplete
+from funbot.pokemon.autocomplete import (
+    dungeon_autocomplete,
+    gym_autocomplete,
+    region_autocomplete,
+    route_autocomplete,
+)
 from funbot.pokemon.constants.enums import Pokeball, Region
 from funbot.pokemon.constants.game_constants import DEFAULT_STARTER_REGION, STARTERS
 from funbot.pokemon.services.battle_service import BattleService
@@ -76,6 +81,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
     pokemon = app_commands.Group(name="pokemon", description="寶可夢指令")
     hatchery = app_commands.Group(
         name="hatchery", parent=pokemon, description="孵化場指令"
+    )
+    dungeon = app_commands.Group(
+        name="dungeon", parent=pokemon, description="地下城指令"
     )
 
     # ═══════════════════════════════════════════════════════════════════════
@@ -663,6 +671,131 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         lines.append("\n-# 等級已重置為 Lv.1")
 
         await interaction.followup.send("\n".join(lines))
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # /pokemon dungeon list
+    # ═══════════════════════════════════════════════════════════════════════
+
+    @dungeon.command(name="list", description="查看可用的地下城")
+    @app_commands.describe(region="地區編號 (0=關都)")
+    @app_commands.autocomplete(region=region_autocomplete)
+    async def dungeon_list(self, interaction: Interaction, region: int = 0) -> None:
+        """List available dungeons in a region."""
+        from funbot.pokemon.services.dungeon_service import DungeonService
+        from funbot.pokemon.views.dungeon_views import DungeonListView
+
+        await interaction.response.defer()
+
+        user_id = interaction.user.id
+        service = DungeonService()
+
+        dungeons = await service.get_available_dungeons(user_id, region)
+
+        view = DungeonListView(dungeons, region, author=interaction.user)
+        await interaction.followup.send(view=view)
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # /pokemon dungeon enter
+    # ═══════════════════════════════════════════════════════════════════════
+
+    @dungeon.command(name="enter", description="進入地下城")
+    @app_commands.describe(region="地區編號 (0=關都)", name="地下城名稱")
+    @app_commands.autocomplete(
+        region=region_autocomplete,
+        name=dungeon_autocomplete,  # pyright: ignore[reportArgumentType]
+    )
+    async def dungeon_enter(
+        self, interaction: Interaction, region: int = 0, name: str = ""
+    ) -> None:
+        """Enter a dungeon and start auto-exploration."""
+        from funbot.db.models.pokemon.dungeon_data import DungeonData
+        from funbot.pokemon.services.dungeon_service import DungeonService
+        from funbot.pokemon.views.dungeon_views import DungeonExploreView
+
+        await interaction.response.defer()
+
+        user_id = interaction.user.id
+        service = DungeonService()
+
+        # Find dungeon by name
+        dungeon = await DungeonData.filter(name__icontains=name).first()
+        if not dungeon:
+            await interaction.followup.send(
+                f"{Emoji.CROSS} 找不到地下城: {name}", ephemeral=True
+            )
+            return
+
+        # Check if can enter
+        can_enter, reason, hints = await service.can_enter_dungeon(user_id, dungeon.id)
+        if not can_enter:
+            msg = f"{Emoji.CROSS} {reason}"
+            if hints:
+                msg += f"\n-# 解鎖條件: {', '.join(hints)}"
+            await interaction.followup.send(msg, ephemeral=True)
+            return
+
+        # Start dungeon run
+        result = await service.start_dungeon_run(user_id, dungeon.id)
+        if not result.success:
+            await interaction.followup.send(
+                f"{Emoji.CROSS} {result.reason}", ephemeral=True
+            )
+            return
+
+        # Get run data
+        if result.run_id is None:
+            await interaction.followup.send(
+                f"{Emoji.CROSS} 無法創建地下城探索", ephemeral=True
+            )
+            return
+
+        # Create explore view with auto-exploration
+        view = DungeonExploreView(
+            run_id=result.run_id,
+            dungeon_name=dungeon.name,
+            user_id=user_id,
+            author=interaction.user,
+        )
+
+        # Send initial message and start exploration loop
+        await interaction.followup.send(view=view)
+        await view.run_exploration(interaction)
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # /pokemon dungeon status
+    # ═══════════════════════════════════════════════════════════════════════
+
+    @dungeon.command(name="status", description="查看當前地下城狀態")
+    async def dungeon_status(self, interaction: Interaction) -> None:
+        """Show current dungeon run status and resume exploration."""
+        from funbot.pokemon.services.dungeon_service import DungeonService
+        from funbot.pokemon.views.dungeon_views import DungeonExploreView
+
+        await interaction.response.defer()
+
+        user_id = interaction.user.id
+        service = DungeonService()
+
+        # Get active run
+        run = await service.get_active_run(user_id)
+        if not run:
+            await interaction.followup.send(
+                f"{Emoji.CROSS} 你目前沒有進行中的地下城探索。\n"
+                "-# 使用 `/pokemon dungeon list` 查看可用地下城",
+                ephemeral=True,
+            )
+            return
+
+        # Create explore view and resume exploration
+        view = DungeonExploreView(
+            run_id=run.id,
+            dungeon_name=run.dungeon.name,
+            user_id=user_id,
+            author=interaction.user,
+        )
+
+        await interaction.followup.send(view=view)
+        await view.run_exploration(interaction)
 
 
 async def setup(bot: FunBot) -> None:

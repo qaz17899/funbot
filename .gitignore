@@ -208,3 +208,4 @@ __marimo__/
 reference/
 .agent/
 logs/
+.kiro/

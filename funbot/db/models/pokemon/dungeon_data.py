@@ -22,6 +22,7 @@ class DungeonData(BaseModel):
     # Reverse relations
     pokemon: fields.ReverseRelation[DungeonPokemon]
     loot: fields.ReverseRelation[DungeonLoot]
+    trainers: fields.ReverseRelation[DungeonTrainer]
 
     def __str__(self) -> str:
         return f"Dungeon: {self.name}"
@@ -85,3 +86,98 @@ class PlayerDungeonProgress(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.dungeon.name}: {self.clears} clears"
+
+
+class DungeonTrainer(BaseModel):
+    """Trainer encounters in a dungeon.
+
+    Trainers are NPCs that the player can battle in dungeons.
+    Each trainer has a team of Pokemon that must be defeated sequentially.
+    """
+
+    class Meta:
+        table = "pokemon_dungeon_trainer"
+
+    id = fields.IntField(primary_key=True)
+    dungeon = fields.ForeignKeyField(
+        "models.DungeonData", related_name="trainers", on_delete=fields.CASCADE
+    )
+    trainer_class = fields.CharField(
+        max_length=100
+    )  # e.g., "Bug Catcher", "Team Rocket Grunt"
+    trainer_name = fields.CharField(max_length=100, null=True)  # Optional specific name
+    weight = fields.IntField(default=1)  # Encounter weight
+    is_boss = fields.BooleanField(default=False)  # Whether this is a boss trainer
+
+    # Reverse relation for trainer's Pokemon
+    pokemon: fields.ReverseRelation[DungeonTrainerPokemon]
+
+    def __str__(self) -> str:
+        prefix = "[BOSS] " if self.is_boss else ""
+        name = self.trainer_name or self.trainer_class
+        return f"{prefix}{name}"
+
+
+class DungeonTrainerPokemon(BaseModel):
+    """Pokemon in a dungeon trainer's team.
+
+    Each Pokemon must be defeated in order before the trainer is considered defeated.
+    """
+
+    class Meta:
+        table = "pokemon_dungeon_trainer_pokemon"
+
+    id = fields.IntField(primary_key=True)
+    trainer = fields.ForeignKeyField(
+        "models.DungeonTrainer", related_name="pokemon", on_delete=fields.CASCADE
+    )
+    pokemon_name = fields.CharField(max_length=100)
+    health = fields.BigIntField()  # BigInt for large health values
+    level = fields.IntField()
+    order = fields.IntField(default=0)  # Position in team (0 = first)
+
+    def __str__(self) -> str:
+        return f"{self.pokemon_name} (Lv.{self.level})"
+
+
+class PlayerDungeonRun(BaseModel):
+    """Active dungeon run session.
+
+    Tracks the state of a player's current dungeon exploration.
+    Allows resuming interrupted runs and preserves collected loot.
+    """
+
+    class Meta:
+        table = "pokemon_player_dungeon_run"
+
+    id = fields.IntField(primary_key=True)
+    player = fields.ForeignKeyField(
+        "models.User", related_name="dungeon_runs", on_delete=fields.CASCADE
+    )
+    dungeon = fields.ForeignKeyField(
+        "models.DungeonData", related_name="active_runs", on_delete=fields.CASCADE
+    )
+    started_at = fields.DatetimeField(auto_now_add=True)
+
+    # Map state - serialized DungeonMap
+    map_data = fields.JSONField(
+        description="Serialized map state with tiles and visibility"
+    )
+
+    # Current position - {x, y, floor}
+    current_position = fields.JSONField(description="Player position {x, y, floor}")
+
+    # Progress tracking
+    chests_opened = fields.IntField(default=0)
+    enemies_defeated = fields.IntField(default=0)
+
+    # Collected loot - list of {item_name, tier, amount}
+    loot_collected = fields.JSONField(
+        default=list, description="List of collected loot items"
+    )
+
+    # Run status: "in_progress", "completed", "abandoned"
+    status = fields.CharField(max_length=20, default="in_progress")
+
+    def __str__(self) -> str:
+        return f"Run #{self.id}: {self.dungeon.name} ({self.status})"
