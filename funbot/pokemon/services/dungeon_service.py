@@ -601,9 +601,21 @@ class DungeonService:
 
         # Attempt catch for wild Pokemon (Requirement 2.3)
         if battle_result.defeated:
-            catch_success = await self._attempt_catch(player_id, enemy_name)
-            battle_result.catch_attempted = True
-            battle_result.catch_success = catch_success
+            from funbot.pokemon.constants.game_constants import SHINY_CHANCE_DUNGEON
+            from funbot.pokemon.services.catch_service import CatchContext, CatchService
+
+            # Use centralized CatchService for complete catch sequence
+            # This handles: ball selection, inventory, catch attempt, EVs, tokens, stats
+            catch_result = await CatchService.perform_catch_sequence(
+                player_id=player_id,
+                pokemon_name=enemy_name,
+                shiny_chance=SHINY_CHANCE_DUNGEON,
+                context=CatchContext.DUNGEON,
+                route_number=(run.dungeon.region + 1) * 5,  # Approximate difficulty
+                region=run.dungeon.region,
+            )
+            battle_result.catch_attempted = not catch_result.skipped
+            battle_result.catch_success = catch_result.success
 
         return battle_result
 
@@ -698,105 +710,6 @@ class DungeonService:
                 return enemy.pokemon_name
 
         return enemies[0].pokemon_name
-
-    async def _attempt_catch(self, player_id: int, pokemon_name: str) -> bool:
-        """Attempt to catch a Pokemon after battle.
-
-        Uses the same catch logic as route exploration:
-        - Check pokeball settings
-        - Use available pokeballs
-        - Calculate catch rate based on Pokemon's catch_rate
-        - Create PlayerPokemon record on success (if new)
-
-        Args:
-            player_id: The player's user ID
-            pokemon_name: Name of the Pokemon to catch
-
-        Returns:
-            True if catch was successful
-        """
-        from funbot.db.models.pokemon import PlayerPokeballSettings, PlayerPokemon
-        from funbot.db.models.pokemon.player_ball_inventory import PlayerBallInventory
-        from funbot.db.models.pokemon.pokemon_data import PokemonData
-        from funbot.pokemon.constants.enums import Pokeball
-        from funbot.pokemon.constants.game_constants import SHINY_CHANCE_DUNGEON
-        from funbot.pokemon.services.catch_service import CatchService
-
-        # Get Pokemon data
-        pokemon_data = await PokemonData.filter(name=pokemon_name).first()
-        if not pokemon_data:
-            logger.warning("Pokemon not found: {}", pokemon_name)
-            return False
-
-        # Check if player already owns this Pokemon
-        existing = await PlayerPokemon.filter(
-            user_id=player_id, pokemon_data_id=pokemon_data.id
-        ).first()
-        is_new = existing is None
-
-        # Roll for shiny (dungeon has better shiny rate: 1/4096 vs 1/8192)
-        is_shiny = CatchService.roll_shiny(SHINY_CHANCE_DUNGEON)
-
-        # Get player's pokeball settings
-        settings, _ = await PlayerPokeballSettings.get_or_create(user_id=player_id)
-
-        # Determine which ball to use based on settings
-        if is_new and is_shiny:
-            preferred_ball = settings.new_shiny
-        elif is_new:
-            preferred_ball = settings.new_pokemon
-        elif is_shiny:
-            preferred_ball = settings.caught_shiny
-        else:
-            preferred_ball = settings.caught_pokemon
-
-        if preferred_ball == Pokeball.NONE:
-            # Player doesn't want to catch this type
-            return False
-
-        # Get ball inventory
-        inventory, _ = await PlayerBallInventory.get_or_create(user_id=player_id)
-
-        # Find available ball (fallback to lower tier)
-        actual_ball = None
-        for ball_type in [
-            preferred_ball,
-            Pokeball.ULTRABALL,
-            Pokeball.GREATBALL,
-            Pokeball.POKEBALL,
-        ]:
-            if ball_type <= preferred_ball and inventory.get_quantity(ball_type) > 0:
-                actual_ball = ball_type
-                break
-
-        if actual_ball is None:
-            # No balls available
-            return False
-
-        # Use the ball
-        await inventory.use_ball(actual_ball)
-
-        # Attempt catch using Pokemon's actual catch_rate
-        catch_result = CatchService.attempt_catch(pokemon_data.catch_rate, actual_ball)
-
-        if not catch_result.success:
-            return False
-
-        # Catch successful - create PlayerPokemon record if new
-        if is_new:
-            await PlayerPokemon.create(
-                user_id=player_id,
-                pokemon_data_id=pokemon_data.id,
-                shiny=is_shiny,
-            )
-            logger.info(
-                "Player {} caught new {} in dungeon (shiny={})",
-                player_id,
-                pokemon_name,
-                is_shiny,
-            )
-
-        return True
 
     async def _get_player_highest_region(self, player_id: int) -> int:
         """Get the highest region the player has reached.
