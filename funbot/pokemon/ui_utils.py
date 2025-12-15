@@ -41,6 +41,7 @@ __all__ = (
     "Emoji",
     # Functions (alphabetical)
     "build_progress_bar",
+    "format_currency",
     "format_dungeon_choice",
     "format_gym_choice",
     "format_route_choice",
@@ -251,6 +252,22 @@ def build_progress_bar(
     if isinstance(current, int) and isinstance(maximum, int):
         return f"{bar} {current:,}/{maximum:,}"
     return f"{bar} {current:.1f}/{maximum:.1f}"
+
+
+def format_currency(amount: int, currency: str | Currency) -> str:
+    """Format currency amount with emoji and thousands separator.
+
+    Centralized function for consistent currency display across all Views.
+
+    Args:
+        amount: The amount of currency
+        currency: Currency enum or string key
+
+    Returns:
+        Formatted string (e.g., "1,000 💰")
+    """
+    emoji = get_currency_emoji(currency)
+    return f"{amount:,} {emoji}"
 
 
 # Discord custom emoji IDs for pokeballs

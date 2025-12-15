@@ -24,10 +24,16 @@ from funbot.pokemon.ui_utils import (
     GYM_STATUS_EMOJI,
     Emoji,
     build_progress_bar,
-    get_currency_emoji,
+    format_currency,
     get_leader_image_url,
 )
-from funbot.ui.components_v2 import Container, LayoutView, Section, TextDisplay, Thumbnail
+from funbot.ui.components_v2 import (
+    Container,
+    LayoutView,
+    Section,
+    TextDisplay,
+    Thumbnail,
+)
 
 if TYPE_CHECKING:
     from funbot.db.models.pokemon.gym_data import GymData
@@ -175,7 +181,6 @@ class GymBattleView(LayoutView):
 
         # Rewards
         if self.result:
-            money_emoji = get_currency_emoji(Currency.POKEDOLLAR)
             rewards = []
 
             if self.result.is_first_win:
@@ -183,7 +188,7 @@ class GymBattleView(LayoutView):
 
             rewards.extend(
                 (
-                    f"**獎金**: {self.result.money_earned:,} {money_emoji}",
+                    f"**獎金**: {format_currency(self.result.money_earned, Currency.POKEDOLLAR)}",
                     f"⏱️ **用時**: {self.result.time_used:.1f}秒",
                 )
             )

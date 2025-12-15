@@ -17,7 +17,7 @@ from discord import ui
 
 from funbot.pokemon.constants.enums import Currency, Pokeball
 from funbot.pokemon.services.shop_service import ShopService
-from funbot.pokemon.ui_utils import Emoji, get_ball_emoji, get_currency_emoji, get_pokeball_name
+from funbot.pokemon.ui_utils import Emoji, format_currency, get_ball_emoji, get_pokeball_name
 from funbot.ui.components_v2 import Button, Container, LayoutView, Section, Separator, TextDisplay
 
 if TYPE_CHECKING:
@@ -71,10 +71,10 @@ class BuyBallModal(ui.Modal, title="購買寶貝球"):
             await self.refresh_callback(interaction, message)
         else:
             # Format error message in View layer
-            currency_emoji = get_currency_emoji(Currency(result.currency_type))
+            currency_type = Currency(result.currency_type)
             error_msg = (
-                f"資金不足！需要 {result.total_cost:,} {currency_emoji}，"
-                f"你只有 {result.new_balance:,} {currency_emoji}"
+                f"資金不足！需要 {format_currency(result.total_cost, currency_type)}，"
+                f"你只有 {format_currency(result.new_balance, currency_type)}"
             )
             await interaction.response.send_message(
                 f"{Emoji.CROSS} {error_msg}", ephemeral=True
@@ -130,10 +130,6 @@ class ShopView(LayoutView):
         # Clear existing items
         self.clear_items()
 
-        # Get emojis
-        money_emoji = get_currency_emoji(Currency.POKEDOLLAR)
-        quest_emoji = get_currency_emoji(Currency.QUEST_POINT)
-
         # Main container with gradient blue
         container = Container(accent_color=discord.Color.from_rgb(66, 133, 244))
 
@@ -146,8 +142,8 @@ class ShopView(LayoutView):
         # Wallet Section
         wallet_text = (
             f"### 💰 錢包餘額\n"
-            f"**{self.wallet['pokedollar']:,}** {money_emoji}\n"
-            f"**{self.wallet['quest_point']:,}** {quest_emoji}"
+            f"**{format_currency(self.wallet['pokedollar'], Currency.POKEDOLLAR)}**\n"
+            f"**{format_currency(self.wallet['quest_point'], Currency.QUEST_POINT)}**"
         )
         container.add_item(TextDisplay(wallet_text))
         container.add_item(Separator(spacing=discord.SeparatorSpacing.small))
@@ -167,11 +163,8 @@ class ShopView(LayoutView):
             price, currency_type = ShopService.get_ball_price(ball_type)
             catch_bonus = ShopService.get_ball_catch_bonus(ball_type)
 
-            # Currency display
-            if currency_type == Currency.POKEDOLLAR:
-                price_str = f"{price:,} {money_emoji}"
-            else:
-                price_str = f"{price:,} {quest_emoji}"
+            # Currency display using centralized format_currency
+            price_str = format_currency(price, Currency(currency_type))
 
             # Catch bonus display
             if ball_type == Pokeball.MASTERBALL:
