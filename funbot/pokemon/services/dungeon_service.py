@@ -21,7 +21,10 @@ from funbot.db.models.pokemon.player_wallet import PlayerWallet
 from funbot.db.models.pokemon.route_requirement import RequirementType, RouteRequirement
 from funbot.pokemon.services.battle_service import BattleService
 from funbot.pokemon.services.dungeon_battle_service import DungeonRewards
-from funbot.pokemon.services.dungeon_exploration_service import ExploreStepResult, MoveResult
+from funbot.pokemon.services.dungeon_exploration_service import (
+    ExploreStepResult,
+    MoveResult,
+)
 from funbot.pokemon.services.dungeon_map import DungeonMap, DungeonMapGenerator
 
 if TYPE_CHECKING:
@@ -593,7 +596,7 @@ class DungeonService:
 
         # Simulate battle
         battle_result = DungeonBattleService.simulate_battle(
-            player_attack=party_attack,
+            party_attack=party_attack,
             enemy_health=enemy_health,
             enemy_name=enemy_name,
             is_boss=False,
@@ -787,7 +790,7 @@ class DungeonService:
 
         # Simulate boss battle
         battle_result = DungeonBattleService.simulate_boss_battle(
-            player_attack=party_attack,
+            party_attack=party_attack,
             boss_health=boss_stats["health"],
             boss_name=boss_stats["name"],
             boss_level=boss_stats["level"],

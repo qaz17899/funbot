@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING
 
 import discord
 
@@ -118,9 +118,6 @@ class DungeonExploreView(LayoutView):
         - 6.2: Show current position, revealed tiles, remaining actions
     """
 
-    # Tile type to emoji mapping (centralized in ui_utils)
-    TILE_EMOJIS: ClassVar[dict[str, str]] = DUNGEON_TILE_EMOJI
-
     def __init__(
         self,
         run_id: int,
@@ -177,16 +174,16 @@ class DungeonExploreView(LayoutView):
             row = []
             for x in range(size):
                 if (x, y) == player_pos:
-                    row.append(self.TILE_EMOJIS["player"])
+                    row.append(DUNGEON_TILE_EMOJI["player"])
                 elif y < len(tiles) and x < len(tiles[y]):
                     tile = tiles[y][x]
                     if tile.get("is_visible", False):
                         tile_type = tile.get("tile_type", "empty")
-                        row.append(self.TILE_EMOJIS.get(tile_type, "❓"))
+                        row.append(DUNGEON_TILE_EMOJI.get(tile_type, "❓"))
                     else:
-                        row.append(self.TILE_EMOJIS["fog"])
+                        row.append(DUNGEON_TILE_EMOJI["fog"])
                 else:
-                    row.append(self.TILE_EMOJIS["fog"])
+                    row.append(DUNGEON_TILE_EMOJI["fog"])
             lines.append("".join(row))
 
         return "\n".join(lines)

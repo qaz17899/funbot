@@ -125,10 +125,10 @@ class BattleService:
         return max(10, money)
 
     @staticmethod
-    def calculate_catch_dungeon_tokens(route: int, region: int) -> int:
-        """Calculate dungeon tokens earned from catching a Pokemon.
+    def calculate_dungeon_tokens(route: int, region: int) -> int:
+        """Calculate dungeon tokens earned.
 
-        This is awarded on EVERY successful catch (route or dungeon).
+        Awarded on successful catches and dungeon completion.
         Formula (Pokeclicker exact): max(1, 6 * pow(route * 2 / (2.8 / (1 + region / 3)), 1.08))
 
         Args:
@@ -140,9 +140,6 @@ class BattleService:
         """
         tokens = 6 * pow(route * 2 / (2.8 / (1 + region / 3)), 1.08)
         return max(1, int(tokens))
-
-    # Backwards compatibility alias
-    calculate_dungeon_tokens = calculate_catch_dungeon_tokens
 
     @staticmethod
     def calculate_party_attack(
