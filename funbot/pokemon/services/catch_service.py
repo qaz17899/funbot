@@ -170,8 +170,14 @@ class CatchService:
         Returns:
             Available Pokeball or None if no balls available
         """
-        # Fallback priority: Preferred -> Ultra -> Great -> Poke
-        for ball_type in [Pokeball.ULTRABALL, Pokeball.GREATBALL, Pokeball.POKEBALL]:
+        # Fallback priority: Master -> Ultra -> Great -> Poke
+        # Include MASTERBALL in the list to handle all ball types
+        for ball_type in [
+            Pokeball.MASTERBALL,
+            Pokeball.ULTRABALL,
+            Pokeball.GREATBALL,
+            Pokeball.POKEBALL,
+        ]:
             if ball_type <= preferred_ball and get_quantity_fn(ball_type) > 0:
                 return ball_type
         return None
@@ -435,7 +441,9 @@ class CatchService:
 
         # 3. Track local state for batch operations
         ball_usage: dict[Pokeball, int] = {}
-        new_pokemon_to_create: list[dict] = []
+        # Track newly caught Pokemon stats (keyed by pokemon_id)
+        # This prevents IntegrityError when same Pokemon caught multiple times in batch
+        newly_caught_stats: dict[int, dict] = {}
         pokemon_to_update: list[PlayerPokemon] = []
         total_tokens = 0
         tokens_per_catch = BattleService.calculate_dungeon_tokens(route_number, region)
@@ -456,9 +464,9 @@ class CatchService:
                 is_shiny=is_shiny,
             )
 
-            # Check ownership
-            existing = owned_map.get(pokemon_id)
-            is_new = existing is None
+            # Check ownership (from DB and from this batch)
+            existing_in_db = owned_map.get(pokemon_id)
+            is_new = existing_in_db is None and pokemon_id not in newly_caught_stats
             result.is_new = is_new
 
             # Determine ball
@@ -473,6 +481,7 @@ class CatchService:
             # Find available ball (accounting for local usage)
             actual_ball = None
             for ball_type in [
+                Pokeball.MASTERBALL,
                 Pokeball.ULTRABALL,
                 Pokeball.GREATBALL,
                 Pokeball.POKEBALL,
@@ -507,50 +516,55 @@ class CatchService:
             result.dungeon_tokens_earned = tokens_per_catch
 
             if is_new:
-                # Queue for batch creation
-                new_pokemon_to_create.append(
-                    {
-                        "user_id": player_id,
-                        "pokemon_data_id": pokemon_id,
-                        "shiny": is_shiny,
-                        "stat_captured": 1,
-                        "stat_shiny_captured": 1 if is_shiny else 0,
-                    }
-                )
-                # Add to owned_map to prevent duplicate creation
-                owned_map[pokemon_id] = None  # Placeholder
+                # First time catching this Pokemon in this batch
+                newly_caught_stats[pokemon_id] = {
+                    "user_id": player_id,
+                    "pokemon_data_id": pokemon_id,
+                    "shiny": is_shiny,
+                    "stat_captured": 1,
+                    "stat_shiny_captured": 1 if is_shiny else 0,
+                }
                 result.stats_updated = {"stat_captured": 1}
-            else:
-                # Update existing Pokemon
-                if existing and existing not in pokemon_to_update:
-                    ep_earned = CatchService.calculate_effort_points(context, is_shiny)
-                    result.effort_points_earned = ep_earned
+            elif pokemon_id in newly_caught_stats:
+                # Duplicate catch of a Pokemon that is new in this batch
+                newly_caught_stats[pokemon_id]["stat_captured"] += 1
+                if is_shiny:
+                    newly_caught_stats[pokemon_id]["stat_shiny_captured"] += 1
+                    if not newly_caught_stats[pokemon_id]["shiny"]:
+                        newly_caught_stats[pokemon_id]["shiny"] = True
+            elif existing_in_db:
+                # Duplicate catch of a Pokemon already in the DB
+                # Stats should update for EVERY catch, not just the first one
+                ep_earned = CatchService.calculate_effort_points(context, is_shiny)
+                result.effort_points_earned = ep_earned
 
-                    existing.stat_captured += 1
-                    if is_shiny:
-                        existing.stat_shiny_captured += 1
-                        if not existing.shiny:
-                            existing.shiny = True
+                existing_in_db.stat_captured += 1
+                if is_shiny:
+                    existing_in_db.stat_shiny_captured += 1
+                    if not existing_in_db.shiny:
+                        existing_in_db.shiny = True
 
-                    if existing.can_gain_evs:
-                        existing.effort_points += ep_earned
-                        if (
-                            existing.pokerus == PokerusState.CONTAGIOUS
-                            and existing.evs >= 50
-                        ):
-                            existing.pokerus = PokerusState.RESISTANT
-                            result.pokerus_evolved = True
+                if existing_in_db.can_gain_evs:
+                    existing_in_db.effort_points += ep_earned
+                    if (
+                        existing_in_db.pokerus == PokerusState.CONTAGIOUS
+                        and existing_in_db.evs >= 50
+                    ):
+                        existing_in_db.pokerus = PokerusState.RESISTANT
+                        result.pokerus_evolved = True
 
-                    pokemon_to_update.append(existing)
+                # Only add to update list once (but stats accumulate above)
+                if existing_in_db not in pokemon_to_update:
+                    pokemon_to_update.append(existing_in_db)
 
             results.append(result)
 
         # === Batch DB Operations ===
 
         # 5. Create new Pokemon in batch
-        if new_pokemon_to_create:
+        if newly_caught_stats:
             await PlayerPokemon.bulk_create(
-                [PlayerPokemon(**data) for data in new_pokemon_to_create]
+                [PlayerPokemon(**data) for data in newly_caught_stats.values()]
             )
 
         # 6. Update existing Pokemon in batch
