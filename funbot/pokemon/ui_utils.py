@@ -13,31 +13,27 @@ from __future__ import annotations
 from funbot.pokemon.constants.enums import Currency, LootTier, Pokeball, Region
 
 __all__ = (
-    # Badges
+    # Constants (alphabetical)
     "BADGE_EMOJI_IDS",
-    # Currency
     "CURRENCY_EMOJI_IDS",
-    # Gems
-    "GEM_EMOJI_IDS",
-    # Pokeballs
-    "POKEBALL_EMOJI_IDS",
-    # Status & Map
-    "ROUTE_STATUS_EMOJI",
     "DUNGEON_TILE_EMOJI",
-    # Loot & Region
+    "GEM_EMOJI_IDS",
     "LOOT_TIER_EMOJIS",
+    "POKEBALL_DISPLAY_NAMES",
+    "POKEBALL_EMOJI_IDS",
     "REGION_DISPLAY_NAMES",
-    # Types
+    "ROUTE_STATUS_EMOJI",
     "TYPE_EMOJIS",
-    # Common emojis
+    # Classes
     "Emoji",
-    # Helper functions
+    # Functions (alphabetical)
     "build_progress_bar",
     "get_badge_emoji",
     "get_ball_emoji",
     "get_currency_emoji",
     "get_gem_emoji",
     "get_loot_tier_emoji",
+    "get_pokeball_name",
     "get_type_emoji",
 )
 
@@ -130,18 +126,40 @@ LOOT_TIER_EMOJIS: dict[LootTier, str] = {
     LootTier.MYTHIC: "🔴",
 }
 
-# Region Display Names (centralized)
+# Region Display Names (centralized, with localized names)
 REGION_DISPLAY_NAMES: dict[int, str] = {
-    Region.KANTO: "Kanto",
-    Region.JOHTO: "Johto",
-    Region.HOENN: "Hoenn",
-    Region.SINNOH: "Sinnoh",
-    Region.UNOVA: "Unova",
-    Region.KALOS: "Kalos",
-    Region.ALOLA: "Alola",
-    Region.GALAR: "Galar",
-    Region.PALDEA: "Paldea",
+    Region.KANTO: "關都 Kanto",
+    Region.JOHTO: "城都 Johto",
+    Region.HOENN: "豐緣 Hoenn",
+    Region.SINNOH: "神奧 Sinnoh",
+    Region.UNOVA: "合眾 Unova",
+    Region.KALOS: "卡洛斯 Kalos",
+    Region.ALOLA: "阿羅拉 Alola",
+    Region.GALAR: "伽勒爾 Galar",
+    Region.PALDEA: "帕底亞 Paldea",
 }
+
+# Pokeball Display Names
+POKEBALL_DISPLAY_NAMES: dict[int, str] = {
+    Pokeball.NONE: "None",
+    Pokeball.POKEBALL: "Poké Ball",
+    Pokeball.GREATBALL: "Great Ball",
+    Pokeball.ULTRABALL: "Ultra Ball",
+    Pokeball.MASTERBALL: "Master Ball",
+}
+
+
+def get_pokeball_name(ball: int | Pokeball) -> str:
+    """Get display name for a Pokeball type.
+
+    Args:
+        ball: Pokeball enum or integer value
+
+    Returns:
+        Display name string (e.g., "Poké Ball")
+    """
+    ball_val = int(ball)
+    return POKEBALL_DISPLAY_NAMES.get(ball_val, "Unknown Ball")
 
 
 def get_loot_tier_emoji(tier: str | LootTier) -> str:

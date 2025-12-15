@@ -13,7 +13,7 @@ from funbot.db.models.pokemon.player_ball_inventory import PlayerBallInventory
 from funbot.db.models.pokemon.player_wallet import PlayerWallet
 from funbot.pokemon.constants.enums import Currency, Pokeball
 from funbot.pokemon.constants.game_constants import POKEBALL_PRICES
-from funbot.pokemon.ui_utils import get_currency_emoji
+from funbot.pokemon.ui_utils import get_currency_emoji, get_pokeball_name
 
 if TYPE_CHECKING:
     from funbot.db.models.user import User
@@ -50,17 +50,6 @@ class ShopService:
             (price, currency_type) tuple
         """
         return POKEBALL_PRICES.get(ball_type, (0, 0))
-
-    @staticmethod
-    def get_ball_name(ball_type: int) -> str:
-        """Get display name for a ball type."""
-        names: dict[int, str] = {
-            Pokeball.POKEBALL: "Poké Ball",
-            Pokeball.GREATBALL: "Great Ball",
-            Pokeball.ULTRABALL: "Ultra Ball",
-            Pokeball.MASTERBALL: "Master Ball",
-        }
-        return names.get(ball_type, "Unknown Ball")
 
     @staticmethod
     async def can_afford(
@@ -147,7 +136,7 @@ class ShopService:
         inventory, _ = await PlayerBallInventory.get_or_create(user=user)
         await inventory.gain_balls(ball_type, amount, purchased=True)
 
-        ball_name = ShopService.get_ball_name(ball_type)
+        ball_name = get_pokeball_name(ball_type)
 
         return PurchaseResult(
             success=True,
@@ -172,7 +161,7 @@ class ShopService:
             shop_items.append(
                 {
                     "ball_type": ball_type,
-                    "name": ShopService.get_ball_name(ball_type),
+                    "name": get_pokeball_name(ball_type),
                     "price": price,
                     "currency": Currency(currency_type).name,
                     "owned": inventory.get_quantity(ball_type),

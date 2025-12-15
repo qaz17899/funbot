@@ -14,6 +14,7 @@ from discord import app_commands
 
 from funbot.pokemon.constants.enums import Region
 from funbot.pokemon.services.route_service import RouteStatus, get_route_status_service
+from funbot.pokemon.ui_utils import REGION_DISPLAY_NAMES
 
 if TYPE_CHECKING:
     from funbot.types import Interaction
@@ -25,26 +26,16 @@ async def region_autocomplete(
     """Autocomplete for region selection.
 
     Shows available regions with localized names.
+    Uses REGION_DISPLAY_NAMES from ui_utils as SSOT.
     """
     # Yield control to event loop (required for async autocomplete)
     await asyncio.sleep(0)
 
-    regions = [
-        (Region.KANTO, "關都 Kanto"),
-        (Region.JOHTO, "城都 Johto"),
-        (Region.HOENN, "豐緣 Hoenn"),
-        (Region.SINNOH, "神奧 Sinnoh"),
-        (Region.UNOVA, "合眾 Unova"),
-        (Region.KALOS, "卡洛斯 Kalos"),
-        (Region.ALOLA, "阿羅拉 Alola"),
-        (Region.GALAR, "伽勒爾 Galar"),
-        (Region.PALDEA, "帕底亞 Paldea"),
-    ]
-
     current_lower = current.lower()
     choices = []
 
-    for region_enum, display_name in regions:
+    for region_enum in Region:
+        display_name = REGION_DISPLAY_NAMES.get(region_enum, region_enum.name)
         if current_lower in display_name.lower():
             choices.append(
                 app_commands.Choice(name=display_name, value=region_enum.value)
