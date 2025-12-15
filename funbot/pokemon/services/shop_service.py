@@ -63,7 +63,9 @@ class ShopService:
         return names.get(ball_type, "Unknown Ball")
 
     @staticmethod
-    async def can_afford(user: User, ball_type: int, amount: int) -> tuple[bool, int, int]:
+    async def can_afford(
+        user: User, ball_type: int, amount: int
+    ) -> tuple[bool, int, int]:
         """Check if user can afford a purchase.
 
         Args:
@@ -117,7 +119,9 @@ class ShopService:
             return PurchaseResult(success=False, message="購買數量必須大於 0")
 
         # Check affordability
-        can_afford, total_cost, balance = await ShopService.can_afford(user, ball_type, amount)
+        can_afford, total_cost, balance = await ShopService.can_afford(
+            user, ball_type, amount
+        )
 
         if not can_afford:
             _price, currency_type = ShopService.get_ball_price(ball_type)
@@ -131,7 +135,7 @@ class ShopService:
             currency_emoji = currency_emoji_map.get(Currency(currency_type), "💰")
             return PurchaseResult(
                 success=False,
-                message=f"資金不足！需要 {currency_emoji} {total_cost:,}，你只有 {currency_emoji} {balance:,}",
+                message=f"資金不足！需要 {total_cost:,} {currency_emoji}，你只有 {balance:,} {currency_emoji}",
             )
 
         # Deduct currency

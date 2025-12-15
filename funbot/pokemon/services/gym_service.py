@@ -19,12 +19,11 @@ from funbot.db.models.pokemon.player_pokemon import PlayerPokemon
 
 # Constants
 GYM_TIME_LIMIT = 30  # seconds
-POKECLICKER_NPC_BASE_URL = (
-    "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/npcs"
-)
-POKECLICKER_BADGE_BASE_URL = (
-    "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/badges"
-)
+# Damage multiplier to compensate for no click attack in Discord bot
+# Original Pokeclicker has both auto-attack AND click attack
+GYM_DAMAGE_MULTIPLIER = 2
+POKECLICKER_NPC_BASE_URL = "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/npcs"
+POKECLICKER_BADGE_BASE_URL = "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/badges"
 
 
 class GymBattleStatus(Enum):
@@ -43,6 +42,7 @@ class GymPokemonState:
     level: int
     max_hp: int
     current_hp: int
+    sprite_url: str | None = None  # Pokemon sprite for UI display
 
     @property
     def hp_percent(self) -> float:
@@ -207,13 +207,26 @@ class GymService:
         Returns:
             Initial battle state
         """
+        from funbot.db.models.pokemon.pokemon_data import PokemonData
+
         # Get gym Pokemon
         gym_pokemon_models = await GymPokemon.filter(gym=gym).order_by("order").all()
 
-        # Convert to battle state
+        # Get sprite URLs for all gym Pokemon
+        pokemon_names = [gp.pokemon_name for gp in gym_pokemon_models]
+        pokemon_data_map: dict[str, str | None] = {}
+        if pokemon_names:
+            pokemon_data_list = await PokemonData.filter(name__in=pokemon_names).all()
+            pokemon_data_map = {p.name: p.sprite_url for p in pokemon_data_list}
+
+        # Convert to battle state with sprites
         gym_pokemon = [
             GymPokemonState(
-                name=gp.pokemon_name, level=gp.level, max_hp=gp.max_health, current_hp=gp.max_health
+                name=gp.pokemon_name,
+                level=gp.level,
+                max_hp=gp.max_health,
+                current_hp=gp.max_health,
+                sprite_url=pokemon_data_map.get(gp.pokemon_name),
             )
             for gp in gym_pokemon_models
         ]
@@ -254,8 +267,9 @@ class GymService:
         # Apply damage to current Pokemon
         current = state.current_pokemon
         if current:
-            # Damage = player attack * delta
-            damage = int(state.player_attack * delta)
+            # Damage = player attack * delta * multiplier
+            # Multiplier compensates for no click attack in Discord bot
+            damage = int(state.player_attack * delta * GYM_DAMAGE_MULTIPLIER)
             current.current_hp = max(0, current.current_hp - damage)
 
             # Check if defeated
@@ -331,12 +345,13 @@ class GymService:
         # Calculate total gym HP
         total_gym_hp = sum(gp.max_hp for gp in state.gym_pokemon)
 
-        # Calculate ticks needed
-        if state.player_attack <= 0:
+        # Calculate ticks needed (with damage multiplier)
+        effective_attack = state.player_attack * GYM_DAMAGE_MULTIPLIER
+        if effective_attack <= 0:
             state.status = GymBattleStatus.LOST
             return state
 
-        ticks_needed = (total_gym_hp + state.player_attack - 1) // state.player_attack
+        ticks_needed = (total_gym_hp + effective_attack - 1) // effective_attack
 
         if ticks_needed <= GYM_TIME_LIMIT:
             # Win!
@@ -352,8 +367,8 @@ class GymService:
             state.status = GymBattleStatus.LOST
             state.time_remaining = 0
 
-            # Calculate damage dealt and update HP sequentially
-            damage_dealt = state.player_attack * GYM_TIME_LIMIT
+            # Calculate damage dealt and update HP sequentially (with multiplier)
+            damage_dealt = effective_attack * GYM_TIME_LIMIT
             for i, gp in enumerate(state.gym_pokemon):
                 if damage_dealt >= gp.max_hp:
                     damage_dealt -= gp.max_hp

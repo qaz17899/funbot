@@ -65,7 +65,9 @@ class RouteStatusService:
     def __init__(self) -> None:
         self._requirement_service = get_requirement_service()
 
-    async def get_route_status(self, player_id: int, route: RouteData) -> tuple[RouteStatus, int]:
+    async def get_route_status(
+        self, player_id: int, route: RouteData
+    ) -> tuple[RouteStatus, int]:
         """Get the status and kill count for a route.
 
         Args:
@@ -78,7 +80,9 @@ class RouteStatusService:
         logger.debug("Checking route status: player={} route={}", player_id, route.name)
 
         # Get or create player progress for this route
-        progress, created = await PlayerRouteProgress.get_or_create(user_id=player_id, route=route)
+        progress, created = await PlayerRouteProgress.get_or_create(
+            user_id=player_id, route=route
+        )
         kills = progress.kills
         if created:
             logger.debug("Created new progress record for route {}", route.name)
@@ -92,7 +96,10 @@ class RouteStatusService:
         # 2. Check if incomplete (kills < 10)
         if kills < ROUTE_KILLS_NEEDED:
             logger.debug(
-                "Route {} is INCOMPLETE: {}/{} kills", route.name, kills, ROUTE_KILLS_NEEDED
+                "Route {} is INCOMPLETE: {}/{} kills",
+                route.name,
+                kills,
+                ROUTE_KILLS_NEEDED,
             )
             return RouteStatus.INCOMPLETE, kills
 
@@ -104,7 +111,9 @@ class RouteStatusService:
         uncaught_status = await self._check_uncaught_pokemon(player_id, route)
         if uncaught_status is not None:
             logger.debug(
-                "Route {} has uncaught pokemon: status={}", route.name, uncaught_status.name
+                "Route {} has uncaught pokemon: status={}",
+                route.name,
+                uncaught_status.name,
             )
             return uncaught_status, kills
 
@@ -129,12 +138,16 @@ class RouteStatusService:
 
         if not requirements:
             # No requirements = unlocked from start
-            logger.debug("Route {} has no requirements, unlocked by default", route.name)
+            logger.debug(
+                "Route {} has no requirements, unlocked by default", route.name
+            )
             return True
 
         # Check each root requirement (they're implicitly AND'd)
         for requirement in requirements:
-            if not await self._requirement_service.check_requirement(player_id, requirement):
+            if not await self._requirement_service.check_requirement(
+                player_id, requirement
+            ):
                 logger.debug(
                     "Route {} locked: requirement {} not met",
                     route.name,
@@ -142,10 +155,14 @@ class RouteStatusService:
                 )
                 return False
 
-        logger.debug("Route {} unlocked: all {} requirements met", route.name, len(requirements))
+        logger.debug(
+            "Route {} unlocked: all {} requirements met", route.name, len(requirements)
+        )
         return True
 
-    async def get_requirement_hints(self, player_id: int, route: RouteData) -> list[str]:
+    async def get_requirement_hints(
+        self, player_id: int, route: RouteData
+    ) -> list[str]:
         """Get hints for unmet requirements.
 
         Args:
@@ -161,7 +178,9 @@ class RouteStatusService:
         )
 
         for requirement in requirements:
-            if not await self._requirement_service.check_requirement(player_id, requirement):
+            if not await self._requirement_service.check_requirement(
+                player_id, requirement
+            ):
                 hint = self._get_requirement_hint(requirement)
                 if hint:
                     hints.append(hint)
@@ -195,7 +214,9 @@ class RouteStatusService:
             case _:
                 return None
 
-    async def _check_uncaught_pokemon(self, player_id: int, route: RouteData) -> RouteStatus | None:
+    async def _check_uncaught_pokemon(
+        self, player_id: int, route: RouteData
+    ) -> RouteStatus | None:
         """Check if there are uncaught Pokemon on this route.
 
         Returns RouteStatus.UNCAUGHT_POKEMON, UNCAUGHT_SHINY, or None if all caught.
@@ -241,7 +262,9 @@ class RouteStatusService:
         Returns:
             List of (RouteData, RouteStatus, kills) tuples, ordered by order_number
         """
-        routes = await RouteData.filter(region=region, is_implemented=True).order_by("order_number")
+        routes = await RouteData.filter(region=region, is_implemented=True).order_by(
+            "order_number"
+        )
 
         results = []
         for route in routes:
@@ -261,7 +284,7 @@ class RouteStatusService:
             kills: Kill count on this route
 
         Returns:
-            Tuple of (display_name, route_id) for app_commands.Choice
+            Tuple of (display_name, route_number) for app_commands.Choice
         """
         emoji = ROUTE_STATUS_EMOJI[status]
         kills_display = f"({kills}/{ROUTE_KILLS_NEEDED})"
@@ -280,7 +303,8 @@ class RouteStatusService:
         if len(display) > 100:
             display = display[:97] + "..."
 
-        return display, route.id
+        # Return route.number (not route.id) to match explore command's filter
+        return display, route.number
 
 
 # Singleton instance
