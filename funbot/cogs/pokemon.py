@@ -95,11 +95,13 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         """Select your starter Pokemon."""
         await interaction.response.defer()
 
-        # Get or create user
-        user, _ = await User.get_or_create(id=interaction.user.id)
+        player_id = interaction.user.id
 
-        # Check if user already has Pokemon
-        existing_count = await PlayerPokemon.filter(user=user).count()
+        # Ensure user exists in database
+        await User.get_or_create(id=player_id)
+
+        # Check if player already has Pokemon
+        existing_count = await PlayerPokemon.filter(user_id=player_id).count()
         if existing_count > 0:
             await interaction.followup.send(
                 f"{Emoji.CROSS} 你已經有寶可夢了！使用 `/pokemon party` 查看你的隊伍。",
@@ -118,10 +120,8 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             )
             return
 
-        # Create V2 layout with starter selection (use player_id for consistency)
-        view = StarterSelectLayout(
-            starters=list(starters), player_id=interaction.user.id
-        )
+        # Create V2 layout with starter selection
+        view = StarterSelectLayout(starters=list(starters), player_id=player_id)
 
         await interaction.followup.send(view=view)
 
@@ -134,9 +134,10 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         """Display all owned Pokemon."""
         await interaction.response.defer()
 
-        # Get user
-        user = await User.get_or_none(id=interaction.user.id)
-        if not user:
+        player_id = interaction.user.id
+
+        # Check if player exists
+        if not await User.exists(id=player_id):
             await interaction.followup.send(
                 f"{Emoji.CROSS} 你還沒有開始寶可夢之旅！使用 `/pokemon start` 選擇初始寶可夢。",
                 ephemeral=True,
@@ -144,7 +145,7 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             return
 
         # Get all Pokemon
-        pokemon_list = await PlayerPokemon.filter(user=user).prefetch_related(
+        pokemon_list = await PlayerPokemon.filter(user_id=player_id).prefetch_related(
             "pokemon_data"
         )
 
@@ -182,21 +183,21 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         """Open the Poké Mart shop."""
         await interaction.response.defer()
 
-        # Get user
-        user = await User.get_or_none(id=interaction.user.id)
-        if not user:
+        player_id = interaction.user.id
+
+        # Check if player exists
+        if not await User.exists(id=player_id):
             await interaction.followup.send(
                 f"{Emoji.CROSS} 你還沒有開始寶可夢之旅！使用 `/pokemon start` 選擇初始寶可夢。",
                 ephemeral=True,
             )
             return
 
-        # Get shop data using player_id (Service layer uses int, not User object)
-        player_id = interaction.user.id
+        # Get shop data and inventory
         shop_data = await ShopService.get_shop_inventory(player_id)
-        inventory, _ = await PlayerBallInventory.get_or_create(user=user)
+        inventory, _ = await PlayerBallInventory.get_or_create(user_id=player_id)
 
-        # Create beautiful V2 shop view (uses player_id for consistency)
+        # Create V2 shop view
         view = ShopView(player_id, shop_data["wallet"], inventory)
 
         await interaction.followup.send(view=view)
@@ -210,9 +211,10 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         """View and edit Pokeball settings."""
         await interaction.response.defer()
 
-        # Get user
-        user = await User.get_or_none(id=interaction.user.id)
-        if not user:
+        player_id = interaction.user.id
+
+        # Check if player exists
+        if not await User.exists(id=player_id):
             await interaction.followup.send(
                 f"{Emoji.CROSS} 你還沒有開始寶可夢之旅！使用 `/pokemon start` 選擇初始寶可夢。",
                 ephemeral=True,
@@ -220,10 +222,10 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             return
 
         # Get or create settings
-        settings, _ = await PlayerPokeballSettings.get_or_create(user=user)
+        settings, _ = await PlayerPokeballSettings.get_or_create(user_id=player_id)
 
         # Create V2 layout
-        view = PokeballSettingsLayout(settings, interaction.user.id)
+        view = PokeballSettingsLayout(settings, player_id)
 
         await interaction.followup.send(view=view)
 
@@ -245,8 +247,10 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         # Validate count
         count = max(1, min(100, count))
 
-        # Get user and validate
-        user = await User.get_or_none(id=interaction.user.id)
+        player_id = interaction.user.id
+
+        # Check if player exists
+        user = await User.get_or_none(id=player_id)
         if not user:
             await interaction.followup.send(
                 f"{Emoji.CROSS} 你還沒有開始寶可夢之旅！使用 `/pokemon start` 選擇初始寶可夢。",
@@ -263,9 +267,13 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             return
 
         # Check route unlock status
-        status, _kills = await self._route_service.get_route_status(user.id, route_data)
+        status, _kills = await self._route_service.get_route_status(
+            player_id, route_data
+        )
         if status.name == "LOCKED":
-            hints = await self._route_service.get_requirement_hints(user.id, route_data)
+            hints = await self._route_service.get_requirement_hints(
+                player_id, route_data
+            )
             await interaction.followup.send(
                 f"{Emoji.CROSS} 此路線尚未解鎖。\n需求: {', '.join(hints) if hints else '未知'}",
                 ephemeral=True,
@@ -273,7 +281,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             return
 
         # Get player's party
-        party = await PlayerPokemon.filter(user=user).prefetch_related("pokemon_data")
+        party = await PlayerPokemon.filter(user_id=player_id).prefetch_related(
+            "pokemon_data"
+        )
         if not party:
             await interaction.followup.send(
                 f"{Emoji.CROSS} 你沒有任何寶可夢！", ephemeral=True
@@ -289,9 +299,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             return
 
         # Get settings and resources
-        settings, _ = await PlayerPokeballSettings.get_or_create(user=user)
-        wallet, _ = await PlayerWallet.get_or_create(user=user)
-        ball_inventory, _ = await PlayerBallInventory.get_or_create(user=user)
+        settings, _ = await PlayerPokeballSettings.get_or_create(user_id=player_id)
+        wallet, _ = await PlayerWallet.get_or_create(user_id=player_id)
+        ball_inventory, _ = await PlayerBallInventory.get_or_create(user_id=player_id)
 
         # Run simulation
         results = await self._simulate_encounters(
@@ -305,9 +315,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             count=count,
         )
 
-        # Progress eggs (use player_id for consistency)
+        # Progress eggs
         steps = HatcheryService.calculate_steps_from_route(route_data.order_number)
-        await HatcheryService.progress_eggs(user.id, int(steps * count))
+        await HatcheryService.progress_eggs(player_id, int(steps * count))
 
         # Create result view
         view = ExploreResultView(interaction.user.display_name, route_data, results)
