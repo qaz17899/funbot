@@ -42,6 +42,10 @@ src_folder = "./."
 asyncio_mode = "auto"
 testpaths = ["tests"]
 addopts = "-v --tb=short"
+filterwarnings = [
+    # Ignore tortoise-orm internal deprecation warnings
+    "ignore:`pk` is deprecated:DeprecationWarning:tortoise",
+]
 
 [tool.pyright]
 pythonVersion = "3.12"
@@ -66,3 +70,8 @@ reportUnnecessaryComparison = true
 reportUnnecessaryContains = true
 reportUnnecessaryIsInstance = true
 reportUnnecessaryTypeIgnoreComment = true
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.148.7",
+]
