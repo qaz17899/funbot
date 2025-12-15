@@ -19,6 +19,7 @@ from funbot.db.models.pokemon.dungeon_data import (
 )
 from funbot.db.models.pokemon.player_wallet import PlayerWallet
 from funbot.db.models.pokemon.route_requirement import RequirementType, RouteRequirement
+from funbot.pokemon.services.battle_service import BattleService
 from funbot.pokemon.services.dungeon_battle_service import DungeonRewards
 from funbot.pokemon.services.dungeon_exploration_service import ExploreStepResult, MoveResult
 from funbot.pokemon.services.dungeon_map import DungeonMap, DungeonMapGenerator
@@ -576,8 +577,8 @@ class DungeonService:
         player_id = run.player.id
         dungeon_id = run.dungeon.id
 
-        # Get player's party attack
-        party_attack = await self._get_player_party_attack(player_id)
+        # Get player's party attack using centralized BattleService
+        party_attack = await BattleService.get_player_party_attack(player_id)
 
         # Get dungeon base health
         base_health = run.dungeon.base_health or 1000
@@ -663,32 +664,6 @@ class DungeonService:
         run.loot_collected = loot_collected
 
         return loot_item
-
-    async def _get_player_party_attack(self, player_id: int) -> int:
-        """Get total party attack power for a player.
-
-        Args:
-            player_id: The player's user ID
-
-        Returns:
-            Total party attack power
-        """
-        from funbot.db.models.pokemon.player_pokemon import PlayerPokemon
-
-        # Sum attack of all player's Pokemon
-        pokemon_list = (
-            await PlayerPokemon.filter(user_id=player_id)
-            .prefetch_related("pokemon_data")
-            .all()
-        )
-
-        if not pokemon_list:
-            return 100  # Default minimum attack
-
-        total_attack = sum(
-            p.calculate_attack(p.pokemon_data.base_attack) for p in pokemon_list
-        )
-        return max(100, total_attack)
 
     async def _get_random_enemy_name(self, dungeon_id: int) -> str:
         """Get a random enemy Pokemon name from dungeon.
@@ -883,8 +858,8 @@ class DungeonService:
         player_id = run.player.id
         dungeon_id = run.dungeon.id
 
-        # Get player's party attack
-        party_attack = await self._get_player_party_attack(player_id)
+        # Get player's party attack using centralized BattleService
+        party_attack = await BattleService.get_player_party_attack(player_id)
 
         # Get boss stats
         boss_stats = await DungeonBattleService.get_boss_stats(dungeon_id)

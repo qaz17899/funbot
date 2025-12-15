@@ -10,6 +10,8 @@ import math
 from dataclasses import dataclass, field
 from enum import Enum
 
+from funbot.pokemon.constants.game_constants import BOT_CLICK_MULTIPLIER
+
 
 class DungeonBattleStatus(Enum):
     """Status of a dungeon battle."""
@@ -68,11 +70,6 @@ class DungeonRewards:
     first_clear_bonus: dict | None = None
     pokemon_caught: list[str] = field(default_factory=list)
 
-
-# Constants matching PokeClicker's mechanics
-# Damage multiplier to compensate for no click attack in Discord bot
-# Original Pokeclicker has both auto-attack AND click attack
-DUNGEON_DAMAGE_MULTIPLIER = 2
 
 # EP modifiers from GameConstants.ts
 DUNGEON_EP_MODIFIER = 3
@@ -151,7 +148,7 @@ class DungeonBattleService:
 
         # Non-boss trainers have health divided by team_size^0.75
         if not is_boss and team_size > 1:
-            health /= (team_size**0.75)
+            health /= team_size**0.75
 
         return max(1, math.floor(health))
 
@@ -175,7 +172,7 @@ class DungeonBattleService:
         Returns:
             Damage dealt per tick
         """
-        return max(1, party_attack * DUNGEON_DAMAGE_MULTIPLIER)
+        return max(1, party_attack * BOT_CLICK_MULTIPLIER)
 
     @staticmethod
     def calculate_ticks_to_defeat(enemy_health: int, party_attack: int) -> int:
@@ -345,12 +342,15 @@ class DungeonBattleService:
             return None
 
         # Get Pokemon ordered by their position
-        pokemon_list = [{
-                    "name": poke.pokemon_name,
-                    "health": poke.health,
-                    "max_health": poke.health,
-                    "level": poke.level,
-                } for poke in sorted(trainer.pokemon, key=lambda p: p.order)]
+        pokemon_list = [
+            {
+                "name": poke.pokemon_name,
+                "health": poke.health,
+                "max_health": poke.health,
+                "level": poke.level,
+            }
+            for poke in sorted(trainer.pokemon, key=lambda p: p.order)
+        ]
 
         return TrainerBattleState(
             trainer_class=trainer.trainer_class,

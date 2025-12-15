@@ -12,6 +12,10 @@ from __future__ import annotations
 # How often auto-battle ticks (seconds) - used for calculation only
 BATTLE_TICK_SECONDS: float = 1.0
 
+# Damage multiplier to compensate for no click attack in Discord bot
+# Original Pokeclicker has both auto-attack AND click attack
+BOT_CLICK_MULTIPLIER: int = 2
+
 # Base health formula constants
 # Health = ROUTE_HEALTH_BASE * (route^2.2 / 12)^1.15 * (1 + region/20)
 ROUTE_HEALTH_BASE: int = 100

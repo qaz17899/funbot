@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 
 import discord
 
+from funbot.pokemon.constants.game_constants import BOT_CLICK_MULTIPLIER
 from funbot.pokemon.services.gym_service import (
     GYM_TIME_LIMIT,
     GymBattleResult,
@@ -19,7 +20,13 @@ from funbot.pokemon.services.gym_service import (
     GymService,
 )
 from funbot.pokemon.ui_utils import Emoji, get_currency_emoji
-from funbot.ui.components_v2 import Container, LayoutView, Section, TextDisplay, Thumbnail
+from funbot.ui.components_v2 import (
+    Container,
+    LayoutView,
+    Section,
+    TextDisplay,
+    Thumbnail,
+)
 
 if TYPE_CHECKING:
     from funbot.db.models.pokemon.gym_data import GymData
@@ -145,9 +152,7 @@ class GymBattleView(LayoutView):
         container.add_item(discord.ui.Separator(spacing=discord.SeparatorSpacing.small))
 
         # Battle stats - show actual damage per tick (with multiplier)
-        from funbot.pokemon.services.gym_service import GYM_DAMAGE_MULTIPLIER
-
-        actual_damage_per_tick = self.state.player_attack * GYM_DAMAGE_MULTIPLIER
+        actual_damage_per_tick = self.state.player_attack * BOT_CLICK_MULTIPLIER
         progress = f"{self.state.defeated_count}/{self.state.total_pokemon}"
         container.add_item(
             TextDisplay(
