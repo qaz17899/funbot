@@ -14,7 +14,12 @@ from discord import app_commands
 
 from funbot.pokemon.constants.enums import Region
 from funbot.pokemon.services.route_service import RouteStatus, get_route_status_service
-from funbot.pokemon.ui_utils import REGION_DISPLAY_NAMES, format_route_choice
+from funbot.pokemon.ui_utils import (
+    REGION_DISPLAY_NAMES,
+    format_dungeon_choice,
+    format_gym_choice,
+    format_route_choice,
+)
 
 if TYPE_CHECKING:
     from funbot.types import Interaction
@@ -123,8 +128,9 @@ async def gym_autocomplete(
     """Autocomplete for gym selection.
 
     Shows available gyms in the current region with badge status.
+    Uses GymService for data and format_gym_choice for display.
     """
-    from funbot.db.models.pokemon.gym_data import GymData, PlayerBadge
+    from funbot.pokemon.services.gym_service import GymService
 
     # Yield control for async
     await asyncio.sleep(0)
@@ -134,26 +140,16 @@ async def gym_autocomplete(
     region = getattr(namespace, "region", 0)
     user_id = interaction.user.id
 
-    # Get gyms for region
-    gyms = await GymData.filter(region=region).order_by("id").limit(25).all()
-
-    # Get player badges
-    player_badges = await PlayerBadge.filter(user_id=user_id).values_list(
-        "badge", flat=True
+    # Use Service to get data (proper layering)
+    gyms_with_status = await GymService.search_gyms_for_autocomplete(
+        user_id, region, current
     )
-    player_badge_set = {str(b) for b in player_badges}
 
-    current_lower = current.lower()
     choices = []
-
-    for gym in gyms:
-        has_badge = gym.badge in player_badge_set
-        status = "🏅" if has_badge else "⚔️"
-        is_elite = "👑 " if gym.is_elite else ""
-        display_name = f"{status} {is_elite}{gym.name} - {gym.leader}"
-
-        if current_lower in display_name.lower() or current_lower in gym.name.lower():
-            choices.append(app_commands.Choice(name=display_name[:100], value=gym.name))
+    for gym, has_badge in gyms_with_status:
+        # Use centralized format function from ui_utils
+        display_name = format_gym_choice(gym.name, gym.leader, gym.is_elite, has_badge)
+        choices.append(app_commands.Choice(name=display_name, value=gym.name))
 
     return choices[:25]
 
@@ -164,13 +160,13 @@ async def dungeon_autocomplete(
     """Autocomplete for dungeon selection.
 
     Shows available dungeons in the current region with status indicators:
-    - 🔒 Locked
     - ⚔️ Available (not cleared)
     - ✅ Cleared
 
+    Uses DungeonService for data and format_dungeon_choice for display.
     Requires 'region' parameter to be filled first (defaults to Kanto).
     """
-    from funbot.db.models.pokemon.dungeon_data import DungeonData, PlayerDungeonProgress
+    from funbot.pokemon.services.dungeon_service import DungeonService
 
     # Yield control for async
     await asyncio.sleep(0)
@@ -180,43 +176,16 @@ async def dungeon_autocomplete(
     region = getattr(namespace, "region", 0)
     user_id = interaction.user.id
 
-    # Get dungeons for region
-    dungeons = await DungeonData.filter(region=region).order_by("id").limit(25).all()
-
-    # Get player progress
-    progress_list = (
-        await PlayerDungeonProgress.filter(
-            player_id=user_id,
-            dungeon__region=region,
-        )
-        .prefetch_related("dungeon")
-        .all()
+    # Use Service to get data (proper layering)
+    service = DungeonService()
+    dungeons_with_status = await service.search_dungeons_for_autocomplete(
+        user_id, region, current
     )
 
-    progress_map = {p.dungeon.id: p.clears for p in progress_list}
-
-    current_lower = current.lower()
     choices = []
-
-    for dungeon in dungeons:
-        clears = progress_map.get(dungeon.id, 0)
-
-        # Determine status
-        if clears > 0:
-            status = "✅"
-            suffix = f" ({clears}次)"
-        else:
-            status = "⚔️"
-            suffix = ""
-
-        display_name = f"{status} {dungeon.name}{suffix}"
-
-        if (
-            current_lower in display_name.lower()
-            or current_lower in dungeon.name.lower()
-        ):
-            choices.append(
-                app_commands.Choice(name=display_name[:100], value=dungeon.name)
-            )
+    for dungeon, clears in dungeons_with_status:
+        # Use centralized format function from ui_utils
+        display_name = format_dungeon_choice(dungeon.name, clears)
+        choices.append(app_commands.Choice(name=display_name, value=dungeon.name))
 
     return choices[:25]

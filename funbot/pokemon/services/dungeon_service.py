@@ -21,10 +21,7 @@ from funbot.db.models.pokemon.player_wallet import PlayerWallet
 from funbot.db.models.pokemon.route_requirement import RequirementType, RouteRequirement
 from funbot.pokemon.services.battle_service import BattleService
 from funbot.pokemon.services.dungeon_battle_service import DungeonRewards
-from funbot.pokemon.services.dungeon_exploration_service import (
-    ExploreStepResult,
-    MoveResult,
-)
+from funbot.pokemon.services.dungeon_exploration_service import ExploreStepResult, MoveResult
 from funbot.pokemon.services.dungeon_map import DungeonMap, DungeonMapGenerator
 
 if TYPE_CHECKING:
@@ -88,6 +85,24 @@ class DungeonService:
 
     # Default map size for dungeons
     DEFAULT_MAP_SIZE = 5
+
+    # Difficulty multiplier per region for dungeon calculations
+    REGION_DIFFICULTY_MULTIPLIER = 5
+
+    @staticmethod
+    def calculate_difficulty_route(region: int) -> int:
+        """Calculate the equivalent route difficulty for a dungeon region.
+
+        Used for reward calculations (money, tokens, exp).
+        Centralizes the formula to avoid magic numbers.
+
+        Args:
+            region: The region ID (0=Kanto, 1=Johto, etc.)
+
+        Returns:
+            Equivalent route number for difficulty calculations
+        """
+        return (region + 1) * DungeonService.REGION_DIFFICULTY_MULTIPLIER
 
     # =========================================================================
     # Dungeon Availability Check (Task 10.1)
@@ -246,6 +261,41 @@ class DungeonService:
                 return f"Obtain {pokemon}"
             case _:
                 return None
+
+    async def search_dungeons_for_autocomplete(
+        self, player_id: int, region: int, query: str = "", limit: int = 25
+    ) -> list[tuple[DungeonData, int]]:
+        """Search dungeons in a region with clear counts for autocomplete.
+
+        Args:
+            player_id: The player's user ID
+            region: The region to search in
+            query: Search query string (filters by name)
+            limit: Max results
+
+        Returns:
+            List of (DungeonData, clears_count) tuples
+        """
+        # Build query
+        dungeon_query = DungeonData.filter(region=region)
+        if query:
+            dungeon_query = dungeon_query.filter(name__icontains=query)
+
+        dungeons = await dungeon_query.order_by("id").limit(limit).all()
+
+        if not dungeons:
+            return []
+
+        # Get player progress for these dungeons
+        dungeon_ids = [d.id for d in dungeons]
+        progress_list = await PlayerDungeonProgress.filter(
+            player_id=player_id,
+            dungeon_id__in=dungeon_ids,
+        ).all()
+
+        progress_map = {p.dungeon_id: p.clears for p in progress_list}
+
+        return [(dungeon, progress_map.get(dungeon.id, 0)) for dungeon in dungeons]
 
     async def get_available_dungeons(
         self, player_id: int, region: int
@@ -614,7 +664,7 @@ class DungeonService:
                 pokemon_name=enemy_name,
                 shiny_chance=SHINY_CHANCE_DUNGEON,
                 context=CatchContext.DUNGEON,
-                route_number=(run.dungeon.region + 1) * 5,  # Approximate difficulty
+                route_number=self.calculate_difficulty_route(run.dungeon.region),
                 region=run.dungeon.region,
             )
             battle_result.catch_attempted = not catch_result.skipped
@@ -842,9 +892,8 @@ class DungeonService:
 
         is_first_clear = progress is None or progress.clears == 0
 
-        # Calculate rewards
-        # Use a default difficulty route based on region
-        difficulty_route = (run.dungeon.region + 1) * 5
+        # Calculate rewards using centralized difficulty calculation
+        difficulty_route = self.calculate_difficulty_route(run.dungeon.region)
         rewards = DungeonBattleService.calculate_completion_rewards(
             dungeon_difficulty_route=difficulty_route,
             dungeon_region=run.dungeon.region,

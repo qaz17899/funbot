@@ -37,6 +37,8 @@ __all__ = (
     "Emoji",
     # Functions (alphabetical)
     "build_progress_bar",
+    "format_dungeon_choice",
+    "format_gym_choice",
     "format_route_choice",
     "get_badge_emoji",
     "get_badge_image_url",
@@ -588,3 +590,47 @@ def format_route_choice(route: RouteData, status: int, kills: int) -> tuple[str,
         display = display[:97] + "..."
 
     return display, route.number
+
+
+def format_gym_choice(
+    gym_name: str, gym_leader: str, is_elite: bool, has_badge: bool
+) -> str:
+    """Format a gym for autocomplete display.
+
+    Args:
+        gym_name: Name of the gym/town
+        gym_leader: Name of the gym leader
+        is_elite: Whether this is an Elite Four member
+        has_badge: Whether player has the badge
+
+    Returns:
+        Display name string for app_commands.Choice
+    """
+    status = "🏅" if has_badge else "⚔️"
+    elite_prefix = "👑 " if is_elite else ""
+
+    display = f"{status} {elite_prefix}{gym_name} - {gym_leader}"
+    if len(display) > 100:
+        display = display[:97] + "..."
+
+    return display
+
+
+def format_dungeon_choice(dungeon_name: str, clears: int) -> str:
+    """Format a dungeon for autocomplete display.
+
+    Args:
+        dungeon_name: Name of the dungeon
+        clears: Number of times cleared
+
+    Returns:
+        Display name string for app_commands.Choice
+    """
+    status = "✅" if clears > 0 else "⚔️"
+    suffix = f" ({clears}次)" if clears > 0 else ""
+
+    display = f"{status} {dungeon_name}{suffix}"
+    if len(display) > 100:
+        display = display[:97] + "..."
+
+    return display

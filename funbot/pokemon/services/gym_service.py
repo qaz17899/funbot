@@ -119,6 +119,39 @@ class GymService:
         return await GymData.filter(region=region).order_by("id").all()
 
     @staticmethod
+    async def search_gyms_for_autocomplete(
+        player_id: int, region: int, query: str = "", limit: int = 25
+    ) -> list[tuple[GymData, bool]]:
+        """Search gyms in a region with badge status for autocomplete.
+
+        Args:
+            player_id: The player's user ID
+            region: The region to search in
+            query: Search query string (filters by name)
+            limit: Max results
+
+        Returns:
+            List of (GymData, has_badge) tuples
+        """
+        # Build query
+        gym_query = GymData.filter(region=region)
+        if query:
+            gym_query = gym_query.filter(name__icontains=query)
+
+        gyms = await gym_query.order_by("id").limit(limit).all()
+
+        if not gyms:
+            return []
+
+        # Get player badges (badge count is low, so fetching all is fine)
+        player_badges = await PlayerBadge.filter(user_id=player_id).values_list(
+            "badge", flat=True
+        )
+        player_badge_set = set(player_badges)
+
+        return [(gym, gym.badge in player_badge_set) for gym in gyms]
+
+    @staticmethod
     async def get_player_badges(player_id: int) -> list[str]:
         """Get list of badge names the player has earned.
 
