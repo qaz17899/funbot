@@ -1,12 +1,7 @@
 # Changelog
 
-## [1.0.0](https://github.com/qaz17899/funbot/compare/v0.1.0...v1.0.0) (2025-12-15)
+## [0.2.0](https://github.com/qaz17899/funbot/compare/v0.1.0...v0.2.0) (2025-12-15)
 
-
-### ⚠ BREAKING CHANGES
-
-* **pokemon:** evs field renamed to effort_points
-* **pokemon:** evs field renamed to effort_points
 
 ### ✨ Features
 
