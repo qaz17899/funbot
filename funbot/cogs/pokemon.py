@@ -33,7 +33,7 @@ from funbot.pokemon.autocomplete import (
     region_autocomplete,
     route_autocomplete,
 )
-from funbot.pokemon.constants.enums import Pokeball, Region
+from funbot.pokemon.constants.enums import Region
 from funbot.pokemon.constants.game_constants import DEFAULT_STARTER_REGION, STARTERS
 from funbot.pokemon.services.battle_service import BattleService
 from funbot.pokemon.services.catch_service import CatchService
@@ -358,27 +358,27 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         wild_pokemon: list[PokemonData],
         count: int,
     ) -> ExploreResult:
-        """Simulate multiple encounters with batched DB operations."""
+        """Simulate multiple encounters with batched DB operations.
+
+        Uses CatchService.perform_batch_catch_sequence for centralized catch logic.
+        """
         from funbot.pokemon.constants.game_constants import SHINY_CHANCE_BATTLE
+        from funbot.pokemon.services.catch_service import CatchContext
 
         total_exp = 0
         total_money = 0
-        total_dungeon_tokens = 0  # Pokeclicker: gained on catch
+        total_dungeon_tokens = 0
         pokedex_new: list[str] = []
         shiny_caught: list[str] = []
         already_caught = 0
         failed_catches = 0
         balls_used: dict[int, int] = {}
 
-        # Get owned Pokemon IDs for "new" detection
-        owned_ids = {p.pokemon_data.id for p in party}
-
-        # Batch collections for DB operations
-        new_pokemon_to_create: list[dict] = []
-        ball_usage: dict[int, int] = {}  # ball_type -> count
-
         # Calculate route level for EXP (Pokeclicker formula)
         route_level = self._calculate_route_level(route_data.number, route_data.region)
+
+        # Prepare catch attempts with pre-rolled shiny
+        catch_attempts: list[dict] = []
 
         for _ in range(count):
             # Pick random wild Pokemon
@@ -388,107 +388,63 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             money_earned = BattleService.calculate_route_money(
                 route_data.number, route_data.region
             )
-            # Use Pokemon's base_exp and route level (from Party.ts:138-143)
             exp_earned = ExpService.calculate_battle_exp(wild.base_exp, route_level)
 
-            # Add rewards
             total_exp += exp_earned
             total_money += money_earned
 
-            # Determine shiny using constant
+            # Pre-roll shiny for this encounter
             is_shiny = random.randint(1, SHINY_CHANCE_BATTLE) == 1
-            is_new = wild.id not in owned_ids
 
-            # Determine which ball to use
-            if is_new and is_shiny:
-                preferred_ball = settings.new_shiny
-            elif is_new:
-                preferred_ball = settings.new_pokemon
-            elif is_shiny:
-                preferred_ball = settings.caught_shiny
-            else:
-                preferred_ball = settings.caught_pokemon
+            catch_attempts.append(
+                {
+                    "pokemon_id": wild.id,
+                    "pokemon_name": wild.name,
+                    "catch_rate": wild.catch_rate,
+                    "is_shiny": is_shiny,
+                }
+            )
 
-            if preferred_ball == Pokeball.NONE:
+        # Execute batch catch sequence using centralized CatchService
+        catch_results = await CatchService.perform_batch_catch_sequence(
+            player_id=user.id,
+            catch_attempts=catch_attempts,
+            context=CatchContext.ROUTE,
+            route_number=route_data.number,
+            region=route_data.region,
+        )
+
+        # Process results
+        for result in catch_results:
+            if result.skipped:
                 continue
 
-            # Find available ball (fallback to lower tier)
-            actual_ball = None
-            for ball_type in [
-                preferred_ball,
-                Pokeball.ULTRABALL,
-                Pokeball.GREATBALL,
-                Pokeball.POKEBALL,
-            ]:
-                current_used = ball_usage.get(ball_type, 0)
-                available = ball_inventory.get_quantity(ball_type) - current_used
-                if ball_type <= preferred_ball and available > 0:
-                    actual_ball = ball_type
-                    break
+            balls_used[result.pokeball_used] = (
+                balls_used.get(result.pokeball_used, 0) + 1
+            )
 
-            if actual_ball is None:
-                failed_catches += 1
-                continue
+            if result.success:
+                total_dungeon_tokens += result.dungeon_tokens_earned
 
-            # Track ball usage locally
-            ball_usage[actual_ball] = ball_usage.get(actual_ball, 0) + 1
-            balls_used[actual_ball] = balls_used.get(actual_ball, 0) + 1
-
-            # Attempt catch using actual catch_rate
-            catch_result = CatchService.attempt_catch(wild.catch_rate, actual_ball)
-
-            if catch_result.success:
-                # Pokeclicker: Dungeon Tokens gained on EVERY successful catch
-                # From Battle.ts:188 - gainTokens() called in catchPokemon()
-                tokens_earned = BattleService.calculate_dungeon_tokens(
-                    route_data.number, route_data.region
-                )
-                total_dungeon_tokens += tokens_earned
-
-                if is_new:
-                    pokedex_new.append(wild.name)
-                    owned_ids.add(wild.id)
-                    # Queue for batch creation
-                    new_pokemon_to_create.append(
-                        {
-                            "user_id": user.id,
-                            "pokemon_data_id": wild.id,
-                            "shiny": is_shiny,
-                        }
-                    )
+                if result.is_new:
+                    pokedex_new.append(result.pokemon_name)
                 else:
                     already_caught += 1
 
-                if is_shiny:
-                    shiny_caught.append(wild.name)
+                if result.is_shiny:
+                    shiny_caught.append(result.pokemon_name)
             else:
                 failed_catches += 1
 
-        # === Batch DB Operations ===
-
-        # 1. Create new Pokemon in batch
-        if new_pokemon_to_create:
-            await PlayerPokemon.bulk_create(
-                [PlayerPokemon(**data) for data in new_pokemon_to_create]
-            )
-
-        # 2. Update ball inventory in batch
-        for ball_type, used_count in ball_usage.items():
-            for _ in range(used_count):
-                await ball_inventory.use_ball(ball_type)
-
-        # 3. Update wallet (money + dungeon tokens)
+        # Update wallet with money (tokens already handled by CatchService)
         wallet.pokedollar += total_money
-        wallet.dungeon_token += total_dungeon_tokens
-        await wallet.save(update_fields=["pokedollar", "dungeon_token"])
+        await wallet.save(update_fields=["pokedollar"])
 
-        # 4. Update party EXP in batch (Pokeclicker: ALL Pokemon get FULL exp)
-        # From Party.ts:145: for (const pokemon of this.caughtPokemon) { pokemon.gainExp(expTotal) }
-        # Each Pokemon receives the full total_exp, not divided!
+        # Update party EXP in batch (Pokeclicker: ALL Pokemon get FULL exp)
         updated_party: list[PlayerPokemon] = []
         for poke in party:
             level_result = ExpService.add_exp_and_level_up(
-                poke.level, poke.exp, total_exp  # Full exp to each Pokemon
+                poke.level, poke.exp, total_exp
             )
             if level_result.leveled_up:
                 poke.level = level_result.new_level

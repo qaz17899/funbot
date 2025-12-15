@@ -379,3 +379,200 @@ class CatchService:
             await wallet.add_dungeon_token(tokens_earned)
 
         return result
+
+    # =========================================================================
+    # Batch Catch Operations (Optimized for Route Explore)
+    # =========================================================================
+
+    @staticmethod
+    async def perform_batch_catch_sequence(
+        player_id: int,
+        catch_attempts: list[dict],
+        *,
+        context: CatchContext = CatchContext.ROUTE,
+        route_number: int = 1,
+        region: int = 0,
+    ) -> list[CatchSequenceResult]:
+        """Execute multiple catch sequences with batched DB operations.
+
+        Optimized for Route Explore where many catches happen at once.
+        Uses batch queries and updates for better performance.
+
+        Args:
+            player_id: The player's user ID
+            catch_attempts: List of dicts with:
+                - pokemon_id: int
+                - pokemon_name: str
+                - catch_rate: int
+                - is_shiny: bool (pre-rolled)
+            context: Where the catches are occurring
+            route_number: Route number for token calculation
+            region: Region for token calculation
+
+        Returns:
+            List of CatchSequenceResult for each attempt
+        """
+        from funbot.db.models.pokemon import PlayerPokeballSettings, PlayerPokemon
+        from funbot.db.models.pokemon.player_ball_inventory import PlayerBallInventory
+        from funbot.db.models.pokemon.player_wallet import PlayerWallet
+        from funbot.pokemon.services.battle_service import BattleService
+
+        if not catch_attempts:
+            return []
+
+        results: list[CatchSequenceResult] = []
+
+        # 1. Get player settings and inventory (single query each)
+        settings, _ = await PlayerPokeballSettings.get_or_create(user_id=player_id)
+        inventory, _ = await PlayerBallInventory.get_or_create(user_id=player_id)
+        wallet, _ = await PlayerWallet.get_or_create(user_id=player_id)
+
+        # 2. Get all owned Pokemon IDs (single query)
+        owned_pokemon = await PlayerPokemon.filter(user_id=player_id).all()
+        owned_map: dict[int, PlayerPokemon] = {
+            p.pokemon_data_id: p for p in owned_pokemon
+        }
+
+        # 3. Track local state for batch operations
+        ball_usage: dict[Pokeball, int] = {}
+        new_pokemon_to_create: list[dict] = []
+        pokemon_to_update: list[PlayerPokemon] = []
+        total_tokens = 0
+        tokens_per_catch = BattleService.calculate_dungeon_tokens(route_number, region)
+
+        settings_dict = settings.to_dict()
+
+        # 4. Process each catch attempt
+        for attempt in catch_attempts:
+            pokemon_id = attempt["pokemon_id"]
+            pokemon_name = attempt["pokemon_name"]
+            catch_rate = attempt["catch_rate"]
+            is_shiny = attempt["is_shiny"]
+
+            result = CatchSequenceResult(
+                success=False,
+                pokemon_name=pokemon_name,
+                pokemon_id=pokemon_id,
+                is_shiny=is_shiny,
+            )
+
+            # Check ownership
+            existing = owned_map.get(pokemon_id)
+            is_new = existing is None
+            result.is_new = is_new
+
+            # Determine ball
+            preferred_ball = CatchService.get_pokeball_for_pokemon(
+                settings_dict, is_new, is_shiny
+            )
+
+            if preferred_ball == Pokeball.NONE:
+                results.append(result)
+                continue
+
+            # Find available ball (accounting for local usage)
+            actual_ball = None
+            for ball_type in [
+                Pokeball.ULTRABALL,
+                Pokeball.GREATBALL,
+                Pokeball.POKEBALL,
+            ]:
+                if ball_type <= preferred_ball:
+                    available = inventory.get_quantity(ball_type) - ball_usage.get(
+                        ball_type, 0
+                    )
+                    if available > 0:
+                        actual_ball = ball_type
+                        break
+
+            if actual_ball is None:
+                results.append(result)
+                continue
+
+            # Track ball usage
+            ball_usage[actual_ball] = ball_usage.get(actual_ball, 0) + 1
+            result.pokeball_used = actual_ball
+
+            # Attempt catch
+            catch_attempt = CatchService.attempt_catch(catch_rate, actual_ball)
+            result.catch_rate = catch_attempt.catch_rate
+            result.success = catch_attempt.success
+
+            if not catch_attempt.success:
+                results.append(result)
+                continue
+
+            # === CATCH SUCCESSFUL ===
+            total_tokens += tokens_per_catch
+            result.dungeon_tokens_earned = tokens_per_catch
+
+            if is_new:
+                # Queue for batch creation
+                new_pokemon_to_create.append(
+                    {
+                        "user_id": player_id,
+                        "pokemon_data_id": pokemon_id,
+                        "shiny": is_shiny,
+                        "stat_captured": 1,
+                        "stat_shiny_captured": 1 if is_shiny else 0,
+                    }
+                )
+                # Add to owned_map to prevent duplicate creation
+                owned_map[pokemon_id] = None  # Placeholder
+                result.stats_updated = {"stat_captured": 1}
+            else:
+                # Update existing Pokemon
+                if existing and existing not in pokemon_to_update:
+                    ep_earned = CatchService.calculate_effort_points(context, is_shiny)
+                    result.effort_points_earned = ep_earned
+
+                    existing.stat_captured += 1
+                    if is_shiny:
+                        existing.stat_shiny_captured += 1
+                        if not existing.shiny:
+                            existing.shiny = True
+
+                    if existing.can_gain_evs:
+                        existing.effort_points += ep_earned
+                        if (
+                            existing.pokerus == PokerusState.CONTAGIOUS
+                            and existing.evs >= 50
+                        ):
+                            existing.pokerus = PokerusState.RESISTANT
+                            result.pokerus_evolved = True
+
+                    pokemon_to_update.append(existing)
+
+            results.append(result)
+
+        # === Batch DB Operations ===
+
+        # 5. Create new Pokemon in batch
+        if new_pokemon_to_create:
+            await PlayerPokemon.bulk_create(
+                [PlayerPokemon(**data) for data in new_pokemon_to_create]
+            )
+
+        # 6. Update existing Pokemon in batch
+        if pokemon_to_update:
+            await PlayerPokemon.bulk_update(
+                pokemon_to_update,
+                fields=[
+                    "stat_captured",
+                    "stat_shiny_captured",
+                    "shiny",
+                    "effort_points",
+                    "pokerus",
+                ],
+            )
+
+        # 7. Update ball inventory
+        for ball_type, used_count in ball_usage.items():
+            for _ in range(used_count):
+                await inventory.use_ball(ball_type)
+
+        # 8. Update wallet with tokens
+        if total_tokens > 0:
+            await wallet.add_dungeon_token(total_tokens)
+
+        return results
