@@ -13,6 +13,7 @@ from dataclasses import dataclass
 
 from funbot.pokemon.constants.enums import PokemonType
 from funbot.pokemon.constants.game_constants import (
+    BOT_CLICK_MULTIPLIER,
     ROUTE_HEALTH_BASE,
     ROUTE_HEALTH_MIN,
     ROUTE_MONEY_BASE,
@@ -124,13 +125,14 @@ class BattleService:
         return max(10, money)
 
     @staticmethod
-    def calculate_dungeon_tokens(route: int, region: int) -> int:
-        """Calculate dungeon tokens earned from route.
+    def calculate_catch_dungeon_tokens(route: int, region: int) -> int:
+        """Calculate dungeon tokens earned from catching a Pokemon.
 
+        This is awarded on EVERY successful catch (route or dungeon).
         Formula (Pokeclicker exact): max(1, 6 * pow(route * 2 / (2.8 / (1 + region / 3)), 1.08))
 
         Args:
-            route: Normalized route number
+            route: Normalized route number (or dungeon difficulty)
             region: Region index
 
         Returns:
@@ -138,6 +140,9 @@ class BattleService:
         """
         tokens = 6 * pow(route * 2 / (2.8 / (1 + region / 3)), 1.08)
         return max(1, int(tokens))
+
+    # Backwards compatibility alias
+    calculate_dungeon_tokens = calculate_catch_dungeon_tokens
 
     @staticmethod
     def calculate_party_attack(
@@ -178,19 +183,39 @@ class BattleService:
         return total_attack
 
     @staticmethod
+    def calculate_damage_per_tick(party_attack: int) -> int:
+        """Calculate damage dealt per tick based on party attack.
+
+        Applies BOT_CLICK_MULTIPLIER to compensate for Discord bot
+        not having click attacks like the original Pokeclicker game.
+
+        Args:
+            party_attack: Total party attack power
+
+        Returns:
+            Damage dealt per tick (minimum 1)
+        """
+        return max(1, int(party_attack * BOT_CLICK_MULTIPLIER))
+
+    @staticmethod
     def calculate_ticks_to_defeat(enemy_health: int, party_attack: int) -> int:
         """Calculate how many ticks to defeat enemy.
 
+        Uses calculate_damage_per_tick() for consistent damage calculation.
+
         Args:
             enemy_health: Enemy's max health
-            party_attack: Total party attack per tick
+            party_attack: Total party attack power (before multiplier)
 
         Returns:
             Number of ticks (rounds up if not exact)
         """
         if party_attack <= 0:
             return 999999  # Can't defeat
-        return max(1, (enemy_health + party_attack - 1) // party_attack)
+
+        damage = BattleService.calculate_damage_per_tick(party_attack)
+        # Ceiling division: (a + b - 1) // b
+        return max(1, (enemy_health + damage - 1) // damage)
 
     @staticmethod
     def can_defeat_enemy(

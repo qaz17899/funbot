@@ -10,7 +10,7 @@ import math
 from dataclasses import dataclass, field
 from enum import Enum
 
-from funbot.pokemon.constants.game_constants import BOT_CLICK_MULTIPLIER
+from funbot.pokemon.services.battle_service import BattleService
 
 
 class DungeonBattleStatus(Enum):
@@ -156,42 +156,9 @@ class DungeonBattleService:
     # Battle Simulation (Task 5.3)
     # =========================================================================
 
-    @staticmethod
-    def calculate_damage_per_tick(party_attack: int) -> int:
-        """Calculate damage dealt per tick based on party attack.
-
-        Matches PokeClicker's battle mechanics where all party Pokemon
-        attack simultaneously each tick.
-
-        The damage multiplier compensates for Discord bot not having
-        click attacks like the original game.
-
-        Args:
-            party_attack: Total party attack power
-
-        Returns:
-            Damage dealt per tick
-        """
-        return max(1, party_attack * BOT_CLICK_MULTIPLIER)
-
-    @staticmethod
-    def calculate_ticks_to_defeat(enemy_health: int, party_attack: int) -> int:
-        """Calculate how many ticks needed to defeat an enemy.
-
-        Args:
-            enemy_health: Enemy's total health
-            party_attack: Total party attack per tick
-
-        Returns:
-            Number of ticks needed (rounds up)
-        """
-        if party_attack <= 0:
-            return 999999  # Can't defeat with 0 attack
-
-        damage_per_tick = DungeonBattleService.calculate_damage_per_tick(party_attack)
-
-        # Ceiling division: (a + b - 1) // b
-        return max(1, (enemy_health + damage_per_tick - 1) // damage_per_tick)
+    # Delegate to BattleService for consistency (SSOT)
+    calculate_damage_per_tick = staticmethod(BattleService.calculate_damage_per_tick)
+    calculate_ticks_to_defeat = staticmethod(BattleService.calculate_ticks_to_defeat)
 
     @staticmethod
     def simulate_battle(
@@ -213,9 +180,7 @@ class DungeonBattleService:
         Returns:
             DungeonBattleResult with battle outcome
         """
-        ticks = DungeonBattleService.calculate_ticks_to_defeat(
-            enemy_health, player_attack
-        )
+        ticks = BattleService.calculate_ticks_to_defeat(enemy_health, player_attack)
         damage_dealt = enemy_health  # Total damage = enemy health when defeated
 
         # Calculate experience earned
@@ -249,9 +214,7 @@ class DungeonBattleService:
         Returns:
             True if enemy can be defeated in time
         """
-        ticks = DungeonBattleService.calculate_ticks_to_defeat(
-            enemy_health, party_attack
-        )
+        ticks = BattleService.calculate_ticks_to_defeat(enemy_health, party_attack)
         return ticks <= max_ticks
 
     # =========================================================================

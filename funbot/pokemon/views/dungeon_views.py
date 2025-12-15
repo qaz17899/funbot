@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, ClassVar
 
 import discord
 
-from funbot.pokemon.ui_utils import get_currency_emoji
+from funbot.pokemon.ui_utils import DUNGEON_TILE_EMOJI, get_currency_emoji
 from funbot.ui.components_v2 import Container, LayoutView, TextDisplay
 
 if TYPE_CHECKING:
@@ -118,17 +118,8 @@ class DungeonExploreView(LayoutView):
         - 6.2: Show current position, revealed tiles, remaining actions
     """
 
-    # Tile type to emoji mapping
-    TILE_EMOJIS: ClassVar[dict[str, str]] = {
-        "entrance": "🚪",
-        "enemy": "👾",
-        "chest": "📦",
-        "boss": "👹",
-        "empty": "⬜",
-        "ladder": "🪜",
-        "fog": "⬛",  # Unrevealed tile
-        "player": "🧑",  # Player position
-    }
+    # Tile type to emoji mapping (centralized in ui_utils)
+    TILE_EMOJIS: ClassVar[dict[str, str]] = DUNGEON_TILE_EMOJI
 
     def __init__(
         self,

@@ -15,7 +15,6 @@ from enum import Enum
 from urllib.parse import quote
 
 from funbot.db.models.pokemon.gym_data import GymData, GymPokemon, PlayerBadge
-from funbot.pokemon.constants.game_constants import BOT_CLICK_MULTIPLIER
 from funbot.pokemon.services.battle_service import BattleService
 
 # Constants
@@ -241,9 +240,9 @@ class GymService:
         # Apply damage to current Pokemon
         current = state.current_pokemon
         if current:
-            # Damage = player attack * delta * multiplier
-            # Multiplier compensates for no click attack in Discord bot
-            damage = int(state.player_attack * delta * BOT_CLICK_MULTIPLIER)
+            # Use centralized damage calculation from BattleService
+            base_damage = BattleService.calculate_damage_per_tick(state.player_attack)
+            damage = int(base_damage * delta)
             current.current_hp = max(0, current.current_hp - damage)
 
             # Check if defeated
@@ -319,8 +318,8 @@ class GymService:
         # Calculate total gym HP
         total_gym_hp = sum(gp.max_hp for gp in state.gym_pokemon)
 
-        # Calculate ticks needed (with damage multiplier)
-        effective_attack = state.player_attack * BOT_CLICK_MULTIPLIER
+        # Calculate ticks needed using centralized BattleService
+        effective_attack = BattleService.calculate_damage_per_tick(state.player_attack)
         if effective_attack <= 0:
             state.status = GymBattleStatus.LOST
             return state

@@ -15,6 +15,9 @@ __all__ = (
     "GEM_EMOJI_IDS",
     # Pokeballs
     "POKEBALL_EMOJI_IDS",
+    # Status & Map
+    "ROUTE_STATUS_EMOJI",
+    "DUNGEON_TILE_EMOJI",
     # Types
     "TYPE_EMOJIS",
     # Common emojis (new)
@@ -82,6 +85,29 @@ TYPE_EMOJIS: dict[int, str] = {
 def get_type_emoji(type_id: int) -> str:
     """Get emoji for Pokemon type ID."""
     return TYPE_EMOJIS.get(type_id, "⚪")
+
+
+# Route Status Emojis (used by RouteStatusService)
+ROUTE_STATUS_EMOJI: dict[int, str] = {
+    0: "🔒",  # LOCKED
+    1: "⚔️",  # INCOMPLETE
+    2: "📋",  # QUEST_AT_LOCATION
+    3: "🆕",  # UNCAUGHT_POKEMON
+    4: "✨",  # UNCAUGHT_SHINY
+    5: "🌈",  # COMPLETED
+}
+
+# Dungeon Tile Emojis (used by DungeonMapView)
+DUNGEON_TILE_EMOJI: dict[str, str] = {
+    "entrance": "🚪",
+    "enemy": "👾",
+    "chest": "📦",
+    "boss": "👹",
+    "empty": "⬜",
+    "ladder": "🪜",
+    "fog": "⬛",  # Unrevealed tile
+    "player": "🧑",  # Player position
+}
 
 
 # Discord custom emoji IDs for pokeballs

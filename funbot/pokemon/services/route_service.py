@@ -20,6 +20,7 @@ from loguru import logger
 from funbot.db.models.pokemon import PlayerPokemon, PlayerRouteProgress, RouteData
 from funbot.pokemon.constants.game_constants import ROUTE_KILLS_NEEDED
 from funbot.pokemon.services.requirement_service import get_requirement_service
+from funbot.pokemon.ui_utils import ROUTE_STATUS_EMOJI
 
 if TYPE_CHECKING:
     from funbot.db.models.pokemon.route_requirement import RouteRequirement
@@ -43,17 +44,6 @@ class RouteStatus(IntEnum):
     UNCAUGHT_POKEMON = 3
     UNCAUGHT_SHINY = 4
     COMPLETED = 5
-
-
-# Emoji mapping for each status
-ROUTE_STATUS_EMOJI: dict[RouteStatus, str] = {
-    RouteStatus.LOCKED: "🔒",
-    RouteStatus.INCOMPLETE: "⚔️",
-    RouteStatus.QUEST_AT_LOCATION: "📋",
-    RouteStatus.UNCAUGHT_POKEMON: "🆕",
-    RouteStatus.UNCAUGHT_SHINY: "✨",
-    RouteStatus.COMPLETED: "🌈",
-}
 
 
 class RouteStatusService:
