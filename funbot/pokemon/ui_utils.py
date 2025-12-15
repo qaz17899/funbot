@@ -23,8 +23,10 @@ __all__ = (
     # Constants (alphabetical)
     "BADGE_EMOJI_IDS",
     "CURRENCY_EMOJI_IDS",
+    "DUNGEON_STATUS_EMOJI",
     "DUNGEON_TILE_EMOJI",
     "GEM_EMOJI_IDS",
+    "GYM_STATUS_EMOJI",
     "LOOT_TIER_EMOJIS",
     "POKEBALL_DISPLAY_NAMES",
     "POKEBALL_EMOJI_IDS",
@@ -121,6 +123,19 @@ ROUTE_STATUS_EMOJI: dict[int, str] = {
     3: "🆕",  # UNCAUGHT_POKEMON
     4: "✨",  # UNCAUGHT_SHINY
     5: "🌈",  # COMPLETED
+}
+
+# Dungeon Status Emojis (SSOT for dungeon list views and autocomplete)
+DUNGEON_STATUS_EMOJI: dict[str, str] = {
+    "LOCKED": "🔒",
+    "AVAILABLE": "⚔️",
+    "COMPLETED": "✅",
+}
+
+# Gym Status Emojis (SSOT for gym list views and autocomplete)
+GYM_STATUS_EMOJI: dict[str, str] = {
+    "AVAILABLE": "⚔️",  # Default state (Available to challenge)
+    "COMPLETED": "🏅",  # Has badge
 }
 
 # Dungeon Tile Emojis (used by DungeonMapView)
@@ -606,7 +621,9 @@ def format_gym_choice(
     Returns:
         Display name string for app_commands.Choice
     """
-    status = "🏅" if has_badge else "⚔️"
+    status = (
+        GYM_STATUS_EMOJI["COMPLETED"] if has_badge else GYM_STATUS_EMOJI["AVAILABLE"]
+    )
     elite_prefix = "👑 " if is_elite else ""
 
     display = f"{status} {elite_prefix}{gym_name} - {gym_leader}"
@@ -626,7 +643,11 @@ def format_dungeon_choice(dungeon_name: str, clears: int) -> str:
     Returns:
         Display name string for app_commands.Choice
     """
-    status = "✅" if clears > 0 else "⚔️"
+    status = (
+        DUNGEON_STATUS_EMOJI["COMPLETED"]
+        if clears > 0
+        else DUNGEON_STATUS_EMOJI["AVAILABLE"]
+    )
     suffix = f" ({clears}次)" if clears > 0 else ""
 
     display = f"{status} {dungeon_name}{suffix}"

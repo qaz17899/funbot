@@ -326,14 +326,17 @@ class GymService:
         # Calculate total gym HP
         total_gym_hp = sum(gp.max_hp for gp in state.gym_pokemon)
 
-        # Calculate ticks needed using centralized BattleService (SSOT)
-        ticks_needed = BattleService.calculate_ticks_to_defeat(
-            total_gym_hp, state.player_attack
+        # Use BattleService SSOT for win/lose check
+        can_win = BattleService.can_defeat_enemy(
+            total_gym_hp, state.player_attack, max_ticks=GYM_TIME_LIMIT
         )
 
-        if ticks_needed <= GYM_TIME_LIMIT:
+        if can_win:
             # Win!
             state.status = GymBattleStatus.WON
+            ticks_needed = BattleService.calculate_ticks_to_defeat(
+                total_gym_hp, state.player_attack
+            )
             state.time_remaining = GYM_TIME_LIMIT - ticks_needed
             state.current_pokemon_index = len(state.gym_pokemon)
 

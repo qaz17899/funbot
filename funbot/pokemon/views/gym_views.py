@@ -11,8 +11,8 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from funbot.pokemon.services.battle_service import BattleService
 from funbot.pokemon.constants.enums import Currency
+from funbot.pokemon.services.battle_service import BattleService
 from funbot.pokemon.services.gym_service import (
     GYM_TIME_LIMIT,
     GymBattleResult,
@@ -21,18 +21,13 @@ from funbot.pokemon.services.gym_service import (
     GymService,
 )
 from funbot.pokemon.ui_utils import (
+    GYM_STATUS_EMOJI,
     Emoji,
     build_progress_bar,
     get_currency_emoji,
     get_leader_image_url,
 )
-from funbot.ui.components_v2 import (
-    Container,
-    LayoutView,
-    Section,
-    TextDisplay,
-    Thumbnail,
-)
+from funbot.ui.components_v2 import Container, LayoutView, Section, TextDisplay, Thumbnail
 
 if TYPE_CHECKING:
     from funbot.db.models.pokemon.gym_data import GymData
@@ -308,7 +303,11 @@ class GymListView(LayoutView):
         gym_lines = []
         for gym in gyms:
             has_badge = gym.badge in player_badges
-            status = "🏅" if has_badge else "⚔️"
+            status = (
+                GYM_STATUS_EMOJI["COMPLETED"]
+                if has_badge
+                else GYM_STATUS_EMOJI["AVAILABLE"]
+            )
             badge_text = f" ({gym.badge} Badge)" if has_badge else ""
             gym_lines.append(f"{status} **{gym.name}** - {gym.leader}{badge_text}")
 

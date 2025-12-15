@@ -14,6 +14,7 @@ import discord
 
 from funbot.pokemon.constants.enums import Currency
 from funbot.pokemon.ui_utils import (
+    DUNGEON_STATUS_EMOJI,
     DUNGEON_TILE_EMOJI,
     REGION_DISPLAY_NAMES,
     build_progress_bar,
@@ -69,11 +70,15 @@ class DungeonListView(LayoutView):
             # Build dungeon list
             dungeon_lines = []
             for dungeon in dungeons:
-                # Status indicator
+                # Status indicator (using centralized DUNGEON_STATUS_EMOJI)
                 if dungeon.is_unlocked:
-                    status = "✅" if dungeon.player_clears > 0 else "⚔️"
+                    status = (
+                        DUNGEON_STATUS_EMOJI["COMPLETED"]
+                        if dungeon.player_clears > 0
+                        else DUNGEON_STATUS_EMOJI["AVAILABLE"]
+                    )
                 else:
-                    status = "🔒"  # Locked
+                    status = DUNGEON_STATUS_EMOJI["LOCKED"]
 
                 # Build line
                 line = f"{status} **{dungeon.name}**"

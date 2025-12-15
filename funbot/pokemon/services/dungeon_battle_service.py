@@ -155,10 +155,6 @@ class DungeonBattleService:
     # Battle Simulation (Task 5.3)
     # =========================================================================
 
-    # Delegate to BattleService for consistency (SSOT)
-    calculate_damage_per_tick = staticmethod(BattleService.calculate_damage_per_tick)
-    calculate_ticks_to_defeat = staticmethod(BattleService.calculate_ticks_to_defeat)
-
     @staticmethod
     def simulate_battle(
         party_attack: int,
