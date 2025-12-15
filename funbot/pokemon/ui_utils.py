@@ -10,7 +10,7 @@ Key naming conventions:
 
 from __future__ import annotations
 
-from funbot.pokemon.constants.enums import Currency, Pokeball
+from funbot.pokemon.constants.enums import Currency, LootTier, Pokeball, Region
 
 __all__ = (
     # Badges
@@ -24,14 +24,20 @@ __all__ = (
     # Status & Map
     "ROUTE_STATUS_EMOJI",
     "DUNGEON_TILE_EMOJI",
+    # Loot & Region
+    "LOOT_TIER_EMOJIS",
+    "REGION_DISPLAY_NAMES",
     # Types
     "TYPE_EMOJIS",
-    # Common emojis (new)
+    # Common emojis
     "Emoji",
+    # Helper functions
+    "build_progress_bar",
     "get_badge_emoji",
     "get_ball_emoji",
     "get_currency_emoji",
     "get_gem_emoji",
+    "get_loot_tier_emoji",
     "get_type_emoji",
 )
 
@@ -114,6 +120,83 @@ DUNGEON_TILE_EMOJI: dict[str, str] = {
     "fog": "⬛",  # Unrevealed tile
     "player": "🧑",  # Player position
 }
+
+# Loot Tier Emojis
+LOOT_TIER_EMOJIS: dict[LootTier, str] = {
+    LootTier.COMMON: "⚪",
+    LootTier.RARE: "🔵",
+    LootTier.EPIC: "🟣",
+    LootTier.LEGENDARY: "🟡",
+    LootTier.MYTHIC: "🔴",
+}
+
+# Region Display Names (centralized)
+REGION_DISPLAY_NAMES: dict[int, str] = {
+    Region.KANTO: "Kanto",
+    Region.JOHTO: "Johto",
+    Region.HOENN: "Hoenn",
+    Region.SINNOH: "Sinnoh",
+    Region.UNOVA: "Unova",
+    Region.KALOS: "Kalos",
+    Region.ALOLA: "Alola",
+    Region.GALAR: "Galar",
+    Region.PALDEA: "Paldea",
+}
+
+
+def get_loot_tier_emoji(tier: str | LootTier) -> str:
+    """Get emoji for loot tier.
+
+    Args:
+        tier: LootTier enum or string value
+
+    Returns:
+        Emoji string
+    """
+    if isinstance(tier, str):
+        try:
+            tier = LootTier(tier.lower())
+        except ValueError:
+            return "⚪"
+    return LOOT_TIER_EMOJIS.get(tier, "⚪")
+
+
+def build_progress_bar(
+    current: int | float,
+    maximum: int | float,
+    width: int = 16,
+    show_values: bool = True,
+) -> str:
+    """Build a visual progress/health bar.
+
+    Centralized function for all progress bar rendering.
+
+    Args:
+        current: Current value
+        maximum: Maximum value
+        width: Number of characters in bar
+        show_values: Whether to show "current/max" text
+
+    Returns:
+        Progress bar string like "████████░░░░░░░░ 432/693"
+    """
+    if maximum <= 0:
+        bar = Emoji.PROGRESS_EMPTY * width
+        return f"{bar} 0/0" if show_values else bar
+
+    percent = max(0.0, min(1.0, current / maximum))
+    filled = int(percent * width)
+    empty = width - filled
+
+    bar = Emoji.PROGRESS * filled + Emoji.PROGRESS_EMPTY * empty
+
+    if not show_values:
+        return bar
+
+    # Format numbers with commas for integers
+    if isinstance(current, int) and isinstance(maximum, int):
+        return f"{bar} {current:,}/{maximum:,}"
+    return f"{bar} {current:.1f}/{maximum:.1f}"
 
 
 # Discord custom emoji IDs for pokeballs

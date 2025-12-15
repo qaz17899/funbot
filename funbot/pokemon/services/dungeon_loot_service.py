@@ -8,21 +8,12 @@ from __future__ import annotations
 
 import random
 from dataclasses import dataclass
-from enum import StrEnum
 from typing import TYPE_CHECKING
+
+from funbot.pokemon.constants.enums import LootTier
 
 if TYPE_CHECKING:
     from funbot.db.models.pokemon.dungeon_data import DungeonLoot
-
-
-class LootTier(StrEnum):
-    """Loot tier classifications matching PokeClicker."""
-
-    COMMON = "common"
-    RARE = "rare"
-    EPIC = "epic"
-    LEGENDARY = "legendary"
-    MYTHIC = "mythic"
 
 
 # Base loot tier chances from PokeClicker's Dungeon.ts

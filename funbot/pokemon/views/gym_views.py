@@ -20,7 +20,7 @@ from funbot.pokemon.services.gym_service import (
     GymService,
 )
 from funbot.pokemon.constants.enums import Currency
-from funbot.pokemon.ui_utils import Emoji, get_currency_emoji
+from funbot.pokemon.ui_utils import Emoji, build_progress_bar, get_currency_emoji
 from funbot.ui.components_v2 import (
     Container,
     LayoutView,
@@ -47,26 +47,6 @@ class GymBattleView(LayoutView):
         self.state = state
         self.running = True
         self.result: GymBattleResult | None = None
-
-    def _build_health_bar(self, current: int, maximum: int, width: int = 16) -> str:
-        """Build a visual health bar.
-
-        Args:
-            current: Current HP
-            maximum: Maximum HP
-            width: Number of characters in bar
-
-        Returns:
-            Health bar string like "████████░░░░░░░░ 432/693"
-        """
-        if maximum <= 0:
-            return "░" * width + " 0/0"
-
-        percent = max(0, min(1, current / maximum))
-        filled = int(percent * width)
-        empty = width - filled
-
-        return f"{'█' * filled}{'░' * empty} {current:,}/{maximum:,}"
 
     def _build_time_bar(self, time_remaining: float, width: int = 20) -> str:
         """Build a visual time bar.
@@ -132,7 +112,7 @@ class GymBattleView(LayoutView):
         # Current opponent with sprite
         current = self.state.current_pokemon
         if current:
-            hp_bar = self._build_health_bar(current.current_hp, current.max_hp)
+            hp_bar = build_progress_bar(current.current_hp, current.max_hp)
             opponent_text = (
                 f"### 🎯 對手: {current.name} Lv.{current.level}\nHP: `{hp_bar}`"
             )
@@ -235,7 +215,7 @@ class GymBattleView(LayoutView):
         # Stats
         current = self.state.current_pokemon
         if current:
-            hp_bar = self._build_health_bar(current.current_hp, current.max_hp)
+            hp_bar = build_progress_bar(current.current_hp, current.max_hp)
             stats = [
                 f"📊 **進度**: {self.state.defeated_count}/{self.state.total_pokemon} 寶可夢",
                 f"🎯 **剩餘對手 HP**: `{hp_bar}`",
