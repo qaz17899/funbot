@@ -532,8 +532,9 @@ class CatchService:
                     newly_caught_stats[pokemon_id]["stat_shiny_captured"] += 1
                     if not newly_caught_stats[pokemon_id]["shiny"]:
                         newly_caught_stats[pokemon_id]["shiny"] = True
-            elif existing_in_db and existing_in_db not in pokemon_to_update:
+            elif existing_in_db:
                 # Duplicate catch of a Pokemon already in the DB
+                # Stats should update for EVERY catch, not just the first one
                 ep_earned = CatchService.calculate_effort_points(context, is_shiny)
                 result.effort_points_earned = ep_earned
 
@@ -552,7 +553,9 @@ class CatchService:
                         existing_in_db.pokerus = PokerusState.RESISTANT
                         result.pokerus_evolved = True
 
-                pokemon_to_update.append(existing_in_db)
+                # Only add to update list once (but stats accumulate above)
+                if existing_in_db not in pokemon_to_update:
+                    pokemon_to_update.append(existing_in_db)
 
             results.append(result)
 
