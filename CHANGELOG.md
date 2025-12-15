@@ -81,10 +81,3 @@
 
 * add architecture documentation ([#13](https://github.com/qaz17899/funbot/issues/13)) ([b4d4889](https://github.com/qaz17899/funbot/commit/b4d488956090c9e8073312be87f0479fead08a06))
 * **pokemon:** add TODO for correct Pokerus trigger migration ([ee32e91](https://github.com/qaz17899/funbot/commit/ee32e9127a426acb5a1c7618f9914985f8c77ce3))
-
-## Changelog
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
