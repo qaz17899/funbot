@@ -10,6 +10,13 @@ import math
 from dataclasses import dataclass, field
 from enum import Enum
 
+from funbot.pokemon.constants.game_constants import (
+    BASE_EP_YIELD,
+    DUNGEON_BOSS_EP_MODIFIER,
+    DUNGEON_EP_MODIFIER,
+)
+from funbot.pokemon.services.battle_service import BattleService
+
 
 class DungeonBattleStatus(Enum):
     """Status of a dungeon battle."""
@@ -67,17 +74,6 @@ class DungeonRewards:
     dungeon_tokens: int = 0
     first_clear_bonus: dict | None = None
     pokemon_caught: list[str] = field(default_factory=list)
-
-
-# Constants matching PokeClicker's mechanics
-# Damage multiplier to compensate for no click attack in Discord bot
-# Original Pokeclicker has both auto-attack AND click attack
-DUNGEON_DAMAGE_MULTIPLIER = 2
-
-# EP modifiers from GameConstants.ts
-DUNGEON_EP_MODIFIER = 3
-DUNGEON_BOSS_EP_MODIFIER = 10
-BASE_EP_YIELD = 100
 
 
 class DungeonBattleService:
@@ -151,7 +147,7 @@ class DungeonBattleService:
 
         # Non-boss trainers have health divided by team_size^0.75
         if not is_boss and team_size > 1:
-            health /= (team_size**0.75)
+            health /= team_size**0.75
 
         return max(1, math.floor(health))
 
@@ -160,45 +156,8 @@ class DungeonBattleService:
     # =========================================================================
 
     @staticmethod
-    def calculate_damage_per_tick(party_attack: int) -> int:
-        """Calculate damage dealt per tick based on party attack.
-
-        Matches PokeClicker's battle mechanics where all party Pokemon
-        attack simultaneously each tick.
-
-        The damage multiplier compensates for Discord bot not having
-        click attacks like the original game.
-
-        Args:
-            party_attack: Total party attack power
-
-        Returns:
-            Damage dealt per tick
-        """
-        return max(1, party_attack * DUNGEON_DAMAGE_MULTIPLIER)
-
-    @staticmethod
-    def calculate_ticks_to_defeat(enemy_health: int, party_attack: int) -> int:
-        """Calculate how many ticks needed to defeat an enemy.
-
-        Args:
-            enemy_health: Enemy's total health
-            party_attack: Total party attack per tick
-
-        Returns:
-            Number of ticks needed (rounds up)
-        """
-        if party_attack <= 0:
-            return 999999  # Can't defeat with 0 attack
-
-        damage_per_tick = DungeonBattleService.calculate_damage_per_tick(party_attack)
-
-        # Ceiling division: (a + b - 1) // b
-        return max(1, (enemy_health + damage_per_tick - 1) // damage_per_tick)
-
-    @staticmethod
     def simulate_battle(
-        player_attack: int,
+        party_attack: int,
         enemy_health: int,
         enemy_name: str = "Unknown",
         is_boss: bool = False,
@@ -208,7 +167,7 @@ class DungeonBattleService:
         Calculates the number of ticks needed and rewards earned.
 
         Args:
-            player_attack: Total party attack power
+            party_attack: Total party attack power
             enemy_health: Enemy's total health
             enemy_name: Name of the enemy Pokemon
             is_boss: Whether this is a boss encounter
@@ -216,9 +175,7 @@ class DungeonBattleService:
         Returns:
             DungeonBattleResult with battle outcome
         """
-        ticks = DungeonBattleService.calculate_ticks_to_defeat(
-            enemy_health, player_attack
-        )
+        ticks = BattleService.calculate_ticks_to_defeat(enemy_health, party_attack)
         damage_dealt = enemy_health  # Total damage = enemy health when defeated
 
         # Calculate experience earned
@@ -252,9 +209,7 @@ class DungeonBattleService:
         Returns:
             True if enemy can be defeated in time
         """
-        ticks = DungeonBattleService.calculate_ticks_to_defeat(
-            enemy_health, party_attack
-        )
+        ticks = BattleService.calculate_ticks_to_defeat(enemy_health, party_attack)
         return ticks <= max_ticks
 
     # =========================================================================
@@ -345,12 +300,15 @@ class DungeonBattleService:
             return None
 
         # Get Pokemon ordered by their position
-        pokemon_list = [{
-                    "name": poke.pokemon_name,
-                    "health": poke.health,
-                    "max_health": poke.health,
-                    "level": poke.level,
-                } for poke in sorted(trainer.pokemon, key=lambda p: p.order)]
+        pokemon_list = [
+            {
+                "name": poke.pokemon_name,
+                "health": poke.health,
+                "max_health": poke.health,
+                "level": poke.level,
+            }
+            for poke in sorted(trainer.pokemon, key=lambda p: p.order)
+        ]
 
         return TrainerBattleState(
             trainer_class=trainer.trainer_class,
@@ -361,7 +319,7 @@ class DungeonBattleService:
 
     @staticmethod
     def simulate_boss_battle(
-        player_attack: int,
+        party_attack: int,
         boss_health: int,
         boss_name: str,
         boss_level: int,
@@ -372,7 +330,7 @@ class DungeonBattleService:
         Uses predefined boss health from dungeon data.
 
         Args:
-            player_attack: Total party attack power
+            party_attack: Total party attack power
             boss_health: Boss's predefined base health
             boss_name: Name of the boss Pokemon
             boss_level: Boss's level
@@ -387,7 +345,7 @@ class DungeonBattleService:
         )
 
         return DungeonBattleService.simulate_battle(
-            player_attack=player_attack,
+            party_attack=party_attack,
             enemy_health=actual_health,
             enemy_name=boss_name,
             is_boss=True,
@@ -395,7 +353,7 @@ class DungeonBattleService:
 
     @staticmethod
     def simulate_trainer_battle(
-        player_attack: int,
+        party_attack: int,
         trainer_state: TrainerBattleState,
         dungeon_base_health: int,
         chests_opened: int = 0,
@@ -406,7 +364,7 @@ class DungeonBattleService:
         Each Pokemon must be defeated before the next is engaged.
 
         Args:
-            player_attack: Total party attack power
+            party_attack: Total party attack power
             trainer_state: Current trainer battle state
             dungeon_base_health: Dungeon's base health for non-boss trainers
             chests_opened: Number of chests opened
@@ -432,7 +390,7 @@ class DungeonBattleService:
                 )
 
             result = DungeonBattleService.simulate_battle(
-                player_attack=player_attack,
+                party_attack=party_attack,
                 enemy_health=health,
                 enemy_name=pokemon["name"],
                 is_boss=trainer_state.is_boss,
@@ -468,9 +426,7 @@ class DungeonBattleService:
     def calculate_money_reward(difficulty_route: int, region: int) -> int:
         """Calculate money reward based on difficulty route.
 
-        Matches PokeClicker's PokemonFactory.routeMoney():
-        money = max(10, 3 * route + 5 * route^1.15 + deviation)
-
+        Delegates to BattleService for consistent formula (SSOT).
         Uses mean deviation (12) for consistent rewards.
 
         Args:
@@ -480,18 +436,15 @@ class DungeonBattleService:
         Returns:
             Money reward amount
         """
-        route = difficulty_route
-        # Use mean deviation (12) for consistency
-        deviation = 12
-        money = 3 * route + 5 * pow(route, 1.15) + deviation
-        return max(10, int(money))
+        return BattleService.calculate_route_money(
+            difficulty_route, region, use_deviation=False
+        )
 
     @staticmethod
     def calculate_dungeon_token_reward(difficulty_route: int, region: int) -> int:
         """Calculate dungeon token reward.
 
-        Matches PokeClicker's PokemonFactory.routeDungeonTokens():
-        tokens = max(1, 6 * (route * 2 / (2.8 / (1 + region / 3)))^1.08)
+        Delegates to BattleService for consistent formula (SSOT).
 
         Args:
             difficulty_route: The dungeon's difficulty route value
@@ -500,9 +453,7 @@ class DungeonBattleService:
         Returns:
             Dungeon token reward amount
         """
-        route = difficulty_route
-        tokens = 6 * pow(route * 2 / (2.8 / (1 + region / 3)), 1.08)
-        return max(1, int(tokens))
+        return BattleService.calculate_dungeon_tokens(difficulty_route, region)
 
     @staticmethod
     def calculate_exp_reward(

@@ -8,31 +8,25 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING
 
 import discord
 
-from funbot.pokemon.ui_utils import get_currency_emoji
+from funbot.pokemon.constants.enums import Currency
+from funbot.pokemon.ui_utils import (
+    DUNGEON_STATUS_EMOJI,
+    DUNGEON_TILE_EMOJI,
+    REGION_DISPLAY_NAMES,
+    build_progress_bar,
+    get_currency_emoji,
+    get_loot_tier_emoji,
+)
 from funbot.ui.components_v2 import Container, LayoutView, TextDisplay
 
 if TYPE_CHECKING:
     from funbot.pokemon.services.dungeon_map import DungeonMap
     from funbot.pokemon.services.dungeon_service import DungeonInfo
     from funbot.types import Interaction, User
-
-
-# Region names for display
-REGION_NAMES = {
-    0: "Kanto",
-    1: "Johto",
-    2: "Hoenn",
-    3: "Sinnoh",
-    4: "Unova",
-    5: "Kalos",
-    6: "Alola",
-    7: "Galar",
-    8: "Paldea",
-}
 
 
 class DungeonListView(LayoutView):
@@ -61,8 +55,8 @@ class DungeonListView(LayoutView):
         """
         super().__init__(author=author, timeout=120)
 
-        region_name = REGION_NAMES.get(region, f"Region {region}")
-        token_emoji = get_currency_emoji("dungeon_token")
+        region_name = REGION_DISPLAY_NAMES.get(region, f"Region {region}")
+        token_emoji = get_currency_emoji(Currency.DUNGEON_TOKEN)
 
         container = Container(accent_color=discord.Color.dark_purple())
 
@@ -76,11 +70,15 @@ class DungeonListView(LayoutView):
             # Build dungeon list
             dungeon_lines = []
             for dungeon in dungeons:
-                # Status indicator
+                # Status indicator (using centralized DUNGEON_STATUS_EMOJI)
                 if dungeon.is_unlocked:
-                    status = "✅" if dungeon.player_clears > 0 else "⚔️"
+                    status = (
+                        DUNGEON_STATUS_EMOJI["COMPLETED"]
+                        if dungeon.player_clears > 0
+                        else DUNGEON_STATUS_EMOJI["AVAILABLE"]
+                    )
                 else:
-                    status = "🔒"  # Locked
+                    status = DUNGEON_STATUS_EMOJI["LOCKED"]
 
                 # Build line
                 line = f"{status} **{dungeon.name}**"
@@ -117,18 +115,6 @@ class DungeonExploreView(LayoutView):
         - 6.1: Display visual map representation
         - 6.2: Show current position, revealed tiles, remaining actions
     """
-
-    # Tile type to emoji mapping
-    TILE_EMOJIS: ClassVar[dict[str, str]] = {
-        "entrance": "🚪",
-        "enemy": "👾",
-        "chest": "📦",
-        "boss": "👹",
-        "empty": "⬜",
-        "ladder": "🪜",
-        "fog": "⬛",  # Unrevealed tile
-        "player": "🧑",  # Player position
-    }
 
     def __init__(
         self,
@@ -186,16 +172,16 @@ class DungeonExploreView(LayoutView):
             row = []
             for x in range(size):
                 if (x, y) == player_pos:
-                    row.append(self.TILE_EMOJIS["player"])
+                    row.append(DUNGEON_TILE_EMOJI["player"])
                 elif y < len(tiles) and x < len(tiles[y]):
                     tile = tiles[y][x]
                     if tile.get("is_visible", False):
                         tile_type = tile.get("tile_type", "empty")
-                        row.append(self.TILE_EMOJIS.get(tile_type, "❓"))
+                        row.append(DUNGEON_TILE_EMOJI.get(tile_type, "❓"))
                     else:
-                        row.append(self.TILE_EMOJIS["fog"])
+                        row.append(DUNGEON_TILE_EMOJI["fog"])
                 else:
-                    row.append(self.TILE_EMOJIS["fog"])
+                    row.append(DUNGEON_TILE_EMOJI["fog"])
             lines.append("".join(row))
 
         return "\n".join(lines)
@@ -261,8 +247,8 @@ class DungeonExploreView(LayoutView):
         container.add_item(discord.ui.Separator(spacing=discord.SeparatorSpacing.small))
 
         # Rewards
-        money_emoji = get_currency_emoji("money")
-        token_emoji = get_currency_emoji("dungeon_token")
+        money_emoji = get_currency_emoji(Currency.POKEDOLLAR)
+        token_emoji = get_currency_emoji(Currency.DUNGEON_TOKEN)
 
         money = self.rewards.get("money", 0)
         exp = self.rewards.get("exp", 0)
@@ -297,9 +283,7 @@ class DungeonExploreView(LayoutView):
             )
             loot_lines = ["### 📦 收集的戰利品"]
             for item in self.loot_collected[:10]:
-                tier_emoji = DungeonResultView._get_tier_emoji(
-                    item.get("tier", "common")
-                )
+                tier_emoji = get_loot_tier_emoji(item.get("tier", "common"))
                 loot_lines.append(f"{tier_emoji} {item.get('item_name', 'Unknown')}")
             if len(self.loot_collected) > 10:
                 loot_lines.append(f"-# ...還有 {len(self.loot_collected) - 10} 個物品")
@@ -327,9 +311,9 @@ class DungeonExploreView(LayoutView):
             TileEventType,
         )
         from funbot.pokemon.services.dungeon_map import DungeonMap
-        from funbot.pokemon.services.dungeon_service import DungeonService
+        from funbot.pokemon.services.dungeon_service import get_dungeon_service
 
-        service = DungeonService()
+        service = get_dungeon_service()
 
         # Get initial run state
         run = await service.get_run_by_id(self.run_id)
@@ -417,7 +401,7 @@ class DungeonExploreView(LayoutView):
                     if result.chest_result:
                         tier = result.chest_result.tier
                         item_name = result.chest_result.item_name
-                        tier_emoji = DungeonResultView._get_tier_emoji(tier)
+                        tier_emoji = get_loot_tier_emoji(tier)
                         self.status_message = f"📦 獲得 {tier_emoji} {item_name}！"
                     else:
                         self.status_message = "📦 開啟寶箱！"
@@ -555,26 +539,6 @@ class DungeonBattleView(LayoutView):
 
         self._build_view()
 
-    def _build_health_bar(self, current: int, maximum: int, width: int = 16) -> str:
-        """Build a visual health bar.
-
-        Args:
-            current: Current HP
-            maximum: Maximum HP
-            width: Number of characters in bar
-
-        Returns:
-            Health bar string
-        """
-        if maximum <= 0:
-            return "░" * width + " 0/0"
-
-        percent = max(0, min(1, current / maximum))
-        filled = int(percent * width)
-        empty = width - filled
-
-        return f"{'█' * filled}{'░' * empty} {current:,}/{maximum:,}"
-
     def _build_view(self) -> None:
         """Build the battle view components."""
         # Choose color based on boss status
@@ -588,7 +552,7 @@ class DungeonBattleView(LayoutView):
         container.add_item(discord.ui.Separator(spacing=discord.SeparatorSpacing.small))
 
         # Enemy info
-        hp_bar = self._build_health_bar(self.enemy_health, self.enemy_max_health)
+        hp_bar = build_progress_bar(self.enemy_health, self.enemy_max_health)
         enemy_text = f"### 🎯 {self.enemy_name}\nHP: `{hp_bar}`"
         container.add_item(TextDisplay(enemy_text))
 
@@ -731,8 +695,8 @@ class DungeonResultView(LayoutView):
         container.add_item(discord.ui.Separator(spacing=discord.SeparatorSpacing.small))
 
         # Rewards
-        money_emoji = get_currency_emoji("money")
-        token_emoji = get_currency_emoji("dungeon_token")
+        money_emoji = get_currency_emoji(Currency.POKEDOLLAR)
+        token_emoji = get_currency_emoji(Currency.DUNGEON_TOKEN)
 
         rewards = [
             f"💰 **金錢**: {money_earned:,} {money_emoji}",
@@ -758,7 +722,7 @@ class DungeonResultView(LayoutView):
             )
             loot_lines = ["### 📦 收集的戰利品"]
             for item in loot_collected[:10]:  # Limit to 10 items
-                tier_emoji = self._get_tier_emoji(item.get("tier", "common"))
+                tier_emoji = get_loot_tier_emoji(item.get("tier", "common"))
                 loot_lines.append(f"{tier_emoji} {item.get('item_name', 'Unknown')}")
             if len(loot_collected) > 10:
                 loot_lines.append(f"-# ...還有 {len(loot_collected) - 10} 個物品")
@@ -773,22 +737,3 @@ class DungeonResultView(LayoutView):
             container.add_item(TextDisplay(caught_text))
 
         self.add_item(container)
-
-    @staticmethod
-    def _get_tier_emoji(tier: str) -> str:
-        """Get emoji for loot tier.
-
-        Args:
-            tier: Loot tier name
-
-        Returns:
-            Emoji string
-        """
-        tier_emojis = {
-            "common": "⚪",
-            "rare": "🔵",
-            "epic": "🟣",
-            "legendary": "🟡",
-            "mythic": "🔴",
-        }
-        return tier_emojis.get(tier.lower(), "⚪")

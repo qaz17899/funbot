@@ -33,7 +33,7 @@ from funbot.pokemon.autocomplete import (
     region_autocomplete,
     route_autocomplete,
 )
-from funbot.pokemon.constants.enums import Pokeball, Region
+from funbot.pokemon.constants.enums import Region
 from funbot.pokemon.constants.game_constants import DEFAULT_STARTER_REGION, STARTERS
 from funbot.pokemon.services.battle_service import BattleService
 from funbot.pokemon.services.catch_service import CatchService
@@ -95,11 +95,13 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         """Select your starter Pokemon."""
         await interaction.response.defer()
 
-        # Get or create user
-        user, _ = await User.get_or_create(id=interaction.user.id)
+        player_id = interaction.user.id
 
-        # Check if user already has Pokemon
-        existing_count = await PlayerPokemon.filter(user=user).count()
+        # Ensure user exists in database
+        await User.get_or_create(id=player_id)
+
+        # Check if player already has Pokemon
+        existing_count = await PlayerPokemon.filter(user_id=player_id).count()
         if existing_count > 0:
             await interaction.followup.send(
                 f"{Emoji.CROSS} 你已經有寶可夢了！使用 `/pokemon party` 查看你的隊伍。",
@@ -119,9 +121,7 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             return
 
         # Create V2 layout with starter selection
-        view = StarterSelectLayout(
-            starters=list(starters), user=user, discord_user_id=interaction.user.id
-        )
+        view = StarterSelectLayout(starters=list(starters), player_id=player_id)
 
         await interaction.followup.send(view=view)
 
@@ -134,9 +134,10 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         """Display all owned Pokemon."""
         await interaction.response.defer()
 
-        # Get user
-        user = await User.get_or_none(id=interaction.user.id)
-        if not user:
+        player_id = interaction.user.id
+
+        # Check if player exists
+        if not await User.exists(id=player_id):
             await interaction.followup.send(
                 f"{Emoji.CROSS} 你還沒有開始寶可夢之旅！使用 `/pokemon start` 選擇初始寶可夢。",
                 ephemeral=True,
@@ -144,7 +145,7 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             return
 
         # Get all Pokemon
-        pokemon_list = await PlayerPokemon.filter(user=user).prefetch_related(
+        pokemon_list = await PlayerPokemon.filter(user_id=player_id).prefetch_related(
             "pokemon_data"
         )
 
@@ -182,21 +183,22 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         """Open the Poké Mart shop."""
         await interaction.response.defer()
 
-        # Get user
-        user = await User.get_or_none(id=interaction.user.id)
-        if not user:
+        player_id = interaction.user.id
+
+        # Check if player exists
+        if not await User.exists(id=player_id):
             await interaction.followup.send(
                 f"{Emoji.CROSS} 你還沒有開始寶可夢之旅！使用 `/pokemon start` 選擇初始寶可夢。",
                 ephemeral=True,
             )
             return
 
-        # Get shop data
-        shop_data = await ShopService.get_shop_inventory(user)
-        inventory, _ = await PlayerBallInventory.get_or_create(user=user)
+        # Get shop data and inventory
+        shop_data = await ShopService.get_shop_inventory(player_id)
+        inventory, _ = await PlayerBallInventory.get_or_create(user_id=player_id)
 
-        # Create beautiful V2 shop view
-        view = ShopView(user, shop_data["wallet"], inventory)
+        # Create V2 shop view
+        view = ShopView(player_id, shop_data["wallet"], inventory)
 
         await interaction.followup.send(view=view)
 
@@ -209,9 +211,10 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         """View and edit Pokeball settings."""
         await interaction.response.defer()
 
-        # Get user
-        user = await User.get_or_none(id=interaction.user.id)
-        if not user:
+        player_id = interaction.user.id
+
+        # Check if player exists
+        if not await User.exists(id=player_id):
             await interaction.followup.send(
                 f"{Emoji.CROSS} 你還沒有開始寶可夢之旅！使用 `/pokemon start` 選擇初始寶可夢。",
                 ephemeral=True,
@@ -219,10 +222,10 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             return
 
         # Get or create settings
-        settings, _ = await PlayerPokeballSettings.get_or_create(user=user)
+        settings, _ = await PlayerPokeballSettings.get_or_create(user_id=player_id)
 
         # Create V2 layout
-        view = PokeballSettingsLayout(settings, interaction.user.id)
+        view = PokeballSettingsLayout(settings, player_id)
 
         await interaction.followup.send(view=view)
 
@@ -244,8 +247,10 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         # Validate count
         count = max(1, min(100, count))
 
-        # Get user and validate
-        user = await User.get_or_none(id=interaction.user.id)
+        player_id = interaction.user.id
+
+        # Check if player exists
+        user = await User.get_or_none(id=player_id)
         if not user:
             await interaction.followup.send(
                 f"{Emoji.CROSS} 你還沒有開始寶可夢之旅！使用 `/pokemon start` 選擇初始寶可夢。",
@@ -262,9 +267,13 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             return
 
         # Check route unlock status
-        status, _kills = await self._route_service.get_route_status(user.id, route_data)
+        status, _kills = await self._route_service.get_route_status(
+            player_id, route_data
+        )
         if status.name == "LOCKED":
-            hints = await self._route_service.get_requirement_hints(user.id, route_data)
+            hints = await self._route_service.get_requirement_hints(
+                player_id, route_data
+            )
             await interaction.followup.send(
                 f"{Emoji.CROSS} 此路線尚未解鎖。\n需求: {', '.join(hints) if hints else '未知'}",
                 ephemeral=True,
@@ -272,7 +281,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             return
 
         # Get player's party
-        party = await PlayerPokemon.filter(user=user).prefetch_related("pokemon_data")
+        party = await PlayerPokemon.filter(user_id=player_id).prefetch_related(
+            "pokemon_data"
+        )
         if not party:
             await interaction.followup.send(
                 f"{Emoji.CROSS} 你沒有任何寶可夢！", ephemeral=True
@@ -288,9 +299,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             return
 
         # Get settings and resources
-        settings, _ = await PlayerPokeballSettings.get_or_create(user=user)
-        wallet, _ = await PlayerWallet.get_or_create(user=user)
-        ball_inventory, _ = await PlayerBallInventory.get_or_create(user=user)
+        settings, _ = await PlayerPokeballSettings.get_or_create(user_id=player_id)
+        wallet, _ = await PlayerWallet.get_or_create(user_id=player_id)
+        ball_inventory, _ = await PlayerBallInventory.get_or_create(user_id=player_id)
 
         # Run simulation
         results = await self._simulate_encounters(
@@ -306,7 +317,7 @@ class PokemonCog(commands.Cog, name="Pokemon"):
 
         # Progress eggs
         steps = HatcheryService.calculate_steps_from_route(route_data.order_number)
-        await HatcheryService.progress_eggs(user, int(steps * count))
+        await HatcheryService.progress_eggs(player_id, int(steps * count))
 
         # Create result view
         view = ExploreResultView(interaction.user.display_name, route_data, results)
@@ -358,27 +369,27 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         wild_pokemon: list[PokemonData],
         count: int,
     ) -> ExploreResult:
-        """Simulate multiple encounters with batched DB operations."""
+        """Simulate multiple encounters with batched DB operations.
+
+        Uses CatchService.perform_batch_catch_sequence for centralized catch logic.
+        """
         from funbot.pokemon.constants.game_constants import SHINY_CHANCE_BATTLE
+        from funbot.pokemon.services.catch_service import CatchContext
 
         total_exp = 0
         total_money = 0
-        total_dungeon_tokens = 0  # Pokeclicker: gained on catch
+        total_dungeon_tokens = 0
         pokedex_new: list[str] = []
         shiny_caught: list[str] = []
         already_caught = 0
         failed_catches = 0
         balls_used: dict[int, int] = {}
 
-        # Get owned Pokemon IDs for "new" detection
-        owned_ids = {p.pokemon_data.id for p in party}
-
-        # Batch collections for DB operations
-        new_pokemon_to_create: list[dict] = []
-        ball_usage: dict[int, int] = {}  # ball_type -> count
-
         # Calculate route level for EXP (Pokeclicker formula)
         route_level = self._calculate_route_level(route_data.number, route_data.region)
+
+        # Prepare catch attempts with pre-rolled shiny
+        catch_attempts: list[dict] = []
 
         for _ in range(count):
             # Pick random wild Pokemon
@@ -388,107 +399,63 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             money_earned = BattleService.calculate_route_money(
                 route_data.number, route_data.region
             )
-            # Use Pokemon's base_exp and route level (from Party.ts:138-143)
             exp_earned = ExpService.calculate_battle_exp(wild.base_exp, route_level)
 
-            # Add rewards
             total_exp += exp_earned
             total_money += money_earned
 
-            # Determine shiny using constant
+            # Pre-roll shiny for this encounter
             is_shiny = random.randint(1, SHINY_CHANCE_BATTLE) == 1
-            is_new = wild.id not in owned_ids
 
-            # Determine which ball to use
-            if is_new and is_shiny:
-                preferred_ball = settings.new_shiny
-            elif is_new:
-                preferred_ball = settings.new_pokemon
-            elif is_shiny:
-                preferred_ball = settings.caught_shiny
-            else:
-                preferred_ball = settings.caught_pokemon
+            catch_attempts.append(
+                {
+                    "pokemon_id": wild.id,
+                    "pokemon_name": wild.name,
+                    "catch_rate": wild.catch_rate,
+                    "is_shiny": is_shiny,
+                }
+            )
 
-            if preferred_ball == Pokeball.NONE:
+        # Execute batch catch sequence using centralized CatchService
+        catch_results = await CatchService.perform_batch_catch_sequence(
+            player_id=user.id,
+            catch_attempts=catch_attempts,
+            context=CatchContext.ROUTE,
+            route_number=route_data.number,
+            region=route_data.region,
+        )
+
+        # Process results
+        for result in catch_results:
+            if result.skipped:
                 continue
 
-            # Find available ball (fallback to lower tier)
-            actual_ball = None
-            for ball_type in [
-                preferred_ball,
-                Pokeball.ULTRABALL,
-                Pokeball.GREATBALL,
-                Pokeball.POKEBALL,
-            ]:
-                current_used = ball_usage.get(ball_type, 0)
-                available = ball_inventory.get_quantity(ball_type) - current_used
-                if ball_type <= preferred_ball and available > 0:
-                    actual_ball = ball_type
-                    break
+            balls_used[result.pokeball_used] = (
+                balls_used.get(result.pokeball_used, 0) + 1
+            )
 
-            if actual_ball is None:
-                failed_catches += 1
-                continue
+            if result.success:
+                total_dungeon_tokens += result.dungeon_tokens_earned
 
-            # Track ball usage locally
-            ball_usage[actual_ball] = ball_usage.get(actual_ball, 0) + 1
-            balls_used[actual_ball] = balls_used.get(actual_ball, 0) + 1
-
-            # Attempt catch using actual catch_rate
-            catch_result = CatchService.attempt_catch(wild.catch_rate, actual_ball)
-
-            if catch_result.success:
-                # Pokeclicker: Dungeon Tokens gained on EVERY successful catch
-                # From Battle.ts:188 - gainTokens() called in catchPokemon()
-                tokens_earned = BattleService.calculate_dungeon_tokens(
-                    route_data.number, route_data.region
-                )
-                total_dungeon_tokens += tokens_earned
-
-                if is_new:
-                    pokedex_new.append(wild.name)
-                    owned_ids.add(wild.id)
-                    # Queue for batch creation
-                    new_pokemon_to_create.append(
-                        {
-                            "user_id": user.id,
-                            "pokemon_data_id": wild.id,
-                            "shiny": is_shiny,
-                        }
-                    )
+                if result.is_new:
+                    pokedex_new.append(result.pokemon_name)
                 else:
                     already_caught += 1
 
-                if is_shiny:
-                    shiny_caught.append(wild.name)
+                if result.is_shiny:
+                    shiny_caught.append(result.pokemon_name)
             else:
                 failed_catches += 1
 
-        # === Batch DB Operations ===
-
-        # 1. Create new Pokemon in batch
-        if new_pokemon_to_create:
-            await PlayerPokemon.bulk_create(
-                [PlayerPokemon(**data) for data in new_pokemon_to_create]
-            )
-
-        # 2. Update ball inventory in batch
-        for ball_type, used_count in ball_usage.items():
-            for _ in range(used_count):
-                await ball_inventory.use_ball(ball_type)
-
-        # 3. Update wallet (money + dungeon tokens)
+        # Update wallet with money (tokens already handled by CatchService)
         wallet.pokedollar += total_money
-        wallet.dungeon_token += total_dungeon_tokens
-        await wallet.save(update_fields=["pokedollar", "dungeon_token"])
+        await wallet.save(update_fields=["pokedollar"])
 
-        # 4. Update party EXP in batch (Pokeclicker: ALL Pokemon get FULL exp)
-        # From Party.ts:145: for (const pokemon of this.caughtPokemon) { pokemon.gainExp(expTotal) }
-        # Each Pokemon receives the full total_exp, not divided!
+        # Update party EXP in batch (Pokeclicker: ALL Pokemon get FULL exp)
         updated_party: list[PlayerPokemon] = []
         for poke in party:
             level_result = ExpService.add_exp_and_level_up(
-                poke.level, poke.exp, total_exp  # Full exp to each Pokemon
+                poke.level, poke.exp, total_exp
             )
             if level_result.leveled_up:
                 poke.level = level_result.new_level
@@ -579,9 +546,9 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         """View all eggs in hatchery."""
         await interaction.response.defer()
 
-        user, _ = await User.get_or_create(id=interaction.user.id)
-        eggs = await HatcheryService.get_eggs(user)
-        slots = await HatcheryService.get_egg_slots(user)
+        player_id = interaction.user.id
+        eggs = await HatcheryService.get_eggs(player_id)
+        slots = await HatcheryService.get_egg_slots(player_id)
 
         view = HatcheryListView(eggs, slots, interaction.user.display_name)
         await interaction.followup.send(view=view)
@@ -596,7 +563,7 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         """Add a Pokemon to the hatchery."""
         await interaction.response.defer()
 
-        user, _ = await User.get_or_create(id=interaction.user.id)
+        player_id = interaction.user.id
 
         # Find Pokemon by name
         pokemon_data = await PokemonData.filter(name__icontains=pokemon_name).first()
@@ -608,7 +575,7 @@ class PokemonCog(commands.Cog, name="Pokemon"):
 
         # Check if user owns this Pokemon
         player_pokemon = await PlayerPokemon.filter(
-            user=user, pokemon_data=pokemon_data
+            user_id=player_id, pokemon_data=pokemon_data
         ).first()
         if not player_pokemon:
             await interaction.followup.send(
@@ -624,8 +591,10 @@ class PokemonCog(commands.Cog, name="Pokemon"):
             )
             return
 
-        # Try to add to hatchery
-        egg = await HatcheryService.add_to_hatchery(user, player_pokemon, pokemon_data)
+        # Try to add to hatchery (use player_id for consistency)
+        egg = await HatcheryService.add_to_hatchery(
+            player_id, player_pokemon, pokemon_data
+        )
         if not egg:
             await interaction.followup.send(
                 f"{Emoji.CROSS} 孵化場已滿！請先孵化現有的蛋。", ephemeral=True
@@ -647,8 +616,8 @@ class PokemonCog(commands.Cog, name="Pokemon"):
         """Hatch all ready eggs."""
         await interaction.response.defer()
 
-        user, _ = await User.get_or_create(id=interaction.user.id)
-        results = await HatcheryService.hatch_all_ready(user)
+        player_id = interaction.user.id
+        results = await HatcheryService.hatch_all_ready(player_id)
 
         if not results:
             await interaction.followup.send(
@@ -681,13 +650,13 @@ class PokemonCog(commands.Cog, name="Pokemon"):
     @app_commands.autocomplete(region=region_autocomplete)
     async def dungeon_list(self, interaction: Interaction, region: int = 0) -> None:
         """List available dungeons in a region."""
-        from funbot.pokemon.services.dungeon_service import DungeonService
+        from funbot.pokemon.services.dungeon_service import get_dungeon_service
         from funbot.pokemon.views.dungeon_views import DungeonListView
 
         await interaction.response.defer()
 
         user_id = interaction.user.id
-        service = DungeonService()
+        service = get_dungeon_service()
 
         dungeons = await service.get_available_dungeons(user_id, region)
 
@@ -709,13 +678,13 @@ class PokemonCog(commands.Cog, name="Pokemon"):
     ) -> None:
         """Enter a dungeon and start auto-exploration."""
         from funbot.db.models.pokemon.dungeon_data import DungeonData
-        from funbot.pokemon.services.dungeon_service import DungeonService
+        from funbot.pokemon.services.dungeon_service import get_dungeon_service
         from funbot.pokemon.views.dungeon_views import DungeonExploreView
 
         await interaction.response.defer()
 
         user_id = interaction.user.id
-        service = DungeonService()
+        service = get_dungeon_service()
 
         # Find dungeon by name
         dungeon = await DungeonData.filter(name__icontains=name).first()
@@ -768,13 +737,13 @@ class PokemonCog(commands.Cog, name="Pokemon"):
     @dungeon.command(name="status", description="查看當前地下城狀態")
     async def dungeon_status(self, interaction: Interaction) -> None:
         """Show current dungeon run status and resume exploration."""
-        from funbot.pokemon.services.dungeon_service import DungeonService
+        from funbot.pokemon.services.dungeon_service import get_dungeon_service
         from funbot.pokemon.views.dungeon_views import DungeonExploreView
 
         await interaction.response.defer()
 
         user_id = interaction.user.id
-        service = DungeonService()
+        service = get_dungeon_service()
 
         # Get active run
         run = await service.get_active_run(user_id)

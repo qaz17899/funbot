@@ -1,6 +1,11 @@
 """Shop views.
 
 UI components for the /pokemon shop command.
+
+Note: Views store player_id (int) instead of User objects to:
+1. Avoid detached instance issues in async context
+2. Match Service layer interface (player_id: int)
+3. Ensure fresh data is fetched when needed
 """
 
 from __future__ import annotations
@@ -11,16 +16,14 @@ import discord
 from discord import ui
 
 from funbot.pokemon.constants.enums import Currency, Pokeball
-from funbot.pokemon.constants.game_constants import POKEBALL_CATCH_BONUS, POKEBALL_PRICES
 from funbot.pokemon.services.shop_service import ShopService
-from funbot.pokemon.ui_utils import Emoji, get_ball_emoji, get_currency_emoji
+from funbot.pokemon.ui_utils import Emoji, format_currency, get_ball_emoji, get_pokeball_name
 from funbot.ui.components_v2 import Button, Container, LayoutView, Section, Separator, TextDisplay
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
     from funbot.db.models.pokemon.player_ball_inventory import PlayerBallInventory
-    from funbot.db.models.user import User
     from funbot.types import Interaction
 
 
@@ -35,9 +38,11 @@ class BuyBallModal(ui.Modal, title="購買寶貝球"):
         default="10",
     )
 
-    def __init__(self, user: User, ball_type: int, refresh_callback: Callable) -> None:
+    def __init__(
+        self, player_id: int, ball_type: int, refresh_callback: Callable
+    ) -> None:
         super().__init__()
-        self.user = user
+        self.player_id = player_id
         self.ball_type = ball_type
         self.refresh_callback = refresh_callback
 
@@ -57,21 +62,29 @@ class BuyBallModal(ui.Modal, title="購買寶貝球"):
             )
             return
 
-        result = await ShopService.buy_pokeballs(self.user, self.ball_type, amount)
+        result = await ShopService.buy_pokeballs(self.player_id, self.ball_type, amount)
 
         if result.success:
-            # Refresh the shop view
-            await self.refresh_callback(interaction, result.message)
+            # Format success message in View layer (Service returns pure data)
+            ball_name = get_pokeball_name(result.ball_type)
+            message = f"成功購買 {result.quantity} 個 {ball_name}！"
+            await self.refresh_callback(interaction, message)
         else:
+            # Format error message in View layer
+            currency_type = Currency(result.currency_type)
+            error_msg = (
+                f"資金不足！需要 {format_currency(result.total_cost, currency_type)}，"
+                f"你只有 {format_currency(result.new_balance, currency_type)}"
+            )
             await interaction.response.send_message(
-                f"{Emoji.CROSS} {result.message}", ephemeral=True
+                f"{Emoji.CROSS} {error_msg}", ephemeral=True
             )
 
 
 class BuyBallButton(Button["ShopView"]):
     """Button to buy a specific ball type."""
 
-    def __init__(self, ball_type: int, user: User) -> None:
+    def __init__(self, ball_type: int, player_id: int) -> None:
         # Style based on ball tier
         styles = {
             Pokeball.POKEBALL: discord.ButtonStyle.secondary,
@@ -85,17 +98,17 @@ class BuyBallButton(Button["ShopView"]):
             style=styles.get(Pokeball(ball_type), discord.ButtonStyle.secondary),
         )
         self.ball_type = ball_type
-        self.user = user
+        self.player_id = player_id
 
     async def callback(self, interaction: Interaction) -> None:
         """Show purchase modal."""
-        if interaction.user.id != self.user.id:
+        if interaction.user.id != self.player_id:
             await interaction.response.send_message(
                 f"{Emoji.CROSS} 這不是你的商店！", ephemeral=True
             )
             return
 
-        modal = BuyBallModal(self.user, self.ball_type, self.view.refresh_shop)
+        modal = BuyBallModal(self.player_id, self.ball_type, self.view.refresh_shop)
         await interaction.response.send_modal(modal)
 
 
@@ -103,10 +116,10 @@ class ShopView(LayoutView):
     """Shop view with V2 components."""
 
     def __init__(
-        self, user: User, wallet: dict, inventory: PlayerBallInventory
+        self, player_id: int, wallet: dict, inventory: PlayerBallInventory
     ) -> None:
         super().__init__(timeout=300)
-        self.user = user
+        self.player_id = player_id
         self.wallet = wallet
         self.inventory = inventory
 
@@ -116,10 +129,6 @@ class ShopView(LayoutView):
         """Build the shop UI."""
         # Clear existing items
         self.clear_items()
-
-        # Get emojis
-        money_emoji = get_currency_emoji("money")
-        quest_emoji = get_currency_emoji("questPoint")
 
         # Main container with gradient blue
         container = Container(accent_color=discord.Color.from_rgb(66, 133, 244))
@@ -133,8 +142,8 @@ class ShopView(LayoutView):
         # Wallet Section
         wallet_text = (
             f"### 💰 錢包餘額\n"
-            f"**{self.wallet['pokedollar']:,}** {money_emoji}\n"
-            f"**{self.wallet['quest_point']:,}** {quest_emoji}"
+            f"**{format_currency(self.wallet['pokedollar'], Currency.POKEDOLLAR)}**\n"
+            f"**{format_currency(self.wallet['quest_point'], Currency.QUEST_POINT)}**"
         )
         container.add_item(TextDisplay(wallet_text))
         container.add_item(Separator(spacing=discord.SeparatorSpacing.small))
@@ -149,16 +158,13 @@ class ShopView(LayoutView):
             Pokeball.MASTERBALL,
         ]:
             ball_emoji = get_ball_emoji(ball_type)
-            name = ShopService.get_ball_name(ball_type)
+            name = get_pokeball_name(ball_type)
             qty = self.inventory.get_quantity(ball_type)
-            price, currency_type = POKEBALL_PRICES.get(ball_type, (0, 0))
-            catch_bonus = POKEBALL_CATCH_BONUS.get(ball_type, 0)
+            price, currency_type = ShopService.get_ball_price(ball_type)
+            catch_bonus = ShopService.get_ball_catch_bonus(ball_type)
 
-            # Currency display
-            if currency_type == Currency.POKEDOLLAR:
-                price_str = f"{price:,} {money_emoji}"
-            else:
-                price_str = f"{price:,} {quest_emoji}"
+            # Currency display using centralized format_currency
+            price_str = format_currency(price, Currency(currency_type))
 
             # Catch bonus display
             if ball_type == Pokeball.MASTERBALL:
@@ -175,7 +181,7 @@ class ShopView(LayoutView):
             section = Section(
                 ball_title,
                 ball_details,
-                accessory=BuyBallButton(ball_type, self.user),
+                accessory=BuyBallButton(ball_type, self.player_id),
             )
             container.add_item(section)
 
@@ -190,8 +196,8 @@ class ShopView(LayoutView):
         self, interaction: Interaction, success_message: str = ""
     ) -> None:
         """Refresh the shop UI after a purchase."""
-        # Re-fetch data
-        self.wallet = (await ShopService.get_shop_inventory(self.user))["wallet"]
+        # Re-fetch data using player_id
+        self.wallet = (await ShopService.get_shop_inventory(self.player_id))["wallet"]
         await self.inventory.refresh_from_db()
 
         # Rebuild UI

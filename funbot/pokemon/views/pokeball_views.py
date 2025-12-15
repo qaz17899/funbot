@@ -11,7 +11,12 @@ import discord
 from discord import ui
 
 from funbot.pokemon.constants.enums import Pokeball
-from funbot.pokemon.ui_utils import POKEBALL_EMOJI_IDS, Emoji, get_ball_emoji
+from funbot.pokemon.ui_utils import (
+    Emoji,
+    get_ball_emoji,
+    get_ball_partial_emoji,
+    get_pokeball_name,
+)
 
 if TYPE_CHECKING:
     from funbot.db.models.pokemon import PlayerPokeballSettings
@@ -22,7 +27,11 @@ class PokeballSelect(ui.Select["PokeballSettingsLayout"]):
     """Select menu for choosing pokeball for a category."""
 
     def __init__(
-        self, category: str, label: str, settings: PlayerPokeballSettings, discord_user_id: int
+        self,
+        category: str,
+        label: str,
+        settings: PlayerPokeballSettings,
+        discord_user_id: int,
     ) -> None:
         self.category = category
         self.settings = settings
@@ -34,31 +43,31 @@ class PokeballSelect(ui.Select["PokeballSettingsLayout"]):
             discord.SelectOption(
                 label="不捕捉",
                 value=str(Pokeball.NONE),
-                emoji=discord.PartialEmoji(name="None", id=POKEBALL_EMOJI_IDS["None"]),
+                emoji=get_ball_partial_emoji(Pokeball.NONE),
                 default=current_value == Pokeball.NONE,
             ),
             discord.SelectOption(
                 label="Poké Ball",
                 value=str(Pokeball.POKEBALL),
-                emoji=discord.PartialEmoji(name="Pokeball", id=POKEBALL_EMOJI_IDS["Pokeball"]),
+                emoji=get_ball_partial_emoji(Pokeball.POKEBALL),
                 default=current_value == Pokeball.POKEBALL,
             ),
             discord.SelectOption(
                 label="Great Ball",
                 value=str(Pokeball.GREATBALL),
-                emoji=discord.PartialEmoji(name="Greatball", id=POKEBALL_EMOJI_IDS["Greatball"]),
+                emoji=get_ball_partial_emoji(Pokeball.GREATBALL),
                 default=current_value == Pokeball.GREATBALL,
             ),
             discord.SelectOption(
                 label="Ultra Ball",
                 value=str(Pokeball.ULTRABALL),
-                emoji=discord.PartialEmoji(name="Ultraball", id=POKEBALL_EMOJI_IDS["Ultraball"]),
+                emoji=get_ball_partial_emoji(Pokeball.ULTRABALL),
                 default=current_value == Pokeball.ULTRABALL,
             ),
             discord.SelectOption(
                 label="Master Ball",
                 value=str(Pokeball.MASTERBALL),
-                emoji=discord.PartialEmoji(name="Masterball", id=POKEBALL_EMOJI_IDS["Masterball"]),
+                emoji=get_ball_partial_emoji(Pokeball.MASTERBALL),
                 default=current_value == Pokeball.MASTERBALL,
             ),
         ]
@@ -91,7 +100,11 @@ class PokeballSelectActionRow(ui.ActionRow["PokeballSettingsLayout"]):
     """ActionRow containing a pokeball select menu."""
 
     def __init__(
-        self, category: str, label: str, settings: PlayerPokeballSettings, discord_user_id: int
+        self,
+        category: str,
+        label: str,
+        settings: PlayerPokeballSettings,
+        discord_user_id: int,
     ) -> None:
         super().__init__()
         self.add_item(PokeballSelect(category, label, settings, discord_user_id))
@@ -125,11 +138,13 @@ class PokeballSettingsLayout(ui.LayoutView):
         for key, name in categories:
             current_value = getattr(settings, key)
             ball_emoji = get_ball_emoji(current_value)
-            ball_name = Pokeball(current_value).name.replace("_", " ").title()
+            ball_name = get_pokeball_name(current_value)
 
             container.add_item(ui.TextDisplay(f"### {name}"))
             container.add_item(ui.TextDisplay(f"目前: {ball_emoji} {ball_name}"))
-            container.add_item(PokeballSelectActionRow(key, name, settings, discord_user_id))
+            container.add_item(
+                PokeballSelectActionRow(key, name, settings, discord_user_id)
+            )
 
         container.add_item(ui.Separator(spacing=discord.SeparatorSpacing.large))
         container.add_item(ui.TextDisplay("-# 選擇後會自動儲存"))

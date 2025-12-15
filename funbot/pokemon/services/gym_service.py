@@ -12,18 +12,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
-from urllib.parse import quote
 
 from funbot.db.models.pokemon.gym_data import GymData, GymPokemon, PlayerBadge
-from funbot.db.models.pokemon.player_pokemon import PlayerPokemon
-
-# Constants
-GYM_TIME_LIMIT = 30  # seconds
-# Damage multiplier to compensate for no click attack in Discord bot
-# Original Pokeclicker has both auto-attack AND click attack
-GYM_DAMAGE_MULTIPLIER = 2
-POKECLICKER_NPC_BASE_URL = "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/npcs"
-POKECLICKER_BADGE_BASE_URL = "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/badges"
+from funbot.pokemon.constants.game_constants import GYM_TIME_LIMIT
+from funbot.pokemon.services.battle_service import BattleService
 
 
 class GymBattleStatus(Enum):
@@ -94,33 +86,11 @@ class GymBattleResult:
 
 
 class GymService:
-    """Service for gym battle operations."""
+    """Service for gym battle operations.
 
-    @staticmethod
-    def get_leader_image_url(leader_name: str) -> str:
-        """Get the URL for a gym leader's image.
-
-        Args:
-            leader_name: Name of the gym leader (e.g., "Brock")
-
-        Returns:
-            URL to the leader's image on Pokeclicker GitHub
-        """
-        # URL encode the name for special characters
-        encoded_name = quote(leader_name)
-        return f"{POKECLICKER_NPC_BASE_URL}/{encoded_name}.png"
-
-    @staticmethod
-    def get_badge_image_url(badge_name: str) -> str:
-        """Get the URL for a badge's image.
-
-        Args:
-            badge_name: Name of the badge (e.g., "Boulder")
-
-        Returns:
-            URL to the badge's image on Pokeclicker GitHub
-        """
-        return f"{POKECLICKER_BADGE_BASE_URL}/{badge_name}.svg"
+    Note: Image URL functions (get_leader_image_url, get_badge_image_url)
+    have been moved to ui_utils.py to maintain separation of concerns.
+    """
 
     @staticmethod
     async def get_gym_by_name(name: str) -> GymData | None:
@@ -147,61 +117,70 @@ class GymService:
         return await GymData.filter(region=region).order_by("id").all()
 
     @staticmethod
-    async def get_player_badges(user_id: int) -> list[str]:
+    async def search_gyms_for_autocomplete(
+        player_id: int, region: int, query: str = "", limit: int = 25
+    ) -> list[tuple[GymData, bool]]:
+        """Search gyms in a region with badge status for autocomplete.
+
+        Args:
+            player_id: The player's user ID
+            region: The region to search in
+            query: Search query string (filters by name)
+            limit: Max results
+
+        Returns:
+            List of (GymData, has_badge) tuples
+        """
+        # Build query
+        gym_query = GymData.filter(region=region)
+        if query:
+            gym_query = gym_query.filter(name__icontains=query)
+
+        gyms = await gym_query.order_by("id").limit(limit).all()
+
+        if not gyms:
+            return []
+
+        # Get player badges (badge count is low, so fetching all is fine)
+        player_badges = await PlayerBadge.filter(user_id=player_id).values_list(
+            "badge", flat=True
+        )
+        player_badge_set = set(player_badges)
+
+        return [(gym, gym.badge in player_badge_set) for gym in gyms]
+
+    @staticmethod
+    async def get_player_badges(player_id: int) -> list[str]:
         """Get list of badge names the player has earned.
 
         Args:
-            user_id: Discord user ID
+            player_id: The player's user ID
 
         Returns:
             List of badge names
         """
-        badges = await PlayerBadge.filter(user_id=user_id).all()
+        badges = await PlayerBadge.filter(user_id=player_id).all()
         return [b.badge for b in badges]
 
     @staticmethod
-    async def has_badge(user_id: int, badge_name: str) -> bool:
+    async def has_badge(player_id: int, badge_name: str) -> bool:
         """Check if player has a specific badge.
 
         Args:
-            user_id: Discord user ID
+            player_id: The player's user ID
             badge_name: Name of the badge
 
         Returns:
             True if player has the badge
         """
-        return await PlayerBadge.filter(user_id=user_id, badge=badge_name).exists()
+        return await PlayerBadge.filter(user_id=player_id, badge=badge_name).exists()
 
     @staticmethod
-    async def calculate_party_attack(user_id: int) -> int:
-        """Calculate total party attack power.
-
-        Args:
-            user_id: Discord user ID
-
-        Returns:
-            Total attack power of player's party
-        """
-        # Get all party Pokemon (not in breeding) with pokemon_data prefetched
-        party = (
-            await PlayerPokemon.filter(user_id=user_id, breeding=False)
-            .prefetch_related("pokemon_data")
-            .all()
-        )
-
-        # Sum attack values using the calculate_attack method
-        total = 0
-        for p in party:
-            if p.pokemon_data:
-                total += p.calculate_attack(p.pokemon_data.base_attack)
-        return max(1, total)  # Minimum 1 attack
-
-    @staticmethod
-    async def start_battle(user_id: int, gym: GymData) -> GymBattleState:
+    async def start_battle(player_id: int, gym: GymData) -> GymBattleState:
         """Start a gym battle.
 
         Args:
-            user_id: Player's Discord ID
+            player_id: Player's Discord ID
             gym: The gym to challenge
 
         Returns:
@@ -231,8 +210,8 @@ class GymService:
             for gp in gym_pokemon_models
         ]
 
-        # Calculate player attack
-        player_attack = await GymService.calculate_party_attack(user_id)
+        # Calculate player attack using centralized BattleService
+        player_attack = await BattleService.get_player_party_attack(player_id)
 
         return GymBattleState(
             gym=gym,
@@ -267,9 +246,9 @@ class GymService:
         # Apply damage to current Pokemon
         current = state.current_pokemon
         if current:
-            # Damage = player attack * delta * multiplier
-            # Multiplier compensates for no click attack in Discord bot
-            damage = int(state.player_attack * delta * GYM_DAMAGE_MULTIPLIER)
+            # Use centralized damage calculation from BattleService
+            base_damage = BattleService.calculate_damage_per_tick(state.player_attack)
+            damage = int(base_damage * delta)
             current.current_hp = max(0, current.current_hp - damage)
 
             # Check if defeated
@@ -283,11 +262,11 @@ class GymService:
         return state
 
     @staticmethod
-    async def complete_battle(user_id: int, state: GymBattleState) -> GymBattleResult:
+    async def complete_battle(player_id: int, state: GymBattleState) -> GymBattleResult:
         """Complete a gym battle and award rewards.
 
         Args:
-            user_id: Player's Discord ID
+            player_id: Player's Discord ID
             state: Final battle state
 
         Returns:
@@ -305,18 +284,18 @@ class GymService:
             money_earned = state.gym.money_reward
 
             # Check if this is first win
-            already_has_badge = await GymService.has_badge(user_id, badge_name)
+            already_has_badge = await GymService.has_badge(player_id, badge_name)
 
             if not already_has_badge:
                 is_first_win = True
 
                 # Award badge
                 await PlayerBadge.create(
-                    user_id=user_id, badge=badge_name, badge_id=state.gym.badge_id
+                    user_id=player_id, badge=badge_name, badge_id=state.gym.badge_id
                 )
 
             # Award money via wallet
-            wallet = await PlayerWallet.filter(user_id=user_id).first()
+            wallet = await PlayerWallet.filter(user_id=player_id).first()
             if wallet:
                 await wallet.add_pokedollar(money_earned)
 
@@ -345,17 +324,17 @@ class GymService:
         # Calculate total gym HP
         total_gym_hp = sum(gp.max_hp for gp in state.gym_pokemon)
 
-        # Calculate ticks needed (with damage multiplier)
-        effective_attack = state.player_attack * GYM_DAMAGE_MULTIPLIER
-        if effective_attack <= 0:
-            state.status = GymBattleStatus.LOST
-            return state
+        # Use BattleService SSOT for win/lose check
+        can_win = BattleService.can_defeat_enemy(
+            total_gym_hp, state.player_attack, max_ticks=GYM_TIME_LIMIT
+        )
 
-        ticks_needed = (total_gym_hp + effective_attack - 1) // effective_attack
-
-        if ticks_needed <= GYM_TIME_LIMIT:
+        if can_win:
             # Win!
             state.status = GymBattleStatus.WON
+            ticks_needed = BattleService.calculate_ticks_to_defeat(
+                total_gym_hp, state.player_attack
+            )
             state.time_remaining = GYM_TIME_LIMIT - ticks_needed
             state.current_pokemon_index = len(state.gym_pokemon)
 
@@ -368,7 +347,10 @@ class GymService:
             state.time_remaining = 0
 
             # Calculate damage dealt and update HP sequentially (with multiplier)
-            damage_dealt = effective_attack * GYM_TIME_LIMIT
+            damage_per_tick = BattleService.calculate_damage_per_tick(
+                state.player_attack
+            )
+            damage_dealt = damage_per_tick * GYM_TIME_LIMIT
             for i, gp in enumerate(state.gym_pokemon):
                 if damage_dealt >= gp.max_hp:
                     damage_dealt -= gp.max_hp

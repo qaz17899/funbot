@@ -5,7 +5,7 @@ Centralized location for all Pokemon-related enumerations.
 
 from __future__ import annotations
 
-from enum import IntEnum, auto
+from enum import Enum, IntEnum, auto
 
 # =============================================================================
 # Pokemon Types and Regions
@@ -112,3 +112,18 @@ class PokerusState(IntEnum):
     INFECTED = 1  # Just contracted, needs to hatch once
     CONTAGIOUS = 2  # Can gain EVs and spread
     RESISTANT = 3  # EVs >= 50, permanent EV gains
+
+
+# =============================================================================
+# Loot and Rewards
+# =============================================================================
+
+
+class LootTier(str, Enum):
+    """Loot tier classifications matching PokeClicker."""
+
+    COMMON = "common"
+    RARE = "rare"
+    EPIC = "epic"
+    LEGENDARY = "legendary"
+    MYTHIC = "mythic"

@@ -13,6 +13,7 @@ from dataclasses import dataclass
 
 from funbot.pokemon.constants.enums import PokemonType
 from funbot.pokemon.constants.game_constants import (
+    BOT_CLICK_MULTIPLIER,
     ROUTE_HEALTH_BASE,
     ROUTE_HEALTH_MIN,
     ROUTE_MONEY_BASE,
@@ -53,6 +54,34 @@ class BattleService:
     """Service for battle calculations."""
 
     @staticmethod
+    async def get_player_party_attack(player_id: int) -> int:
+        """Calculate total party attack power for a player.
+
+        Standardized method for fetching player attack.
+        Excludes Pokemon currently in the hatchery (breeding).
+
+        Args:
+            player_id: The player's user ID
+
+        Returns:
+            Total party attack power (minimum 1)
+        """
+        from funbot.db.models.pokemon.player_pokemon import PlayerPokemon
+
+        party = (
+            await PlayerPokemon.filter(user_id=player_id, breeding=False)
+            .prefetch_related("pokemon_data")
+            .all()
+        )
+
+        total_attack = sum(
+            p.calculate_attack(p.pokemon_data.base_attack)
+            for p in party
+            if p.pokemon_data
+        )
+        return max(1, total_attack)
+
+    @staticmethod
     def calculate_route_health(route: int, region: int) -> int:
         """Calculate enemy Pokemon health for a route.
 
@@ -69,12 +98,16 @@ class BattleService:
         normalized_route = route  # TODO: normalize route based on region
         # Issue URL: https://github.com/qaz17899/funbot/issues/17
         health = int(
-            ROUTE_HEALTH_BASE * pow(pow(normalized_route, 2.2) / 12, 1.15) * (1 + region / 20)
+            ROUTE_HEALTH_BASE
+            * pow(pow(normalized_route, 2.2) / 12, 1.15)
+            * (1 + region / 20)
         )
         return max(ROUTE_HEALTH_MIN, health)
 
     @staticmethod
-    def calculate_route_money(route: int, region: int, use_deviation: bool = True) -> int:
+    def calculate_route_money(
+        route: int, region: int, use_deviation: bool = True
+    ) -> int:
         """Calculate money earned from defeating a Pokemon on route.
 
         Formula (Pokeclicker exact): 3 * route + 5 * route^1.15 + random(-25, 25)
@@ -93,12 +126,13 @@ class BattleService:
 
     @staticmethod
     def calculate_dungeon_tokens(route: int, region: int) -> int:
-        """Calculate dungeon tokens earned from route.
+        """Calculate dungeon tokens earned.
 
+        Awarded on successful catches and dungeon completion.
         Formula (Pokeclicker exact): max(1, 6 * pow(route * 2 / (2.8 / (1 + region / 3)), 1.08))
 
         Args:
-            route: Normalized route number
+            route: Normalized route number (or dungeon difficulty)
             region: Region index
 
         Returns:
@@ -136,7 +170,9 @@ class BattleService:
             poke_type2 = pokemon.get("type2", PokemonType.NONE)
 
             # Calculate type effectiveness
-            modifier = get_attack_modifier(poke_type1, poke_type2, enemy_type1, enemy_type2)
+            modifier = get_attack_modifier(
+                poke_type1, poke_type2, enemy_type1, enemy_type2
+            )
 
             # Add modified attack to total
             total_attack += int(base_attack * modifier)
@@ -144,22 +180,44 @@ class BattleService:
         return total_attack
 
     @staticmethod
+    def calculate_damage_per_tick(party_attack: int) -> int:
+        """Calculate damage dealt per tick based on party attack.
+
+        Applies BOT_CLICK_MULTIPLIER to compensate for Discord bot
+        not having click attacks like the original Pokeclicker game.
+
+        Args:
+            party_attack: Total party attack power
+
+        Returns:
+            Damage dealt per tick (minimum 1)
+        """
+        return max(1, int(party_attack * BOT_CLICK_MULTIPLIER))
+
+    @staticmethod
     def calculate_ticks_to_defeat(enemy_health: int, party_attack: int) -> int:
         """Calculate how many ticks to defeat enemy.
 
+        Uses calculate_damage_per_tick() for consistent damage calculation.
+
         Args:
             enemy_health: Enemy's max health
-            party_attack: Total party attack per tick
+            party_attack: Total party attack power (before multiplier)
 
         Returns:
             Number of ticks (rounds up if not exact)
         """
         if party_attack <= 0:
             return 999999  # Can't defeat
-        return max(1, (enemy_health + party_attack - 1) // party_attack)
+
+        damage = BattleService.calculate_damage_per_tick(party_attack)
+        # Ceiling division: (a + b - 1) // b
+        return max(1, (enemy_health + damage - 1) // damage)
 
     @staticmethod
-    def can_defeat_enemy(enemy_health: int, party_attack: int, max_ticks: int = 100) -> bool:
+    def can_defeat_enemy(
+        enemy_health: int, party_attack: int, max_ticks: int = 100
+    ) -> bool:
         """Check if party can defeat enemy within tick limit.
 
         Args:

@@ -2,32 +2,34 @@
 
 Handles Pokeball purchases and other shop transactions.
 Matches Pokeclicker's Shop.ts and PokeballItem.ts mechanics.
+
+Note: All methods use player_id: int for consistency with other services.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 
 from funbot.db.models.pokemon.player_ball_inventory import PlayerBallInventory
 from funbot.db.models.pokemon.player_wallet import PlayerWallet
-from funbot.pokemon.constants.enums import Currency, Pokeball
-from funbot.pokemon.constants.game_constants import POKEBALL_PRICES
-from funbot.pokemon.ui_utils import get_currency_emoji
-
-if TYPE_CHECKING:
-    from funbot.db.models.user import User
+from funbot.pokemon.constants.enums import Currency
+from funbot.pokemon.constants.game_constants import POKEBALL_CATCH_BONUS, POKEBALL_PRICES
 
 
 @dataclass
 class PurchaseResult:
-    """Result of a purchase attempt."""
+    """Result of a purchase attempt.
+
+    Contains pure data - View layer handles formatting with emojis.
+    """
 
     success: bool
     message: str
     quantity: int = 0
     total_cost: int = 0
     new_balance: int = 0
+    ball_type: int = 0  # For View to format ball name
+    currency_type: int = 0  # For View to format currency emoji
 
 
 class ShopService:
@@ -52,24 +54,25 @@ class ShopService:
         return POKEBALL_PRICES.get(ball_type, (0, 0))
 
     @staticmethod
-    def get_ball_name(ball_type: int) -> str:
-        """Get display name for a ball type."""
-        names: dict[int, str] = {
-            Pokeball.POKEBALL: "Poké Ball",
-            Pokeball.GREATBALL: "Great Ball",
-            Pokeball.ULTRABALL: "Ultra Ball",
-            Pokeball.MASTERBALL: "Master Ball",
-        }
-        return names.get(ball_type, "Unknown Ball")
+    def get_ball_catch_bonus(ball_type: int) -> int:
+        """Get catch bonus percentage for a ball type.
+
+        Args:
+            ball_type: Pokeball enum value
+
+        Returns:
+            Bonus percentage (e.g., 5 for 5%)
+        """
+        return POKEBALL_CATCH_BONUS.get(ball_type, 0)
 
     @staticmethod
     async def can_afford(
-        user: User, ball_type: int, amount: int
+        player_id: int, ball_type: int, amount: int
     ) -> tuple[bool, int, int]:
         """Check if user can afford a purchase.
 
         Args:
-            user: The user
+            player_id: The player's user ID
             ball_type: Pokeball enum value
             amount: Number to purchase
 
@@ -79,7 +82,7 @@ class ShopService:
         price, currency_type = ShopService.get_ball_price(ball_type)
         total_cost = price * amount
 
-        wallet, _ = await PlayerWallet.get_or_create(user=user)
+        wallet, _ = await PlayerWallet.get_or_create(user_id=player_id)
 
         # Get current balance based on currency type
         if currency_type == Currency.POKEDOLLAR:
@@ -96,7 +99,9 @@ class ShopService:
         return balance >= total_cost, total_cost, balance
 
     @staticmethod
-    async def buy_pokeballs(user: User, ball_type: int, amount: int) -> PurchaseResult:
+    async def buy_pokeballs(
+        player_id: int, ball_type: int, amount: int
+    ) -> PurchaseResult:
         """Purchase Pokeballs.
 
         Matches Pokeclicker mechanics:
@@ -105,7 +110,7 @@ class ShopService:
         - Purchase statistics tracking
 
         Args:
-            user: The user making the purchase
+            player_id: The player's user ID
             ball_type: Pokeball enum value (1-4)
             amount: Number of balls to buy
 
@@ -120,27 +125,24 @@ class ShopService:
 
         # Check affordability
         can_afford, total_cost, balance = await ShopService.can_afford(
-            user, ball_type, amount
+            player_id, ball_type, amount
         )
 
         if not can_afford:
-            _price, currency_type = ShopService.get_ball_price(ball_type)
-            # Get currency emoji based on type
-            currency_emoji_map = {
-                Currency.POKEDOLLAR: get_currency_emoji("money"),
-                Currency.QUEST_POINT: get_currency_emoji("questPoint"),
-                Currency.DUNGEON_TOKEN: get_currency_emoji("dungeonToken"),
-                Currency.BATTLE_POINT: get_currency_emoji("battlePoint"),
-            }
-            currency_emoji = currency_emoji_map.get(Currency(currency_type), "💰")
+            _, currency_type = ShopService.get_ball_price(ball_type)
+            # Return pure data - View layer handles formatting with emojis
             return PurchaseResult(
                 success=False,
-                message=f"資金不足！需要 {total_cost:,} {currency_emoji}，你只有 {balance:,} {currency_emoji}",
+                message="資金不足",
+                quantity=0,
+                total_cost=total_cost,
+                new_balance=balance,
+                currency_type=currency_type,
             )
 
         # Deduct currency
         _, currency_type = ShopService.get_ball_price(ball_type)
-        wallet, _ = await PlayerWallet.get_or_create(user=user)
+        wallet, _ = await PlayerWallet.get_or_create(user_id=player_id)
 
         if currency_type == Currency.POKEDOLLAR:
             new_balance = await wallet.add_pokedollar(-total_cost)
@@ -150,37 +152,41 @@ class ShopService:
             new_balance = 0
 
         # Add balls to inventory
-        inventory, _ = await PlayerBallInventory.get_or_create(user=user)
+        inventory, _ = await PlayerBallInventory.get_or_create(user_id=player_id)
         await inventory.gain_balls(ball_type, amount, purchased=True)
 
-        ball_name = ShopService.get_ball_name(ball_type)
-
+        # Return pure data - View layer handles formatting
         return PurchaseResult(
             success=True,
-            message=f"成功購買 {amount} 個 {ball_name}！",
+            message="購買成功",
             quantity=amount,
             total_cost=total_cost,
             new_balance=new_balance,
+            ball_type=ball_type,
+            currency_type=currency_type,
         )
 
     @staticmethod
-    async def get_shop_inventory(user: User) -> dict:
+    async def get_shop_inventory(player_id: int) -> dict:
         """Get shop inventory with prices and user's current quantities.
+
+        Args:
+            player_id: The player's user ID
 
         Returns:
             Dict with ball info for shop display
         """
-        wallet, _ = await PlayerWallet.get_or_create(user=user)
-        inventory, _ = await PlayerBallInventory.get_or_create(user=user)
+        wallet, _ = await PlayerWallet.get_or_create(user_id=player_id)
+        inventory, _ = await PlayerBallInventory.get_or_create(user_id=player_id)
 
         shop_items = []
         for ball_type, (price, currency_type) in POKEBALL_PRICES.items():
             shop_items.append(
                 {
                     "ball_type": ball_type,
-                    "name": ShopService.get_ball_name(ball_type),
+                    # name removed - View layer uses get_pokeball_name()
                     "price": price,
-                    "currency": Currency(currency_type).name,
+                    "currency_type": currency_type,
                     "owned": inventory.get_quantity(ball_type),
                 }
             )

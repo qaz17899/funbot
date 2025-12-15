@@ -2,29 +2,64 @@
 
 Contains emoji mappings and other UI helpers used across multiple cogs.
 Discord custom emoji IDs are used for pokeballs, currencies, and items.
+
+Key naming conventions:
+- Currency keys use snake_case to match Python conventions and Enum names
+- Pokeball keys use PascalCase to match Discord emoji names
 """
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+from urllib.parse import quote
+
+import discord
+
+from funbot.pokemon.constants.enums import Currency, LootTier, Pokeball, Region
+from funbot.pokemon.constants.game_constants import ROUTE_KILLS_NEEDED
+
+if TYPE_CHECKING:
+    from funbot.db.models.pokemon.route_data import RouteData
+
 __all__ = (
-    # Badges
+    # Constants (alphabetical)
     "BADGE_EMOJI_IDS",
-    # Currency
     "CURRENCY_EMOJI_IDS",
-    # Gems
+    "DUNGEON_STATUS_EMOJI",
+    "DUNGEON_TILE_EMOJI",
     "GEM_EMOJI_IDS",
-    # Pokeballs
+    "GYM_STATUS_EMOJI",
+    "LOOT_TIER_EMOJIS",
+    "POKEBALL_DISPLAY_NAMES",
     "POKEBALL_EMOJI_IDS",
-    # Types
+    "POKECLICKER_BADGE_BASE_URL",
+    "POKECLICKER_NPC_BASE_URL",
+    "REGION_DISPLAY_NAMES",
+    "ROUTE_STATUS_EMOJI",
     "TYPE_EMOJIS",
-    # Common emojis (new)
+    # Classes
     "Emoji",
+    # Functions (alphabetical)
+    "build_progress_bar",
+    "format_currency",
+    "format_dungeon_choice",
+    "format_gym_choice",
+    "format_route_choice",
     "get_badge_emoji",
+    "get_badge_image_url",
     "get_ball_emoji",
+    "get_ball_partial_emoji",
     "get_currency_emoji",
     "get_gem_emoji",
+    "get_leader_image_url",
+    "get_loot_tier_emoji",
+    "get_pokeball_name",
     "get_type_emoji",
 )
+
+# Pokeclicker asset URLs (moved from GymService)
+POKECLICKER_NPC_BASE_URL = "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/npcs"
+POKECLICKER_BADGE_BASE_URL = "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/badges"
 
 
 class Emoji:
@@ -84,6 +119,157 @@ def get_type_emoji(type_id: int) -> str:
     return TYPE_EMOJIS.get(type_id, "⚪")
 
 
+# Route Status Emojis (used by RouteStatusService)
+ROUTE_STATUS_EMOJI: dict[int, str] = {
+    0: "🔒",  # LOCKED
+    1: "⚔️",  # INCOMPLETE
+    2: "📋",  # QUEST_AT_LOCATION
+    3: "🆕",  # UNCAUGHT_POKEMON
+    4: "✨",  # UNCAUGHT_SHINY
+    5: "🌈",  # COMPLETED
+}
+
+# Dungeon Status Emojis (SSOT for dungeon list views and autocomplete)
+DUNGEON_STATUS_EMOJI: dict[str, str] = {
+    "LOCKED": "🔒",
+    "AVAILABLE": "⚔️",
+    "COMPLETED": "✅",
+}
+
+# Gym Status Emojis (SSOT for gym list views and autocomplete)
+GYM_STATUS_EMOJI: dict[str, str] = {
+    "AVAILABLE": "⚔️",  # Default state (Available to challenge)
+    "COMPLETED": "🏅",  # Has badge
+}
+
+# Dungeon Tile Emojis (used by DungeonMapView)
+DUNGEON_TILE_EMOJI: dict[str, str] = {
+    "entrance": "🚪",
+    "enemy": "👾",
+    "chest": "📦",
+    "boss": "👹",
+    "empty": "⬜",
+    "ladder": "🪜",
+    "fog": "⬛",  # Unrevealed tile
+    "player": "🧑",  # Player position
+}
+
+# Loot Tier Emojis
+LOOT_TIER_EMOJIS: dict[LootTier, str] = {
+    LootTier.COMMON: "⚪",
+    LootTier.RARE: "🔵",
+    LootTier.EPIC: "🟣",
+    LootTier.LEGENDARY: "🟡",
+    LootTier.MYTHIC: "🔴",
+}
+
+# Region Display Names (centralized, with localized names)
+REGION_DISPLAY_NAMES: dict[int, str] = {
+    Region.KANTO: "關都 Kanto",
+    Region.JOHTO: "城都 Johto",
+    Region.HOENN: "豐緣 Hoenn",
+    Region.SINNOH: "神奧 Sinnoh",
+    Region.UNOVA: "合眾 Unova",
+    Region.KALOS: "卡洛斯 Kalos",
+    Region.ALOLA: "阿羅拉 Alola",
+    Region.GALAR: "伽勒爾 Galar",
+    Region.PALDEA: "帕底亞 Paldea",
+}
+
+# Pokeball Display Names
+POKEBALL_DISPLAY_NAMES: dict[int, str] = {
+    Pokeball.NONE: "None",
+    Pokeball.POKEBALL: "Poké Ball",
+    Pokeball.GREATBALL: "Great Ball",
+    Pokeball.ULTRABALL: "Ultra Ball",
+    Pokeball.MASTERBALL: "Master Ball",
+}
+
+
+def get_pokeball_name(ball: int | Pokeball) -> str:
+    """Get display name for a Pokeball type.
+
+    Args:
+        ball: Pokeball enum or integer value
+
+    Returns:
+        Display name string (e.g., "Poké Ball")
+    """
+    ball_val = int(ball)
+    return POKEBALL_DISPLAY_NAMES.get(ball_val, "Unknown Ball")
+
+
+def get_loot_tier_emoji(tier: str | LootTier) -> str:
+    """Get emoji for loot tier.
+
+    Args:
+        tier: LootTier enum or string value
+
+    Returns:
+        Emoji string
+    """
+    if isinstance(tier, str):
+        try:
+            tier = LootTier(tier.lower())
+        except ValueError:
+            return "⚪"
+    return LOOT_TIER_EMOJIS.get(tier, "⚪")
+
+
+def build_progress_bar(
+    current: int | float,
+    maximum: int | float,
+    width: int = 16,
+    show_values: bool = True,
+) -> str:
+    """Build a visual progress/health bar.
+
+    Centralized function for all progress bar rendering.
+
+    Args:
+        current: Current value
+        maximum: Maximum value
+        width: Number of characters in bar
+        show_values: Whether to show "current/max" text
+
+    Returns:
+        Progress bar string like "████████░░░░░░░░ 432/693"
+    """
+    if maximum <= 0:
+        bar = Emoji.PROGRESS_EMPTY * width
+        return f"{bar} 0/0" if show_values else bar
+
+    percent = max(0.0, min(1.0, current / maximum))
+    filled = int(percent * width)
+    empty = width - filled
+
+    bar = Emoji.PROGRESS * filled + Emoji.PROGRESS_EMPTY * empty
+
+    if not show_values:
+        return bar
+
+    # Format numbers with commas for integers
+    if isinstance(current, int) and isinstance(maximum, int):
+        return f"{bar} {current:,}/{maximum:,}"
+    return f"{bar} {current:.1f}/{maximum:.1f}"
+
+
+def format_currency(amount: int, currency: str | Currency) -> str:
+    """Format currency amount with emoji and thousands separator.
+
+    Centralized function for consistent currency display across all Views.
+
+    Args:
+        amount: The amount of currency
+        currency: Currency enum or string key
+
+    Returns:
+        Formatted string (e.g., "1,000 💰")
+    """
+    emoji = get_currency_emoji(currency)
+    return f"{amount:,} {emoji}"
+
+
 # Discord custom emoji IDs for pokeballs
 POKEBALL_EMOJI_IDS: dict[str, int] = {
     "None": 1449471351818551437,
@@ -113,32 +299,61 @@ POKEBALL_EMOJI_IDS: dict[str, int] = {
     "Rocketball": 1449471365659885679,
 }
 
-# Pokeball enum value to emoji name mapping
+# Pokeball enum value to emoji name mapping (Maps Enum to POKEBALL_EMOJI_IDS keys)
 BALL_ENUM_TO_NAME: dict[int, str] = {
-    0: "None",
-    1: "Pokeball",
-    2: "Greatball",
-    3: "Ultraball",
-    4: "Masterball",
+    Pokeball.NONE: "None",
+    Pokeball.POKEBALL: "Pokeball",
+    Pokeball.GREATBALL: "Greatball",
+    Pokeball.ULTRABALL: "Ultraball",
+    Pokeball.MASTERBALL: "Masterball",
 }
 
 
-def get_ball_emoji(ball_id: int) -> str:
-    """Get Discord custom emoji for Pokeball type."""
-    name = BALL_ENUM_TO_NAME.get(ball_id, "Pokeball")
-    emoji_id = POKEBALL_EMOJI_IDS[name]
+def get_ball_emoji(ball: int | Pokeball) -> str:
+    """Get Discord custom emoji for Pokeball type.
+
+    Args:
+        ball: Pokeball enum or integer value
+
+    Returns:
+        Discord custom emoji string
+    """
+    ball_val = int(ball)
+    name = BALL_ENUM_TO_NAME.get(ball_val, "Pokeball")
+    emoji_id = POKEBALL_EMOJI_IDS.get(name, POKEBALL_EMOJI_IDS["Pokeball"])
     return f"<:{name}:{emoji_id}>"
 
 
+def get_ball_partial_emoji(ball: int | Pokeball) -> discord.PartialEmoji:
+    """Get Discord PartialEmoji for Pokeball type.
+
+    Encapsulates emoji ID lookup - View layer doesn't need to know about IDs.
+
+    Args:
+        ball: Pokeball enum or integer value
+
+    Returns:
+        discord.PartialEmoji object for use in SelectOption, etc.
+    """
+    ball_val = int(ball)
+    name = BALL_ENUM_TO_NAME.get(ball_val, "Pokeball")
+    emoji_id = POKEBALL_EMOJI_IDS.get(name, POKEBALL_EMOJI_IDS["Pokeball"])
+    return discord.PartialEmoji(name=name, id=emoji_id)
+
+
 # Discord custom emoji IDs for currencies
+# Keys normalized to snake_case to match Enum names and Python conventions
 CURRENCY_EMOJI_IDS: dict[str, int] = {
+    # Primary currencies (match Currency enum)
     "money": 1449471872482672830,
-    "battlePoint": 1449471848046788639,
-    "dungeonToken": 1449471868103819446,
-    "questPoint": 1449471874902921267,
-    "farmPoint": 1449471869454385235,
-    "contestToken": 1449471864672878682,
+    "pokedollar": 1449471872482672830,  # Alias for money
+    "dungeon_token": 1449471868103819446,
+    "battle_point": 1449471848046788639,
+    "quest_point": 1449471874902921267,
+    "farm_point": 1449471869454385235,
+    "contest_token": 1449471864672878682,
     "diamond": 1449471866220581084,
+    # Coin variants
     "coinyellow": 1449471860738887752,
     "coinwhite": 1449471859123945584,
     "coinred": 1449471857395896463,
@@ -149,11 +364,31 @@ CURRENCY_EMOJI_IDS: dict[str, int] = {
     "coinblue": 1449471849770520647,
 }
 
+# Currency enum to emoji key mapping
+_CURRENCY_ENUM_TO_KEY: dict[Currency, str] = {
+    Currency.POKEDOLLAR: "money",
+    Currency.DUNGEON_TOKEN: "dungeon_token",
+    Currency.BATTLE_POINT: "battle_point",
+    Currency.QUEST_POINT: "quest_point",
+}
 
-def get_currency_emoji(currency: str) -> str:
-    """Get Discord custom emoji for currency type."""
-    emoji_id = CURRENCY_EMOJI_IDS.get(currency, CURRENCY_EMOJI_IDS["money"])
-    return f"<:{currency}:{emoji_id}>"
+
+def get_currency_emoji(currency: str | Currency) -> str:
+    """Get Discord custom emoji for currency type.
+
+    Args:
+        currency: Currency enum or string key (snake_case)
+
+    Returns:
+        Discord custom emoji string
+    """
+    if isinstance(currency, Currency):
+        key = _CURRENCY_ENUM_TO_KEY.get(currency, "money")
+    else:
+        key = currency
+
+    emoji_id = CURRENCY_EMOJI_IDS.get(key, CURRENCY_EMOJI_IDS["money"])
+    return f"<:{key}:{emoji_id}>"
 
 
 # Discord custom emoji IDs for type gems (18 types)
@@ -339,3 +574,121 @@ def get_badge_emoji(badge_name: str) -> str:
     """Get Discord custom emoji for gym badge."""
     emoji_id = BADGE_EMOJI_IDS.get(badge_name, BADGE_EMOJI_IDS["Boulder"])
     return f"<:{badge_name}:{emoji_id}>"
+
+
+# =============================================================================
+# UI Formatting Functions (moved from Service layer for separation of concerns)
+# =============================================================================
+
+
+def get_leader_image_url(leader_name: str) -> str:
+    """Get the URL for a gym leader's image.
+
+    Moved from GymService to decouple Service from UI assets.
+
+    Args:
+        leader_name: Name of the gym leader (e.g., "Brock")
+
+    Returns:
+        URL to the leader's image on Pokeclicker GitHub
+    """
+    encoded_name = quote(leader_name)
+    return f"{POKECLICKER_NPC_BASE_URL}/{encoded_name}.png"
+
+
+def get_badge_image_url(badge_name: str) -> str:
+    """Get the URL for a badge's image.
+
+    Moved from GymService to decouple Service from UI assets.
+
+    Args:
+        badge_name: Name of the badge (e.g., "Boulder")
+
+    Returns:
+        URL to the badge's image on Pokeclicker GitHub
+    """
+    return f"{POKECLICKER_BADGE_BASE_URL}/{badge_name}.svg"
+
+
+def format_route_choice(route: RouteData, status: int, kills: int) -> tuple[str, int]:
+    """Format a route for autocomplete display.
+
+    Moved from RouteStatusService to decouple Service from UI.
+
+    Args:
+        route: The route data
+        status: RouteStatus integer value (0-5)
+        kills: Kill count on this route
+
+    Returns:
+        Tuple of (display_name, route_number) for app_commands.Choice
+    """
+    emoji = ROUTE_STATUS_EMOJI.get(status, "❓")
+    kills_display = f"({kills}/{ROUTE_KILLS_NEEDED})"
+
+    # Add status-specific suffix
+    # RouteStatus: 5=COMPLETED, 3=UNCAUGHT_POKEMON, 4=UNCAUGHT_SHINY
+    suffix = ""
+    if status == 5:  # COMPLETED
+        suffix = " ✓"
+    elif status == 3:  # UNCAUGHT_POKEMON
+        suffix = " | 新"
+    elif status == 4:  # UNCAUGHT_SHINY
+        suffix = " | 閃"
+
+    # Discord autocomplete has 100 char limit for name
+    display = f"{emoji} {route.name} {kills_display}{suffix}"
+    if len(display) > 100:
+        display = display[:97] + "..."
+
+    return display, route.number
+
+
+def format_gym_choice(
+    gym_name: str, gym_leader: str, is_elite: bool, has_badge: bool
+) -> str:
+    """Format a gym for autocomplete display.
+
+    Args:
+        gym_name: Name of the gym/town
+        gym_leader: Name of the gym leader
+        is_elite: Whether this is an Elite Four member
+        has_badge: Whether player has the badge
+
+    Returns:
+        Display name string for app_commands.Choice
+    """
+    status = (
+        GYM_STATUS_EMOJI["COMPLETED"] if has_badge else GYM_STATUS_EMOJI["AVAILABLE"]
+    )
+    elite_prefix = "👑 " if is_elite else ""
+
+    display = f"{status} {elite_prefix}{gym_name} - {gym_leader}"
+    if len(display) > 100:
+        display = display[:97] + "..."
+
+    return display
+
+
+def format_dungeon_choice(dungeon_name: str, clears: int) -> str:
+    """Format a dungeon for autocomplete display.
+
+    Args:
+        dungeon_name: Name of the dungeon
+        clears: Number of times cleared
+
+    Returns:
+        Display name string for app_commands.Choice
+    """
+    status = (
+        DUNGEON_STATUS_EMOJI["COMPLETED"]
+        if clears > 0
+        else DUNGEON_STATUS_EMOJI["AVAILABLE"]
+    )
+    suffix = f" ({clears}次)" if clears > 0 else ""
+
+    display = f"{status} {dungeon_name}{suffix}"
+    if len(display) > 100:
+        display = display[:97] + "..."
+
+    return display
